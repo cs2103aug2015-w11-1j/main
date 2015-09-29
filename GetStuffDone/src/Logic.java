@@ -1,5 +1,11 @@
 import java.util.*;
 
+/*
+ * Logic deals with handling of input commands, CRUD of tasks, update of History and update of Storage
+ * Logic knows the existence of Parser, Task, History and Storage
+ * Logic does not know the existence of UI
+ */
+
 public class Logic {
 	
 	private static final String TASK_NOT_FOUND = "Task was not found";

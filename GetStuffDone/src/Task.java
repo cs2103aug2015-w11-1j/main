@@ -1,5 +1,10 @@
 import java.util.Date;
 
+/*
+ * Task is an object used in GetStuffDone
+ * Task does not know the existence of UI, Logic, Parser, History and Storage
+ */
+
 public class Task {
 	
 	private String description;
