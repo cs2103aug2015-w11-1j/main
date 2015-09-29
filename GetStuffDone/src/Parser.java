@@ -40,6 +40,19 @@ public class Parser{
 	}
 	
 	
+	///////////////////////////////////////////////////
+	
+	private static String getLocation(String input){
+		String result= "";
+		return result;
+	}
+	
+	private static String getDescription(String input){
+		String result= "";
+		return result;
+	}
+	///////////////////////////////////////////////////////
+	
 	private static int getPriority(String input){
 		ArrayList<String> strTokens = new ArrayList<String> (Arrays.asList(input.toUpperCase().split(" ")));
 		if(strTokens.lastIndexOf("PRIORITY") == -1){
