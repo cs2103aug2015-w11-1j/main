@@ -7,7 +7,7 @@ public class Parser{
 	private static Date deadLine = null;
 	private static Date startDate = null;
 	private static String Venue = null;
-	private static int priority;
+	private static String priority;
 	private static String currentDay = getCurrentDay();
 	final static String DATE_FORMAT = "dd/MM/yyyy";
 	
@@ -15,26 +15,15 @@ public class Parser{
 		ADD,DELETE,DONE,UNDO,REDO,SEARCH,HELP,
 	}
 	
-	
-	public Parser(String input){
-		
-		
-	}
-	
-	
-	private static Date getStartDate(String input){
-		Date result = null;
-		
-		ArrayList<String> strTokens = new ArrayList<String> (Arrays.asList(input.toUpperCase().split(" ")));
-
-		
+	private static Date parseStartDate(String input){
+		Date result = new Date();
 		return result;
 		
 	}
 	
 	
-	private static Date getEndDate(String input){
-		Date result= null;
+	private static Date parseEndDate(String input){
+		Date result= new Date();
 		return result;
 		
 	}
@@ -42,39 +31,48 @@ public class Parser{
 	
 	///////////////////////////////////////////////////
 	
-	private static String getLocation(String input){
+	private static String parseLocation(String input){
 		String result= "";
+		
+		ArrayList<String> strTokens = new ArrayList<String> (Arrays.asList(input.toUpperCase().split(" ")));
+		if(strTokens.lastIndexOf("/AT") == -1){
+			return "NONE";
+		}
+		
+		
+		
+		
 		return result;
 	}
 	
-	private static String getDescription(String input){
+	private static String parseDescription(String input){
 		String result= "";
 		return result;
 	}
 	///////////////////////////////////////////////////////
 	
-	private static int getPriority(String input){
+	private static String parsePriority(String input){
 		ArrayList<String> strTokens = new ArrayList<String> (Arrays.asList(input.toUpperCase().split(" ")));
 		if(strTokens.lastIndexOf("PRIORITY") == -1){
-			return 0;
+			return "NONE";
 		}else{
 			int priorityLocate = strTokens.lastIndexOf("PRIORITY") + 1;
 			String priority = strTokens.get(priorityLocate);
 			
 			switch(priority){
 				case "HIGH":
-					return 3;
+					return "HIGH";
 				case "MEDIUM":
-					return 2;
+					return "MEDIUM";
 				case "LOW":
-					return 1;
+					return "LOW";
 				default:
-					return 100; //Invalid priority number
+					return "Invalid priority number"; //Invalid priority number
 			}
 		}
 	}
 	
-	private static COMMANDS getCommandType(String input){
+	private static COMMANDS parseCommandType(String input){
 		
 		String[] temp = input.split(" ");
 		
@@ -111,8 +109,8 @@ public class Parser{
 	}
 	
 	public static void main(String args[]){
-		String input = "add dinner with mum PRiORiTy low";
-		COMMANDS command = getCommandType(input);
-		System.out.println(getPriority(input));
+		String input = "add do code buddy /at home from 29 sept 2015 7pm to 29 sept 2015 11.59pm priority high";
+		COMMANDS command = parseCommandType(input);
+		System.out.println(parsePriority(input));
 	}
 }
