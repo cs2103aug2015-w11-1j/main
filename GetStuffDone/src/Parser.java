@@ -8,6 +8,7 @@ public class Parser{
 	private static Date startDate = null;
 	private static String Venue = null;
 	private static String priority;
+	private static String description;
 	private static String currentDay = getCurrentDay();
 	final static String DATE_FORMAT = "dd/MM/yyyy";
 	
@@ -108,9 +109,71 @@ public class Parser{
 		return ft.format(now);
 	}
 	
+	
+	
+	//creating and sending commandDetails object to logic class
+	static Logic commandDetailsObject = null;
+	Parser (Logic obj) {
+		this.commandDetailsObject = obj;
+	}
+	
+	public static void sendToLogic (Object cmdDetails){
+		commandDetailsObject.setCmdDetailsObj(cmdDetails);
+	}
+	
+	
 	public static void main(String args[]){
 		String input = "add do code buddy /at home from 29 sept 2015 7pm to 29 sept 2015 11.59pm priority high";
 		COMMANDS command = parseCommandType(input);
 		System.out.println(parsePriority(input));
+		
+		//create commandDetailsObject
+		CommandDetails cmdDetails = new CommandDetails(deadLine, startDate, Venue, priority, description);
+		sendToLogic(cmdDetails);
+		
+		
+	}
+}
+
+
+class CommandDetails {
+	private Date deadline;
+	private Date startDate;
+	private String venue, priority, description;
+	
+	public CommandDetails() {
+		this.deadline = null;
+		this.startDate = null;
+		this.venue = null;
+		this.priority = null;
+		this.description = null;
+	}
+	
+	public CommandDetails(Date deadline, Date startDate, String venue, String priority, String description) {
+		this.deadline = deadline;
+		this.startDate = startDate;
+		this.venue = venue;
+		this.priority = priority;
+		this.description = description;
+	}
+	
+	public Date getDeadline() {
+		return this.deadline;
+	}
+	
+	public Date getStartDate() {
+		return this.startDate;
+	}
+	
+	public String getVenue() {
+		return this.venue;
+	}
+	
+	public String getPriority() {
+		return this.priority;
+	}
+	
+	public String getDescription() {
+		return this.description;
 	}
 }
