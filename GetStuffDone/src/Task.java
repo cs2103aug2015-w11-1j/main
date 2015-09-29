@@ -10,7 +10,7 @@ public class Task {
 	
 	private String description;
 	private Date startDate;
-	private Date endDate;
+	private Date deadline;
 	private String venue;
 	private String priority;
 	
@@ -20,15 +20,15 @@ public class Task {
 	public Task()	{
 		description = null;
 		startDate = null;
-		endDate = null;
+		deadline = null;
 		venue = null;
 		priority = null;
 	}
 	
-	public Task(commandDetails details)	{
+	public Task(CommandDetails details)	{
 		this.description = details.getDescription();
 		this.startDate = details.getStartDate();
-		this.endDate = details.getEndDate();
+		this.deadline = details.getDeadline();
 		this.venue = details.getVenue();
 		this.priority = details.getPriority();
 	}
@@ -44,8 +44,8 @@ public class Task {
 		this.startDate = startDate;
 	}
 	
-	public void setEndDate(Date endDate)	{
-		this.endDate = endDate;
+	public void setdeadline(Date deadline)	{
+		this.deadline = deadline;
 	}
 	
 	public void setVenue(String venue)	{
@@ -66,8 +66,8 @@ public class Task {
 		return this.startDate;
 	}
 	
-	public Date getEndDate()	{
-		return this.endDate;
+	public Date getdeadline()	{
+		return this.deadline;
 	}
 	
 	public String getVenue()	{
@@ -80,7 +80,7 @@ public class Task {
 	
 	//Behavioural methods
 	
-	public void updateDetails(commandDetails details)	{
+	public void updateDetails(CommandDetails details)	{
 		
 		if(details.getDescription() != null)	{
 			this.description = details.getDescription();
@@ -90,8 +90,8 @@ public class Task {
 			this.startDate = details.getStartDate();
 		}
 		
-		if(details.getEndDate() != null)	{
-			this.endDate = details.getEndDate();
+		if(details.getDeadline() != null)	{
+			this.deadline = details.getDeadline();
 		}
 		
 		if(details.getVenue() != null)	{
@@ -106,33 +106,33 @@ public class Task {
 	
 	//Overriding methods
 	
-	public Task contains(commandDetails details)	{
+	public boolean contains(CommandDetails details)	{
 		
 		if(details.getDescription().equals(this.description))	{
-			return this;
+			return true;
 		}
 		
 		if(details.getStartDate().equals(this.startDate))	{
-			return this;
+			return true;
 		}
 		
-		if(details.getEndDate().equals(this.endDate))	{
-			return this;
+		if(details.getDeadline().equals(this.deadline))	{
+			return true;
 		}
 		
 		if(details.getVenue().equals(this.venue))	{
-			return this;
+			return true;
 		}
 		
 		if(details.getPriority().equals(this.priority))	{
-			return this;
+			return true;
 		}
 		
-		return null;
+		return false;
 	}
 	
 	public String toString()	{
-		return (description + " " + startDate + " " + endDate + " " + venue + " " + priority);
+		return (description + " " + startDate + " " + deadline + " " + venue + " " + priority);
 	}
 }
 

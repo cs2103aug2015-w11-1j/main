@@ -34,7 +34,6 @@ public class Logic {
 
 	public Logic()	{
 		this.input = null;
-		this.commandDetails = getCommandDetails();
 	}
 
 	//Behavioural Methods
@@ -43,12 +42,13 @@ public class Logic {
 		this.input = sc.nextLine();
 	}
 
-	public void getCommandDetails()	{
+	/*public void getCommandDetails()	{
 		this.commandDetails = Parser.parse(); 
 	}
+	*/
 
 	public void createTask()	{
-		Task task = new Task(commandDetails);
+		Task task = new Task(this.commandDetails);
 		tasks.add(task);
 		taskCount++;
 	}
@@ -59,7 +59,7 @@ public class Logic {
 		this.searchTask();
 
 		if(tasksInAction.isEmpty())	{	
-			return TASK_NOT_FOUND;
+			System.out.println(TASK_NOT_FOUND);
 		}
 		else	{
 			for(int i = 0; i < tasksInAction.size(); i++)	{
@@ -81,6 +81,7 @@ public class Logic {
 	public void updateTask()	{
 
 		this.searchTask();
+		int i = 0;
 
 		if(tasksInAction.isEmpty())	{	
 			System.out.println(TASK_NOT_FOUND);
@@ -93,6 +94,7 @@ public class Logic {
 	public void deleteTask()	{
 
 		this.searchTask();
+		int i = 0;
 
 		if(tasksInAction.isEmpty())	{	
 			System.out.println(TASK_NOT_FOUND);
