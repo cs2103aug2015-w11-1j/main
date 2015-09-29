@@ -3,6 +3,7 @@ import java.util.Date;
 /*
  * Task is an object used in GetStuffDone
  * Task does not know the existence of UI, Logic, Parser, History and Storage
+ * Task knows the existence of commandDetails object
  */
 
 public class Task {
@@ -24,78 +25,14 @@ public class Task {
 		priority = null;
 	}
 	
-	//Fully initialised task
-	public Task(String description, Date startDate, Date endDate, String venue, String priority)	{
-		this.description = description;
-		this.startDate = startDate;
-		this.endDate = endDate;
-		this.venue = venue;
-		this.priority = priority;
+	public Task(commandDetails details)	{
+		this.description = details.getDescription();
+		this.startDate = details.getStartDate();
+		this.endDate = details.getEndDate();
+		this.venue = details.getVenue();
+		this.priority = details.getPriority();
 	}
 	
-	//Task without venue
-	public Task(String description, Date startDate, Date endDate, String priority)	{
-		this.description = description;
-		this.startDate = startDate;
-		this.endDate = endDate;
-		this.venue = null;
-		this.priority = priority;
-	}
-	
-	//Task without priority
-	public Task(String description, Date startDate, Date endDate, String venue)	{
-		this.description = description;
-		this.startDate = startDate;
-		this.endDate = endDate;
-		this.venue = venue;
-		this.priority = null;
-	}
-
-	//Task without venue and priority
-	public Task(String description, Date startDate, Date endDate)	{
-		this.description = description;
-		this.startDate = startDate;
-		this.endDate = endDate;
-		this.venue = null;
-		this.priority = null;
-	}
-
-	
-	//Floating task
-	public Task(String description, Date startDate, String venue, String priority)	{
-		this.description = description;
-		this.startDate = startDate;
-		this.endDate = null;
-		this.venue = venue;
-		this.priority = priority;
-	}
-	
-	//Floating Task with no venue
-	public Task(String description, Date startDate, String priority)	{
-		this.description = description;
-		this.startDate = startDate;
-		this.endDate = null;
-		this.venue = null;
-		this.priority = priority;
-	}
-	
-	//Floating Task with no priority
-	public Task(String description, Date startDate, String venue)	{
-		this.description = description;
-		this.startDate = startDate;
-		this.endDate = null;
-		this.venue = venue;
-		this.priority = null;
-	}
-	
-	//Floating Task with no venue and priority
-	public Task(String description, Date startDate)	{
-		this.description = description;
-		this.startDate = startDate;
-		this.endDate = null;
-		this.venue = null;
-		this.priority = null;
-	}
 	
 	//Mutators
 	
