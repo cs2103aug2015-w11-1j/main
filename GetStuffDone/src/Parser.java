@@ -117,7 +117,7 @@ public class Parser{
 		this.commandDetailsObject = obj;
 	}
 	
-	public static void sendToLogic (Object cmdDetails){
+	public static void sendToLogic (CommandDetails cmdDetails){
 		commandDetailsObject.setCmdDetailsObj(cmdDetails);
 	}
 	

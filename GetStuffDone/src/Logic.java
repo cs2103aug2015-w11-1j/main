@@ -12,7 +12,7 @@ public class Logic {
 	public static int taskCount = 0;
 	public static ArrayList<Task> tasks = new ArrayList<Task>();
 	public static ArrayList<Integer> tasksInAction = new ArrayList<Integer>();
-	public Object commandDetails;
+	public CommandDetails commandDetails;
 	private String input;
 	private Scanner sc;
 
@@ -26,7 +26,7 @@ public class Logic {
 	}
 
 	//receive commandDetails object from Parser @@@
-	public void setCmdDetailsObj (Object cmdDetailsObj) {
+	public void setCmdDetailsObj (CommandDetails cmdDetailsObj) {
 		this.commandDetails = cmdDetailsObj;
 	}
 
