@@ -4,11 +4,6 @@ import java.util.Arrays;
 import java.util.Date;
 
 public class Parser{
-	private static Date deadLine = null;
-	private static Date startDate = null;
-	private static String Venue = null;
-	private static String priority;
-	private static String description;
 	private static String currentDay = getCurrentDay();
 	final static String DATE_FORMAT = "dd/MM/yyyy";
 	private static ArrayList<String> keyWords = new ArrayList<String>() {{
@@ -98,7 +93,7 @@ public class Parser{
 	
 	
 	
-	private static String parseLocation(ArrayList<String> input){
+	private static String parseVenue(ArrayList<String> input){
 		int indexOfKeyWord = input.lastIndexOf("AT");
 		int indexOfNextKeyWord;
 		if(indexOfKeyWord == -1){
@@ -228,30 +223,49 @@ public class Parser{
 	}
 	
 	
-	public static void main(String args[]){
+	public static void main(String[] args){
+		
+		String deadLine = null;
+		String startDate = null;
+		String venue = null;
+		String priority;
+		String description;
+		
+		
+		
 		String input = "add submit code to git hub AT my room at 4302 BY 2359 today PRIORITY HIGH";
 		ArrayList<String> strTokens = new ArrayList<String> (Arrays.asList(input.split(" ")));
 		
+		System.out.println(input);
 		
 		COMMANDS command = parseCommandType(strTokens);
-		System.out.println(strTokens);
-		System.out.println("Priority= " + parsePriority(strTokens));
-		System.out.println(strTokens);
-		System.out.println("Location= " + parseLocation(strTokens));
-		System.out.println(strTokens);
+		//System.out.println(strTokens);
 		
-		System.out.println("Start= "+ parseStartDate(strTokens));
-		System.out.println(strTokens);
-		System.out.println("End= "+ parseEndDate(strTokens));
-		System.out.println(strTokens);
-		System.out.println("Dis= "+ parseDescription(strTokens));
+		priority = parsePriority(strTokens);
+		System.out.println("Priority= " + priority);
+		//System.out.println(strTokens);
+		
+		venue = parseVenue(strTokens);
+		System.out.println("Venue= " + venue);
+		//System.out.println(strTokens);
+		
+		startDate = parseStartDate(strTokens);
+		System.out.println("Start= "+ startDate);
+		//System.out.println(strTokens);
+		
+		deadLine = parseEndDate(strTokens);
+		System.out.println("End= "+ deadLine);
+		//System.out.println(strTokens);
+		
+		description = parseDescription(strTokens);
+		System.out.println("Description= " + description);
 		
 		
 		
 		
 		//create commandDetailsObject
-		CommandDetails cmdDetails = new CommandDetails(deadLine, startDate, Venue, priority, description);
-		sendToLogic(cmdDetails);
+		//CommandDetails cmdDetails = new CommandDetails(deadLine, startDate, venue, priority, description);
+		//sendToLogic(cmdDetails);
 		
 		
 	}
