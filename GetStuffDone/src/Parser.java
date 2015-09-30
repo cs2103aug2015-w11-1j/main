@@ -25,7 +25,6 @@ public class Parser{
 	
 	private static String parseStartDate(ArrayList<String> input){
 		String result = "";
-		
 		int indexOfKeyWord = input.lastIndexOf("FROM");
 		int indexOfNextKeyWord;
 		if(indexOfKeyWord == -1){
@@ -47,26 +46,45 @@ public class Parser{
 
 	
 	private static String parseEndDate(ArrayList<String> input){
-		String result = "hehehe";
+		String result = "";
+		int indexOfNextKeyWord;
 		
 		int indexOfKeyWordTO = input.lastIndexOf("TO");
 		int indexOfKeyWordBY = input.lastIndexOf("BY");
 		
-		System.out.println(indexOfKeyWordTO);
-		System.out.println(indexOfKeyWordBY);
-		
 		if(indexOfKeyWordTO == -1 && indexOfKeyWordBY == -1){
 			return "NO End Date found";
+		}else if(indexOfKeyWordTO == -1 && !(indexOfKeyWordBY == -1)){
+			indexOfNextKeyWord=-2;
+			for(int i=indexOfKeyWordBY+1; i<input.size();i++){
+				if(isKeyWord(input.get(i))){
+					indexOfNextKeyWord=i;
+					break;
+				}
+			}
+		}else{
+			indexOfNextKeyWord=-2;
+			for(int i=indexOfKeyWordTO+1; i<input.size();i++){
+				if(isKeyWord(input.get(i))){
+					indexOfNextKeyWord=i;
+					break;
+				}
+			}
 		}
 		
+		if(indexOfNextKeyWord == -2){
+			indexOfNextKeyWord = input.size();
+		}
+		//end date is FROM
+		if(indexOfKeyWordBY == -1){
+			result = getInputBetweenArrayList(input, indexOfKeyWordTO, indexOfNextKeyWord);
+		}
+		//end date is BY
+		if(indexOfKeyWordTO == -1){
+			result = getInputBetweenArrayList(input, indexOfKeyWordBY, indexOfNextKeyWord);
+		}
 		return result;
-		
-		
-		
 	}
-	
-	
-	///////////////////////////////////////////////////
 	
 	private static boolean isKeyWord(String input){
 
@@ -75,7 +93,6 @@ public class Parser{
 				return true;
 			}
 		}
-		
 		return false;
 	}
 	
@@ -91,16 +108,13 @@ public class Parser{
 			for(int i=indexOfKeyWord+1; i<input.size();i++){
 				if(isKeyWord(input.get(i))){
 					indexOfNextKeyWord=i;
-					
 					break;
 				}
 			}
 		}
-
 		if(indexOfNextKeyWord == -2){
 			indexOfNextKeyWord = input.size();
 		}
-		
 		String result = getInputBetweenArrayList(input, indexOfKeyWord, indexOfNextKeyWord);
 		return result;
 	}
@@ -116,11 +130,20 @@ public class Parser{
 		return result;
 	}
 	
-	private static String parseDescription(String input){
+	private static String parseDescription(ArrayList<String> input){
 		String result= "";
-		return result;
+
+		if(input.isEmpty()){
+			return "please include a description for task";
+		}
+		
+		while(!input.isEmpty()){
+			result = result+" " +input.remove(0);
+		}
+		
+		return result.substring(1,result.length());
 	}
-	///////////////////////////////////////////////////////
+
 	
 	private static String parsePriority(ArrayList<String> input){
 		
@@ -206,7 +229,7 @@ public class Parser{
 	
 	
 	public static void main(String args[]){
-		String input = "add do code buddy AT aloy's kfc <3 <3 <3 home";
+		String input = "add submit code to git hub AT my room at 4302 BY 2359 today PRIORITY HIGH";
 		ArrayList<String> strTokens = new ArrayList<String> (Arrays.asList(input.split(" ")));
 		
 		
@@ -217,11 +240,11 @@ public class Parser{
 		System.out.println("Location= " + parseLocation(strTokens));
 		System.out.println(strTokens);
 		
-		System.out.println(parseStartDate(strTokens));
+		System.out.println("Start= "+ parseStartDate(strTokens));
 		System.out.println(strTokens);
-		System.out.println(parseEndDate(strTokens));
+		System.out.println("End= "+ parseEndDate(strTokens));
 		System.out.println(strTokens);
-		
+		System.out.println("Dis= "+ parseDescription(strTokens));
 		
 		
 		
