@@ -11,38 +11,108 @@ public class Parser{
 	private static String description;
 	private static String currentDay = getCurrentDay();
 	final static String DATE_FORMAT = "dd/MM/yyyy";
+	private static ArrayList<String> keyWords = new ArrayList<String>() {{
+	    add("AT");
+	    add("BY");
+	    add("FROM");
+	    add("TO");
+	    add("PRIORITY");
+	}};
 	
 	public enum COMMANDS{
 		ADD,DELETE,DONE,UNDO,REDO,SEARCH,HELP,
 	}
 	
-	private static Date parseStartDate(String input){
-		Date result = new Date();
+	private static String parseStartDate(ArrayList<String> input){
+		String result = "";
+		
+		int indexOfKeyWord = input.lastIndexOf("FROM");
+		int indexOfNextKeyWord;
+		if(indexOfKeyWord == -1){
+			System.out.print("no start date, default set as today ");
+			return currentDay;
+		}else{
+			indexOfNextKeyWord=0;
+			for(int i=indexOfKeyWord+1; i<input.size();i++){
+				if(isKeyWord(input.get(i))){
+					indexOfNextKeyWord=i;
+					break;
+				}
+			}
+		}
+		result = getInputBetweenArrayList(input, indexOfKeyWord, indexOfNextKeyWord);
+		return result;
+	}
+		
+
+	
+	private static String parseEndDate(ArrayList<String> input){
+		String result = "hehehe";
+		
+		int indexOfKeyWordTO = input.lastIndexOf("TO");
+		int indexOfKeyWordBY = input.lastIndexOf("BY");
+		
+		System.out.println(indexOfKeyWordTO);
+		System.out.println(indexOfKeyWordBY);
+		
+		if(indexOfKeyWordTO == -1 && indexOfKeyWordBY == -1){
+			return "NO End Date found";
+		}
+		
 		return result;
 		
-	}
-	
-	
-	private static Date parseEndDate(String input){
-		Date result= new Date();
-		return result;
+		
 		
 	}
 	
 	
 	///////////////////////////////////////////////////
 	
-	private static String parseLocation(String input){
-		String result= "";
-		
-		ArrayList<String> strTokens = new ArrayList<String> (Arrays.asList(input.toUpperCase().split(" ")));
-		if(strTokens.lastIndexOf("/AT") == -1){
-			return "NONE";
+	private static boolean isKeyWord(String input){
+
+		for(int i=0;i<keyWords.size();i++){
+			if(keyWords.get(i).equals(input)){
+				return true;
+			}
 		}
 		
+		return false;
+	}
+	
+	
+	
+	private static String parseLocation(ArrayList<String> input){
+		int indexOfKeyWord = input.lastIndexOf("AT");
+		int indexOfNextKeyWord;
+		if(indexOfKeyWord == -1){
+			return null;
+		}else{
+			indexOfNextKeyWord=-2;
+			for(int i=indexOfKeyWord+1; i<input.size();i++){
+				if(isKeyWord(input.get(i))){
+					indexOfNextKeyWord=i;
+					
+					break;
+				}
+			}
+		}
+
+		if(indexOfNextKeyWord == -2){
+			indexOfNextKeyWord = input.size();
+		}
 		
-		
-		
+		String result = getInputBetweenArrayList(input, indexOfKeyWord, indexOfNextKeyWord);
+		return result;
+	}
+
+
+	private static String getInputBetweenArrayList(ArrayList<String> input, int indexOfKeyWord, int indexOfNextKeyWord) {
+		String result = "";
+		for(int i = 0;i<  indexOfNextKeyWord - indexOfKeyWord - 1;i++){
+			result = result + " " + input.remove(indexOfKeyWord + 1);
+		}
+		result = result.substring(1);
+		input.remove(indexOfKeyWord);
 		return result;
 	}
 	
@@ -52,52 +122,65 @@ public class Parser{
 	}
 	///////////////////////////////////////////////////////
 	
-	private static String parsePriority(String input){
-		ArrayList<String> strTokens = new ArrayList<String> (Arrays.asList(input.toUpperCase().split(" ")));
-		if(strTokens.lastIndexOf("PRIORITY") == -1){
-			return "NONE";
+	private static String parsePriority(ArrayList<String> input){
+		
+		if(input.lastIndexOf("PRIORITY") == -1){
+			System.out.println("No Priority found");
+			return null;
 		}else{
-			int priorityLocate = strTokens.lastIndexOf("PRIORITY") + 1;
-			String priority = strTokens.get(priorityLocate);
+			int keyWordLocation = input.lastIndexOf("PRIORITY");
+			int priorityLocate = keyWordLocation + 1;
+			String priority = input.get(priorityLocate).toUpperCase();
 			
 			switch(priority){
 				case "HIGH":
+					input.remove(priorityLocate);
+					input.remove(keyWordLocation);
 					return "HIGH";
 				case "MEDIUM":
+					input.remove(priorityLocate);
+					input.remove(keyWordLocation);
 					return "MEDIUM";
 				case "LOW":
+					input.remove(priorityLocate);
+					input.remove(keyWordLocation);
 					return "LOW";
 				default:
-					return "Invalid priority number"; //Invalid priority number
+					return null;
 			}
 		}
 	}
 	
-	private static COMMANDS parseCommandType(String input){
-		
-		String[] temp = input.split(" ");
-		
-		switch(temp[0].toUpperCase()){
+	private static COMMANDS parseCommandType(ArrayList<String> input){
+
+		switch(input.get(0).toUpperCase()){
 		case "ADD":
 			System.out.println("ADD command");
+			input.remove(0);
 			return COMMANDS.ADD;
 		case "DELETE":
 			System.out.println("DELETE command");
+			input.remove(0);
 			return COMMANDS.DELETE;
 		case "DONE":
 			System.out.println("DONE command");
+			input.remove(0);
 			return COMMANDS.DONE;
 		case "HELP":
 			System.out.println("HELP command");
+			input.remove(0);
 			return COMMANDS.HELP;
 		case "REDO":
 			System.out.println("add command");
+			input.remove(0);
 			return COMMANDS.ADD;
 		case "SEARCH":
 			System.out.println("SEARCH command");
+			input.remove(0);
 			return COMMANDS.SEARCH;
 		case "UNDO":
 			System.out.println("UNDO command");
+			input.remove(0);
 			return COMMANDS.UNDO;
 		}
 		return null;
@@ -105,7 +188,7 @@ public class Parser{
 	
 	private static String getCurrentDay(){
 		Date now = new Date();
-		SimpleDateFormat ft = new SimpleDateFormat ("dd.MM.yyyy");
+		SimpleDateFormat ft = new SimpleDateFormat (DATE_FORMAT);
 		return ft.format(now);
 	}
 	
@@ -123,9 +206,25 @@ public class Parser{
 	
 	
 	public static void main(String args[]){
-		String input = "add do code buddy /at home from 29 sept 2015 7pm to 29 sept 2015 11.59pm priority high";
-		COMMANDS command = parseCommandType(input);
-		System.out.println(parsePriority(input));
+		String input = "add do code buddy AT aloy's kfc <3 <3 <3 home";
+		ArrayList<String> strTokens = new ArrayList<String> (Arrays.asList(input.split(" ")));
+		
+		
+		COMMANDS command = parseCommandType(strTokens);
+		System.out.println(strTokens);
+		System.out.println("Priority= " + parsePriority(strTokens));
+		System.out.println(strTokens);
+		System.out.println("Location= " + parseLocation(strTokens));
+		System.out.println(strTokens);
+		
+		System.out.println(parseStartDate(strTokens));
+		System.out.println(strTokens);
+		System.out.println(parseEndDate(strTokens));
+		System.out.println(strTokens);
+		
+		
+		
+		
 		
 		//create commandDetailsObject
 		CommandDetails cmdDetails = new CommandDetails(deadLine, startDate, Venue, priority, description);
