@@ -1,3 +1,43 @@
+/*
+	keywords demarked by (case sensitive):
+	Start date and time - FROM
+	End date and time - BY/TO
+	Priority - PRIORITY
+	Venue - AT
+	
+	eg. add do homework AT School of Computing FROM 12.30pm 6/10/15 TO 6pm 6/10/15 PRIORITY high
+	
+	Date and time format - <time><date>
+	time format - HHmm		2359
+				- HH.mm		23.59
+				- HH:mm		23:59
+				- hhmma		1159pm
+				- hha		11pm
+				- hh.mma	11.59pm
+				- hh:mma	11:59pm
+				
+	date format - dd MMMM yy	01 April 15		01 Apr 15
+				- dd MM yy		01 04 15
+				- dd MMMM yyyy	01 April 2015	01 Apr 2015
+				- dd MM yyyy	01 04 2015
+				- dd MMMM		01 April		01 Apr
+				- dd MM			01 04
+				
+				- dd-MMMM-yy	01-April-15		01-Apr-15
+				- dd-MM-yy		01-04-15
+				- dd-MMMM-yyyy	01-April-2015	01-Apr-2015
+				- dd-MM-yyyy	01-04-2015
+				- dd-MMMM		01-April		01-Apr
+				- dd-MM			01-04
+				
+				- dd/MMMM/yy	01/April/15		01/Apr/15
+				- dd/MM/yy		01/04/15
+				- dd/MMMM/yyyy	01/April/2015	01/Apr/2015
+				- dd/MM/yyyy	01/04/2015
+				- dd/MMMM		01/April		01/Apr
+				- dd/MM			01/04
+				
+*/
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -48,7 +88,7 @@ public class Parser{
 			"dd MM",
 			
 			"HHmm dd/MMMM/yy",
-			"HH.mm dd/MMMMMM/yy",
+			"HH.mm dd/MMMMM/yy",
 			"HH:mm dd/MM/yy",
 			"hhmma dd/MMMM/yy",
 			"hha dd/MMMM/yy",
@@ -67,6 +107,15 @@ public class Parser{
 			"hh:mma dd/MM/yy",
 			"dd/MM/yy",
 			
+			"HHmm dd/MMMM",
+			"HH.mm dd/MMMM",
+			"HH:mm dd/MMMM",
+			"hhmma dd/MMMM",
+			"hha dd/MMMM",
+			"hmma dd/MMMM",
+			"hh.mma dd/MMMM",
+			"hh:mma dd/MMMM",
+			"dd/MMMM",
 			
 			"HHmm dd/MM",
 			"HH.mm dd/MM",
@@ -87,8 +136,27 @@ public class Parser{
 			"hmma dd-MMMM-yy",
 			"hh.mma dd-MMMM-yy",
 			"hh:mma dd-MMMM-yy",
+			"dd-MMMM-yy",
+			
+			"HHmm dd-MM-yy",
+			"HH.mm dd-MM-yy",
+			"HH:mm dd-MM-yy",
+			"hhmma dd-MM-yy",
+			"hha dd-MM-yy",
+			"hmma dd-MM-yy",
+			"hh.mma dd-MM-yy",
+			"hh:mma dd-MM-yy",
 			"dd-MM-yy",
 			
+			"HHmm dd-MMMM",
+			"HH.mm dd-MMMM",
+			"HH:mm dd-MMMM",
+			"hhmma dd-MMMM",
+			"hha dd-MMMM",
+			"hmma dd-MMMM",
+			"hh.mma dd-MMMM",
+			"hh:mma dd-MMMM",
+			"dd-MMMM",
 			
 			"HHmm dd-MM",
 			"HH.mm dd-MM",
@@ -101,15 +169,6 @@ public class Parser{
 			"dd-MM",
 			
 			
-			"HHmm dd-MMMM",
-			"HH.mm dd-MMMM",
-			"HH:mm dd-MMMM",
-			"hhmma dd-MMMM",
-			"hha dd-MMMM",
-			"hmma dd-MMMM",
-			"hh.mma dd-MMMM",
-			"hh:mma dd-MMMM",
-			"dd-MM",
 
 	};
 	private static ArrayList<String> keyWords = new ArrayList<String>() {{
