@@ -1,11 +1,117 @@
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.Date;
+import java.util.Scanner;
 
 public class Parser{
-	private static String currentDay = getCurrentDay();
-	final static String DATE_FORMAT = "dd/MM/yyyy";
+	private final static String[] DATE_FORMAT = {
+			"HHmm dd MMMM yy",
+			"HH.mm dd MMMM yy",
+			"HH:mm dd MMMM yy",
+			"hhmma dd MMMM yy",
+			"hha dd MMMM yy",
+			"hmma dd MMMM yy",
+			"hh.mma dd MMMM yy",
+			"hh:mma dd MMMM yy",
+			"dd MMMM yy",
+
+			"HHmm dd MM yy",
+			"HH.mm dd MM yy",
+			"HH:mm dd MM yy",
+			"hhmma dd MM yy",
+			"hha dd MM yy",
+			"hmma dd MM yy",
+			"hh.mma dd MM yy",
+			"hh:mma dd MM yy",
+			"dd MM yy",
+
+			"HHmm dd MMMM",
+			"HH.mm dd MMMM",
+			"HH:mm dd MMMM",
+			"hhmma dd MMMM",
+			"hha dd MMMM",
+			"hmma dd MMMM",
+			"hh.mma dd MMMM",
+			"hh:mma dd MMMM",
+			"dd MMMM",
+			
+			"HHmm dd MM",
+			"HH.mm dd MM",
+			"HH:mm dd MM",
+			"hhmma dd MM",
+			"hha dd MM",
+			"hmma dd MM",
+			"hh.mma dd MM",
+			"hh:mma dd MM",
+			"dd MM",
+			
+			"HHmm dd/MMMM/yy",
+			"HH.mm dd/MMMMMM/yy",
+			"HH:mm dd/MM/yy",
+			"hhmma dd/MMMM/yy",
+			"hha dd/MMMM/yy",
+			"hmma dd/MMMM/yy",
+			"hh.mma dd/MMMM/yy",
+			"hh:mma dd/MMMM/yy",
+			"dd/MMMM/yy",
+			
+			"HHmm dd/MM/yy",
+			"HH.mm dd/MM/yy",
+			"HH:mm dd/MM/yy",
+			"hhmma dd/MM/yy",
+			"hha dd/MM/yy",
+			"hmma dd/MM/yy",
+			"hh.mma dd/MM/yy",
+			"hh:mma dd/MM/yy",
+			"dd/MM/yy",
+			
+			
+			"HHmm dd/MM",
+			"HH.mm dd/MM",
+			"HH:mm dd/MM",
+			"hhmma dd/MM",
+			"hha dd/MM",
+			"hmma dd/MM",
+			"hh.mma dd/MM",
+			"hh:mma dd/MM",
+			"dd/MM",
+			
+			
+			"HHmm dd-MMMM-yy",
+			"HH.mm dd-MMMM-yy",
+			"HH:mm dd-MMMM-yy",
+			"hhmma dd-MMMM-yy",
+			"hha dd-MMMM-yy",
+			"hmma dd-MMMM-yy",
+			"hh.mma dd-MMMM-yy",
+			"hh:mma dd-MMMM-yy",
+			"dd-MM-yy",
+			
+			
+			"HHmm dd-MM",
+			"HH.mm dd-MM",
+			"HH:mm dd-MM",
+			"hhmma dd-MM",
+			"hha dd-MM",
+			"hmma dd-MM",
+			"hh.mma dd-MM",
+			"hh:mma dd-MM",
+			"dd-MM",
+			
+			
+			"HHmm dd-MMMM",
+			"HH.mm dd-MMMM",
+			"HH:mm dd-MMMM",
+			"hhmma dd-MMMM",
+			"hha dd-MMMM",
+			"hmma dd-MMMM",
+			"hh.mma dd-MMMM",
+			"hh:mma dd-MMMM",
+			"dd-MM",
+
+	};
 	private static ArrayList<String> keyWords = new ArrayList<String>() {{
 	    add("AT");
 	    add("BY");
@@ -24,9 +130,9 @@ public class Parser{
 		int indexOfNextKeyWord;
 		if(indexOfKeyWord == -1){
 			System.out.print("no start date, default set as today ");
-			return currentDay;
+			return null;
 		}else{
-			indexOfNextKeyWord=0;
+			indexOfNextKeyWord=-2;
 			for(int i=indexOfKeyWord+1; i<input.size();i++){
 				if(isKeyWord(input.get(i))){
 					indexOfNextKeyWord=i;
@@ -34,6 +140,11 @@ public class Parser{
 				}
 			}
 		}
+		
+		if(indexOfNextKeyWord == -2){
+			indexOfNextKeyWord = input.size();
+		}
+		
 		result = getInputBetweenArrayList(input, indexOfKeyWord, indexOfNextKeyWord);
 		return result;
 	}
@@ -204,14 +315,6 @@ public class Parser{
 		return null;
 	}
 	
-	private static String getCurrentDay(){
-		Date now = new Date();
-		SimpleDateFormat ft = new SimpleDateFormat (DATE_FORMAT);
-		return ft.format(now);
-	}
-	
-	
-	
 	//creating and sending commandDetails object to logic class
 	static Logic commandDetailsObject = null;
 	Parser (Logic obj) {
@@ -220,6 +323,28 @@ public class Parser{
 	
 	public static void sendToLogic (CommandDetails cmdDetails){
 		commandDetailsObject.setCmdDetailsObj(cmdDetails);
+	}
+	
+	private static Date createDate(String input) {
+		for(String temp: DATE_FORMAT){
+			try{
+			SimpleDateFormat possibleFormats = new SimpleDateFormat(temp);
+			possibleFormats.setLenient(false);
+			Date mydate = possibleFormats.parse(input);
+			Calendar cal = Calendar.getInstance();
+			cal.setTime(mydate);
+			if(cal.get(Calendar.YEAR) == 1970){
+				cal.set(Calendar.YEAR, Calendar.getInstance().get(Calendar.YEAR));
+				mydate= cal.getTime();
+			}
+			
+			System.out.println(temp +" match");
+			return mydate;
+			} catch(Exception e){
+				//System.out.println(temp +" dont match, next!");
+			}
+		}
+		return null;
 	}
 	
 	
@@ -231,9 +356,9 @@ public class Parser{
 		String priority;
 		String description;
 		
+		Scanner sc = new Scanner(System.in);
 		
-		
-		String input = "add submit code to git hub AT my room at 4302 BY 2359 today PRIORITY HIGH";
+		String input = sc.nextLine();
 		ArrayList<String> strTokens = new ArrayList<String> (Arrays.asList(input.split(" ")));
 		
 		System.out.println(input);
@@ -249,13 +374,21 @@ public class Parser{
 		System.out.println("Venue= " + venue);
 		//System.out.println(strTokens);
 		
+		
+		
 		startDate = parseStartDate(strTokens);
-		System.out.println("Start= "+ startDate);
+		//System.out.println("Start= "+ startDate);
 		//System.out.println(strTokens);
+		Date start = createDate(startDate);
+		System.out.println("Start= "+ start);
+		
+		
 		
 		deadLine = parseEndDate(strTokens);
 		System.out.println("End= "+ deadLine);
 		//System.out.println(strTokens);
+		Date end = createDate(deadLine);
+		System.out.println("End= "+ end);
 		
 		description = parseDescription(strTokens);
 		System.out.println("Description= " + description);
@@ -264,7 +397,7 @@ public class Parser{
 		
 		
 		//create commandDetailsObject
-		//CommandDetails cmdDetails = new CommandDetails(deadLine, startDate, venue, priority, description);
+		CommandDetails cmdDetails = new CommandDetails(end, start, venue, priority, description);
 		//sendToLogic(cmdDetails);
 		
 		
