@@ -137,7 +137,7 @@ public class Task {
 		DateFormat df = new SimpleDateFormat("hh:mma dd/MMM/yyyy ");
 		String start = df.format(startDate);
 		String end = df.format(deadline);
-		return (description + " " + start + " " + end + " " + venue + " " + priority);
+		return (description + "\n" + start + "\n" + end + "\n" + venue + "\n" + priority);
 	}
 }
 

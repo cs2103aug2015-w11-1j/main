@@ -1,5 +1,7 @@
 import java.util.*;
 
+import Parser.COMMANDS;
+
 /*
  * Logic deals with handling of input commands, CRUD of tasks, update of History and update of Storage
  * Logic knows the existence of Parser, Task, History and Storage
@@ -19,7 +21,28 @@ public class Logic {
 	private History history = new History();
 	
 	public String processInput(String input)	{
-		CommandDetails commandDetails = Parser.parse(input);
+		this.commandDetails = Parser.parse(input);
+		switch (this.commandDetails.getCommand()) {
+		case ADD:
+			String displayText = createTask();
+			Feedback feedback = new Feedback(displayText, ADD_TEXT_FEEDBACK)
+		case DELETE:
+			deleteTask();
+			
+		case SEARCH:
+			readTask();
+		
+		case DONE:
+			
+		case HELP:
+			
+		case REDO:
+			
+		case UNDO:
+			
+		}
+
+		
 		Feedback feedback = new Feedback();
 	}
 
@@ -31,13 +54,14 @@ public class Logic {
 
 	//Behavioural Methods
 
-	public void createTask()	{
+	private String createTask()	{
 		Task task = new Task(this.commandDetails);
 		tasks.add(task);
+		task.toString();
 	}
 
 	//Print task according to the given commandDetails
-	public void readTask()	{
+	private void readTask()	{
 
 		this.searchTask();
 
@@ -53,7 +77,7 @@ public class Logic {
 	}
 
 	//Records the index of found tasks in tasksInAction
-	public void searchTask()	{
+	private void searchTask()	{
 		for(int i = 0; i < tasks.size(); i++)	{
 			if(tasks.get(i).contains(commandDetails))	{
 				tasksInAction.add(i);
@@ -61,7 +85,7 @@ public class Logic {
 		}
 	}
 
-	public void updateTask()	{
+	private void updateTask()	{
 
 		this.searchTask();
 		int i = 0;
@@ -74,7 +98,7 @@ public class Logic {
 		}
 	}
 
-	public void deleteTask()	{
+	private void deleteTask()	{
 
 		this.searchTask();
 		int i = 0;
