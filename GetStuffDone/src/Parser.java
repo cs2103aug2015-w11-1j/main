@@ -47,7 +47,7 @@ import java.util.Calendar;
 import java.util.Date;
 
 public class Parser {
-	private final static String[] DATE_FORMAT = { "HHmm dd MMMM yy", "HH.mm dd MMMM yy", "HH:mm dd MMMM yy",
+	private final static String[] DATE_FORMAT = { "HHmm", "HHmm dd MMMM yy", "HH.mm dd MMMM yy", "HH:mm dd MMMM yy",
 			"hhmma dd MMMM yy", "hha dd MMMM yy", "hmma dd MMMM yy", "hh.mma dd MMMM yy", "hh:mma dd MMMM yy",
 			"dd MMMM yy",
 
@@ -105,7 +105,7 @@ public class Parser {
 	private final static int NO_YEAR_INPUT = 1970;
 
 	private static Date parseStartDate(ArrayList<String> input) {
-		String result = null;
+		String result = "";
 		int indexOfKeyWord = input.lastIndexOf("FROM");
 		int indexOfNextKeyWord = NO_NEXT_KEYWORD;
 
@@ -130,7 +130,7 @@ public class Parser {
 	}
 
 	private static Date parseEndDate(ArrayList<String> input) {
-		String result = null;
+		String result = "";
 		int indexOfNextKeyWord = NO_NEXT_KEYWORD;
 		int indexOfKeyWordTO = input.lastIndexOf("TO");
 		int indexOfKeyWordBY = input.lastIndexOf("BY");
@@ -152,6 +152,8 @@ public class Parser {
 		if (containsKeword(indexOfKeyWordTO)) {
 			result = getInputBetweenArrayList(input, indexOfKeyWordBY, indexOfNextKeyWord);
 		}
+		
+		System.out.println(result);
 		return createDate(result);
 	}
 
@@ -193,7 +195,7 @@ public class Parser {
 
 	private static String getInputBetweenArrayList(ArrayList<String> input, int indexOfKeyWord,
 			int indexOfNextKeyWord) {
-		String result = null;
+		String result = "";
 		for (int i = 0; i < indexOfNextKeyWord - indexOfKeyWord - 1; i++) {
 			result = result + " " + input.remove(indexOfKeyWord + 1);
 		}
@@ -305,13 +307,46 @@ public class Parser {
 				possibleFormats.setLenient(false);
 				Date mydate = possibleFormats.parse(input);
 				Calendar cal = Calendar.getInstance();
-				cal.setTime(mydate);
+				
 				if (cal.get(Calendar.YEAR) == NO_YEAR_INPUT) {
+					cal.setTime(mydate);
 					cal.set(Calendar.YEAR, Calendar.getInstance().get(Calendar.YEAR));
 					mydate = cal.getTime();
+					return mydate;
 				}
-
-				// System.out.println(temp +" match");
+				
+				if(input.toUpperCase().contains("TODAY")){
+					//System.out.println(mydate + " mydate");
+					cal.setTime(mydate);
+					cal.set(Calendar.DATE,Calendar.getInstance().get(Calendar.DATE));
+					cal.set(Calendar.MONTH,Calendar.getInstance().get(Calendar.MONTH));
+					cal.set(Calendar.YEAR, Calendar.getInstance().get(Calendar.YEAR));
+					mydate = cal.getTime();
+					return mydate;
+					//System.out.println(mydate + " new mydate");
+				}
+				
+				if(input.toUpperCase().contains("TOMORROW")){
+					cal.setTime(mydate);
+					cal.set(Calendar.DATE,Calendar.getInstance().get(Calendar.DATE));
+					cal.add(Calendar.DATE, 1);
+					cal.set(Calendar.MONTH,Calendar.getInstance().get(Calendar.MONTH));
+					cal.set(Calendar.YEAR, Calendar.getInstance().get(Calendar.YEAR));
+					mydate = cal.getTime();
+					return mydate;
+				}
+				
+				if(input.toUpperCase().contains("NEXT WEEK")){
+					cal.setTime(mydate);
+					cal.set(Calendar.DATE,Calendar.getInstance().get(Calendar.DATE));
+					cal.add(Calendar.DATE, 7);
+					cal.set(Calendar.MONTH,Calendar.getInstance().get(Calendar.MONTH));
+					cal.set(Calendar.YEAR, Calendar.getInstance().get(Calendar.YEAR));
+					mydate = cal.getTime();
+					return mydate;
+				}
+				
+				//System.out.println(temp +" match "+ input);
 				return mydate;
 			} catch (ParseException e) {
 				// System.out.println(temp +" dont match, next!");
