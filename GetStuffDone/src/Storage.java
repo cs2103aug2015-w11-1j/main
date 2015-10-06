@@ -1,6 +1,10 @@
 import java.util.ArrayList;
+import java.util.Scanner;
+
 
 public class Storage {
+	
+	Scanner sc = new Scanner(System.in);
 	
 	public Storage(String fileName)	{
 		//create file
@@ -15,10 +19,10 @@ public class Storage {
 		
 	}
 	
-	public ArrayList<Task> load(){
-		ArrayList<Task> tasks = new ArrayList<Task();
+	public ArrayList<Task> load(File file){
+		ArrayList<Task> tasks = new <ArrayList>Task();
 		while(file has nextline)	{
-				Task task = new task();
+				Task task = new Task();
 				task.setDescription() = sc.nextLine();
 				task.setStartDate() = sc.nextLine();
 				task.setDeadline() = sc.nextLine();
