@@ -7,7 +7,7 @@ public class CommandDetails {
 	private Parser.COMMANDS commandType;
 
 	public enum COMMANDS {
-		ADD, DELETE, DONE, UNDO, REDO, SEARCH, HELP,
+		ADD, DELETE, SEARCH, UPDATE, DONE, UNDO, REDO, HELP,
 	}
 
 	//constructor
@@ -21,7 +21,7 @@ public class CommandDetails {
 		this.commandType = command;
 	}
 	
-	public COMMANDS getCommand()	{
+	public Parser.COMMANDS getCommand()	{
 		return this.commandType;
 	}
 

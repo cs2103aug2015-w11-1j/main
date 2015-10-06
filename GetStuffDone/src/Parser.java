@@ -97,7 +97,7 @@ public class Parser {
 	};
 
 	public enum COMMANDS {
-		ADD, DELETE, DONE, UNDO, REDO, SEARCH, HELP,DISPLAY
+		ADD, DELETE, DONE, UNDO, REDO, SEARCH, HELP,DISPLAY, UPDATE
 	}
 
 	private final static int NO_NEXT_KEYWORD = -2;
@@ -281,6 +281,10 @@ public class Parser {
 			System.out.println("UNDO command");
 			input.remove(0);
 			return COMMANDS.UNDO;
+		case "UPDATE":
+			System.out.println("UPDATE command");
+			input.remove(0);
+			return COMMANDS.UPDATE;
 		}
 		return null;
 	}

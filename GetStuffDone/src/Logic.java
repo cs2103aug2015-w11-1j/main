@@ -12,9 +12,9 @@ public class Logic {
 	private static final String TASK_NOT_FOUND = "Task was not found";
 	private static final String DEFAULT_FILE_NAME = "mytextfile.txt";
 	private static final String FEEDBACK_ADD = "ADDED ";
-	private static final String FEEDBACK_SEARCH = "";
-	private static final String FEEDBACK_UPDATE = "";
-	private static final String FEEDBACK_DELETE = "";
+	private static final String FEEDBACK_SEARCH = "SEARCH for ";
+	private static final String FEEDBACK_UPDATE = "UPDATED ";
+	private static final String FEEDBACK_DELETE = "DELETED ";
 	public ArrayList<Task> tasks = new ArrayList<Task>();
 	public static ArrayList<Integer> tasksInAction = new ArrayList<Integer>();
 	public CommandDetails commandDetails;
@@ -29,13 +29,12 @@ public class Logic {
 		switch (this.commandDetails.getCommand()) {
 		case ADD:
 			return feedback = new Feedback(createTask(), FEEDBACK_ADD + commandDetails.getDescription());
-			break;
 		case DELETE:
-			deleteTask();
-			
+			return feedback = new Feedback(deleteTask(), FEEDBACK_DELETE + commandDetails.getDescription());
 		case SEARCH:
 			return feedback = new Feedback(searchTask(), FEEDBACK_SEARCH + commandDetails.getDescription());
-			break;
+		case UPDATE:
+			return feedback = new Feedback(updateTask(), FEEDBACK_UPDATE + commandDetails.getDescription());
 		case DONE:
 			
 		case HELP:
@@ -43,6 +42,9 @@ public class Logic {
 		case REDO:
 			
 		case UNDO:
+			
+		default:
+			return feedback = new Feedback(null, null);
 			
 		}
 	}
@@ -77,30 +79,26 @@ public class Logic {
 		return display;
 	}
 
-	private void updateTask()	{
-
-		this.searchTask();
-		int i = 0;
-
-		if(tasksInAction.isEmpty())	{	
-			System.out.println(TASK_NOT_FOUND);
+	private String updateTask()	{
+		int index= 0;
+		for(int i = 0; i < tasks.size(); i++)	{
+			if(tasks.get(i).contains(commandDetails))	{
+				index = i;
+				break;
+			}
 		}
-		else	{
-			tasks.get(tasksInAction.get(i)).updateDetails(commandDetails);
-		}
+		Task task = new Task(this.commandDetails);
+		tasks.set(index, task);
+		return index+1 + " " + task.toString();
 	}
 
-	private void deleteTask()	{
-
-		this.searchTask();
-		int i = 0;
-
-		if(tasksInAction.isEmpty())	{	
-			System.out.println(TASK_NOT_FOUND);
+	private String deleteTask()	{
+		for(int i = 0; i < tasks.size(); i++)	{
+			if(tasks.get(i).contains(commandDetails))	{
+				tasks.remove(i);
+				}
 		}
-		else	{
-			tasks.remove(tasksInAction.get(i));
-		}
+		return null;
 	}
 
 }
