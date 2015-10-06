@@ -29,7 +29,9 @@ public class History {
 		if (undoStack.isEmpty()) {
 			return null;
 		} else {
-			return undoStack.pop();
+			CommandDetails temp = undoStack.pop();
+			redoStack.push(temp);
+			return temp;
 		}
 	}
 	
@@ -38,7 +40,9 @@ public class History {
 		if (redoStack.isEmpty()) {
 			return null;
 		} else {
-			return redoStack.pop();
+			CommandDetails temp = redoStack.pop();
+			undoStack.push(temp);
+			return temp;
 		}
 	}
 }
