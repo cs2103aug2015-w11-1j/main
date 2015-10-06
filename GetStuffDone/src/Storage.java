@@ -1,3 +1,4 @@
+import java.util.ArrayList;
 
 public class Storage {
 	
@@ -6,6 +7,11 @@ public class Storage {
 	}
 	
 	public void save(ArrayList<Task> tasks)	{
+		
+		for(int i = 0; i<tasks.size(); i++)	{
+			tasks.get(i).toString();
+			//write to file
+		}
 		
 	}
 	
