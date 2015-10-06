@@ -1,3 +1,5 @@
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 
 /*
@@ -132,7 +134,10 @@ public class Task {
 	}
 	
 	public String toString()	{
-		return (description + " " + startDate + " " + deadline + " " + venue + " " + priority);
+		DateFormat df = new SimpleDateFormat("hh:mma dd/MMM/yyyy ");
+		String start = df.format(startDate);
+		String end = df.format(deadline);
+		return (description + " " + start + " " + end + " " + venue + " " + priority);
 	}
 }
 
