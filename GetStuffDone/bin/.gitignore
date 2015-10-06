@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 /CommandDetails.class
 /Logic.class
 /Parser$COMMANDS.class
@@ -6,3 +7,7 @@
 /UI.class
 /Feedback.class
 /Storage.class
+=======
+/CommandDetails$COMMANDS.class
+/History.class
+>>>>>>> origin/master
