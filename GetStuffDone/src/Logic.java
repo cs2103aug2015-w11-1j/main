@@ -20,7 +20,7 @@ public class Logic {
 	public CommandDetails commandDetails;
 	private Scanner sc;
 	private Parser parser = new Parser();
-	private Storage storage = new Storage(DEFAULT_FILE_NAME);
+	private Storage storage = new Storage();
 	private History history = new History();
 	
 	public Feedback processInput(String input)	{
