@@ -96,9 +96,9 @@ public class Parser {
 		}
 	};
 
-	public enum COMMANDS {
+	/*public enum COMMANDS {
 		ADD, DELETE, DONE, UNDO, REDO, SEARCH, HELP,DISPLAY
-	}
+	}*/
 
 	private final static int NO_NEXT_KEYWORD = -2;
 	private final static int NO_KEYWORD = -1;
@@ -248,41 +248,41 @@ public class Parser {
 		}
 	}
 
-	private static COMMANDS parseCommandType(ArrayList<String> input) {
+	private static CommandDetails.COMMANDS parseCommandType(ArrayList<String> input) {
 
 		switch (input.get(0).toUpperCase()) {
 		case "ADD":
 			System.out.println("ADD command");
 			input.remove(0);
-			return COMMANDS.ADD;
+			return CommandDetails.COMMANDS.ADD;
 		case "DELETE":
 			System.out.println("DELETE command");
 			input.remove(0);
-			return COMMANDS.DELETE;
+			return CommandDetails.COMMANDS.DELETE;
 		case "DISPLAY":
 			System.out.println("DISPLAY command");
 			input.remove(0);
-			return COMMANDS.DISPLAY;
+			return CommandDetails.COMMANDS.DISPLAY;
 		case "DONE":
 			System.out.println("DONE command");
 			input.remove(0);
-			return COMMANDS.DONE;
+			return CommandDetails.COMMANDS.DONE;
 		case "HELP":
 			System.out.println("HELP command");
 			input.remove(0);
-			return COMMANDS.HELP;
+			return CommandDetails.COMMANDS.HELP;
 		case "REDO":
 			System.out.println("REDO command");
 			input.remove(0);
-			return COMMANDS.ADD;
+			return CommandDetails.COMMANDS.REDO;
 		case "SEARCH":
 			System.out.println("SEARCH command");
 			input.remove(0);
-			return COMMANDS.SEARCH;
+			return CommandDetails.COMMANDS.SEARCH;
 		case "UNDO":
 			System.out.println("UNDO command");
 			input.remove(0);
-			return COMMANDS.UNDO;
+			return CommandDetails.COMMANDS.UNDO;
 		}
 		return null;
 	}
@@ -365,7 +365,7 @@ public class Parser {
 		Date end;
 
 		ArrayList<String> strTokens = new ArrayList<String>(Arrays.asList(input.split(" ")));
-		COMMANDS command = parseCommandType(strTokens);
+		CommandDetails.COMMANDS command = parseCommandType(strTokens);
 		priority = parsePriority(strTokens);
 		System.out.println("Priority= " + priority);
 		venue = parseVenue(strTokens);

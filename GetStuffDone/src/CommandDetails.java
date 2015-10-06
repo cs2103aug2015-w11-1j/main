@@ -4,14 +4,14 @@ public class CommandDetails {
 	private Date deadline;
 	private Date startDate;
 	private String venue, priority, description;
-	private Parser.COMMANDS commandType;
+	private COMMANDS commandType;
 
 	public enum COMMANDS {
-		ADD, DELETE, DONE, UNDO, REDO, SEARCH, HELP,
+		ADD, DELETE, DONE, UNDO, REDO, SEARCH, HELP, DISPLAY,
 	}
 
 	//constructor
-	public CommandDetails(Parser.COMMANDS command, String description, String venue, Date startDate, Date deadline,
+	public CommandDetails(COMMANDS command, String description, String venue, Date startDate, Date deadline,
 			String priority) {
 		this.deadline = deadline;
 		this.startDate = startDate;
