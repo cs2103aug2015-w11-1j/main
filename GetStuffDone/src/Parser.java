@@ -39,17 +39,17 @@
 				- dd/MM			01/04
 				
 */
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.Scanner;
 
 public class Parser {
-	private final static String[] DATE_FORMAT = { 
-			"HHmm dd MMMM yy", "HH.mm dd MMMM yy", "HH:mm dd MMMM yy", "hhmma dd MMMM yy", "hha dd MMMM yy", 
-			"hmma dd MMMM yy", "hh.mma dd MMMM yy", "hh:mma dd MMMM yy","dd MMMM yy",
+	private final static String[] DATE_FORMAT = { "HHmm dd MMMM yy", "HH.mm dd MMMM yy", "HH:mm dd MMMM yy",
+			"hhmma dd MMMM yy", "hha dd MMMM yy", "hmma dd MMMM yy", "hh.mma dd MMMM yy", "hh:mma dd MMMM yy",
+			"dd MMMM yy",
 
 			"HHmm dd MM yy", "HH.mm dd MM yy", "HH:mm dd MM yy", "hhmma dd MM yy", "hha dd MM yy", "hmma dd MM yy",
 			"hh.mma dd MM yy", "hh:mma dd MM yy", "dd MM yy",
@@ -85,6 +85,7 @@ public class Parser {
 			"hh:mma dd-MM", "dd-MM",
 
 	};
+	
 	private static ArrayList<String> keyWords = new ArrayList<String>() {
 		{
 			add("AT");
@@ -96,77 +97,65 @@ public class Parser {
 	};
 
 	public enum COMMANDS {
-		ADD, DELETE, DONE, UNDO, REDO, SEARCH, HELP,
+		ADD, DELETE, DONE, UNDO, REDO, SEARCH, HELP,DISPLAY
 	}
 
-	private static String parseStartDate(ArrayList<String> input) {
-		String result = "";
+	private final static int NO_NEXT_KEYWORD = -2;
+	private final static int NO_KEYWORD = -1;
+	private final static int NO_YEAR_INPUT = 1970;
+
+	private static Date parseStartDate(ArrayList<String> input) {
+		String result = null;
 		int indexOfKeyWord = input.lastIndexOf("FROM");
-		int indexOfNextKeyWord;
-		if (indexOfKeyWord == -1) {
-			System.out.print("no start date, default set as today ");
-			return null;
+		int indexOfNextKeyWord = NO_NEXT_KEYWORD;
+
+		if (containsKeword(indexOfKeyWord)) {
+			//System.out.print("no start date, default set as today ");
+			return createDate(result);
 		} else {
-			indexOfNextKeyWord = -2;
-			for (int i = indexOfKeyWord + 1; i < input.size(); i++) {
-				if (isKeyWord(input.get(i))) {
-					indexOfNextKeyWord = i;
-					break;
-				}
-			}
+			indexOfNextKeyWord = findNextKeyword(input, indexOfKeyWord, indexOfNextKeyWord);
 		}
 
-		if (indexOfNextKeyWord == -2) {
-			indexOfNextKeyWord = input.size();
-		}
+		indexOfNextKeyWord = checkLastIndex(input, indexOfNextKeyWord);
 
 		result = getInputBetweenArrayList(input, indexOfKeyWord, indexOfNextKeyWord);
-		return result;
+		return createDate(result);
 	}
 
-	private static String parseEndDate(ArrayList<String> input) {
-		String result = "";
-		int indexOfNextKeyWord;
+	private static int checkLastIndex(ArrayList<String> input, int indexOfNextKeyWord) {
+		if (indexOfNextKeyWord == NO_NEXT_KEYWORD) {
+			indexOfNextKeyWord = input.size();
+		}
+		return indexOfNextKeyWord;
+	}
 
+	private static Date parseEndDate(ArrayList<String> input) {
+		String result = null;
+		int indexOfNextKeyWord = NO_NEXT_KEYWORD;
 		int indexOfKeyWordTO = input.lastIndexOf("TO");
 		int indexOfKeyWordBY = input.lastIndexOf("BY");
 
-		if (indexOfKeyWordTO == -1 && indexOfKeyWordBY == -1) {
-			return "NO End Date found";
-		} else if (indexOfKeyWordTO == -1 && !(indexOfKeyWordBY == -1)) {
-			indexOfNextKeyWord = -2;
-			for (int i = indexOfKeyWordBY + 1; i < input.size(); i++) {
-				if (isKeyWord(input.get(i))) {
-					indexOfNextKeyWord = i;
-					break;
-				}
-			}
+		if (containsKeword(indexOfKeyWordTO) && containsKeword(indexOfKeyWordBY)) {
+			return null;
+		} else if (containsKeword(indexOfKeyWordTO) && !containsKeword(indexOfKeyWordBY)) {
+			indexOfNextKeyWord = NO_NEXT_KEYWORD;
+			indexOfNextKeyWord = findNextKeyword(input, indexOfKeyWordBY, indexOfNextKeyWord);
 		} else {
-			indexOfNextKeyWord = -2;
-			for (int i = indexOfKeyWordTO + 1; i < input.size(); i++) {
-				if (isKeyWord(input.get(i))) {
-					indexOfNextKeyWord = i;
-					break;
-				}
-			}
-		} 
-
-		if (indexOfNextKeyWord == -2) {
-			indexOfNextKeyWord = input.size();
+			indexOfNextKeyWord = findNextKeyword(input, indexOfKeyWordTO, indexOfNextKeyWord);
 		}
+		indexOfNextKeyWord = checkLastIndex(input, indexOfNextKeyWord);
 		// end date is FROM
-		if (indexOfKeyWordBY == -1) {
+		if (containsKeword(indexOfKeyWordBY)) {
 			result = getInputBetweenArrayList(input, indexOfKeyWordTO, indexOfNextKeyWord);
 		}
 		// end date is BY
-		if (indexOfKeyWordTO == -1) {
+		if (containsKeword(indexOfKeyWordTO)) {
 			result = getInputBetweenArrayList(input, indexOfKeyWordBY, indexOfNextKeyWord);
 		}
-		return result;
+		return createDate(result);
 	}
 
 	private static boolean isKeyWord(String input) {
-
 		for (int i = 0; i < keyWords.size(); i++) {
 			if (keyWords.get(i).equals(input)) {
 				return true;
@@ -177,28 +166,34 @@ public class Parser {
 
 	private static String parseVenue(ArrayList<String> input) {
 		int indexOfKeyWord = input.lastIndexOf("AT");
-		int indexOfNextKeyWord;
-		if (indexOfKeyWord == -1) {
+		int indexOfNextKeyWord = NO_NEXT_KEYWORD;
+		if (containsKeword(indexOfKeyWord)) {
 			return null;
 		} else {
-			indexOfNextKeyWord = -2;
-			for (int i = indexOfKeyWord + 1; i < input.size(); i++) {
-				if (isKeyWord(input.get(i))) {
-					indexOfNextKeyWord = i;
-					break;
-				}
-			}
+			indexOfNextKeyWord = findNextKeyword(input, indexOfKeyWord, indexOfNextKeyWord);
 		}
-		if (indexOfNextKeyWord == -2) {
-			indexOfNextKeyWord = input.size();
-		}
+		indexOfNextKeyWord = checkLastIndex(input, indexOfNextKeyWord);
 		String result = getInputBetweenArrayList(input, indexOfKeyWord, indexOfNextKeyWord);
 		return result;
 	}
 
+	private static int findNextKeyword(ArrayList<String> input, int indexOfKeyWord, int indexOfNextKeyWord) {
+		for (int i = indexOfKeyWord + 1; i < input.size(); i++) {
+			if (isKeyWord(input.get(i))) {
+				indexOfNextKeyWord = i;
+				break;
+			}
+		}
+		return indexOfNextKeyWord;
+	}
+
+	private static boolean containsKeword(int indexOfKeyWord) {
+		return indexOfKeyWord == NO_KEYWORD;
+	}
+
 	private static String getInputBetweenArrayList(ArrayList<String> input, int indexOfKeyWord,
 			int indexOfNextKeyWord) {
-		String result = "";
+		String result = null;
 		for (int i = 0; i < indexOfNextKeyWord - indexOfKeyWord - 1; i++) {
 			result = result + " " + input.remove(indexOfKeyWord + 1);
 		}
@@ -211,7 +206,8 @@ public class Parser {
 		String result = "";
 
 		if (input.isEmpty()) {
-			return "please include a description for task";
+			// System.out.println("please include a description for task");
+			return result;
 		}
 
 		while (!input.isEmpty()) {
@@ -223,8 +219,8 @@ public class Parser {
 
 	private static String parsePriority(ArrayList<String> input) {
 
-		if (input.lastIndexOf("PRIORITY") == -1) {
-			System.out.println("No Priority found");
+		if (input.lastIndexOf("PRIORITY") == NO_KEYWORD) {
+			//System.out.println("No Priority found");
 			return null;
 		} else {
 			int keyWordLocation = input.lastIndexOf("PRIORITY");
@@ -261,6 +257,10 @@ public class Parser {
 			System.out.println("DELETE command");
 			input.remove(0);
 			return COMMANDS.DELETE;
+		case "DISPLAY":
+			System.out.println("DISPLAY command");
+			input.remove(0);
+			return COMMANDS.DISPLAY;
 		case "DONE":
 			System.out.println("DONE command");
 			input.remove(0);
@@ -270,7 +270,7 @@ public class Parser {
 			input.remove(0);
 			return COMMANDS.HELP;
 		case "REDO":
-			System.out.println("add command");
+			System.out.println("REDO command");
 			input.remove(0);
 			return COMMANDS.ADD;
 		case "SEARCH":
@@ -286,16 +286,18 @@ public class Parser {
 	}
 
 	// creating and sending commandDetails object to logic class
-	static Logic commandDetailsObject = null;
+	//static Logic commandDetailsObject = null;
 
-	Parser(Logic obj) {
+	/*Parser(Logic obj) {
 		this.commandDetailsObject = obj;
-	}
+	}*/
 
+	/*
 	public static void sendToLogic(CommandDetails cmdDetails) {
 		commandDetailsObject.setCmdDetailsObj(cmdDetails);
 	}
-
+	*/
+	
 	static Date createDate(String input) {
 		for (String temp : DATE_FORMAT) {
 			try {
@@ -304,43 +306,44 @@ public class Parser {
 				Date mydate = possibleFormats.parse(input);
 				Calendar cal = Calendar.getInstance();
 				cal.setTime(mydate);
-				if (cal.get(Calendar.YEAR) == 1970) {
+				if (cal.get(Calendar.YEAR) == NO_YEAR_INPUT) {
 					cal.set(Calendar.YEAR, Calendar.getInstance().get(Calendar.YEAR));
 					mydate = cal.getTime();
 				}
 
 				// System.out.println(temp +" match");
 				return mydate;
-			} catch (Exception e) {
+			} catch (ParseException e) {
 				// System.out.println(temp +" dont match, next!");
+			}catch (NullPointerException f){
+				// System.out.println("no date given");
 			}
 		}
 		return null;
 	}
-	
-	
-	public static CommandDetails parse(String input){
-		
-		String deadLine = null;
-		String startDate = null;
-		String venue = null;
+
+	public static CommandDetails parse(String input) {
+		String venue;
 		String priority;
 		String description;
-		
+		Date start;
+		Date end;
+
 		ArrayList<String> strTokens = new ArrayList<String>(Arrays.asList(input.split(" ")));
 		COMMANDS command = parseCommandType(strTokens);
 		priority = parsePriority(strTokens);
+		System.out.println("Priority= " + priority);
 		venue = parseVenue(strTokens);
-		startDate = parseStartDate(strTokens);
-		Date start = createDate(startDate);
-		deadLine = parseEndDate(strTokens);
-		Date end = createDate(deadLine);
+		System.out.println("Venue= " + venue);
+		start = parseStartDate(strTokens);
+		System.out.println("Start= " + start);
+		end = parseEndDate(strTokens);
+		System.out.println("End= " + end);
 		description = parseDescription(strTokens);
-		
-		return new CommandDetails(command, description, venue,start, end,priority);
+		System.out.println("description= " + description);
+		return new CommandDetails(command, description, venue, start, end, priority);
 	}
-	
-
+/*
 	public static void main(String[] args) {
 
 		String deadLine = null;
@@ -383,8 +386,11 @@ public class Parser {
 		System.out.println("Description= " + description);
 
 		// create commandDetailsObject
-		//CommandDetails cmdDetails = new CommandDetails(end, start, venue, priority, description);
-		//sendToLogic(cmdDetails);
+		// CommandDetails cmdDetails = new CommandDetails(end, start, venue,
+		// priority, description);
+		// sendToLogic(cmdDetails);
 
 	}
+	
+	*/
 }
