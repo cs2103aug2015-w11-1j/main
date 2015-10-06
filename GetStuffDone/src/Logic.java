@@ -9,48 +9,31 @@ import java.util.*;
 public class Logic {
 
 	private static final String TASK_NOT_FOUND = "Task was not found";
-	public static int taskCount = 0;
+	private static final String DEFAULT_FILE_NAME = "mytextfile.txt";
 	public static ArrayList<Task> tasks = new ArrayList<Task>();
 	public static ArrayList<Integer> tasksInAction = new ArrayList<Integer>();
 	public CommandDetails commandDetails;
-	private String input;
 	private Scanner sc;
-
-	public void main()	{
-		sc = new Scanner(System.in);
-		Logic lg = new Logic();
-		while(true)	{
-			lg.readInput();
-		}
-
-	}
-
-	//receive commandDetails object from Parser @@@
-	public void setCmdDetailsObj (CommandDetails cmdDetailsObj) {
-		this.commandDetails = cmdDetailsObj;
+	private Parser parser = new Parser();
+	private Storage storage = new Storage(DEFAULT_FILE_NAME);
+	private History history = new History();
+	
+	public String processInput(String input)	{
+		CommandDetails commandDetails = Parser.parse(input);
+		Feedback feedback = new Feedback();
 	}
 
 	//Constructor
 
 	public Logic()	{
-		this.input = null;
+		
 	}
 
 	//Behavioural Methods
 
-	public void readInput()	{
-		this.input = sc.nextLine();
-	}
-
-	/*public void getCommandDetails()	{
-		this.commandDetails = Parser.parse(); 
-	}
-	*/
-
 	public void createTask()	{
 		Task task = new Task(this.commandDetails);
 		tasks.add(task);
-		taskCount++;
 	}
 
 	//Print task according to the given commandDetails
@@ -71,7 +54,7 @@ public class Logic {
 
 	//Records the index of found tasks in tasksInAction
 	public void searchTask()	{
-		for(int i = 0; i < taskCount; i++)	{
+		for(int i = 0; i < tasks.size(); i++)	{
 			if(tasks.get(i).contains(commandDetails))	{
 				tasksInAction.add(i);
 			}

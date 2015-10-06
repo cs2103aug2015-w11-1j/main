@@ -28,6 +28,10 @@ public class CommandDetails {
 		this.description = description;
 		this.commandType = command;
 	}
+	
+	public COMMANDS getCommand()	{
+		return this.commandType;
+	}
 
 	public Date getDeadline() {
 		return this.deadline;
