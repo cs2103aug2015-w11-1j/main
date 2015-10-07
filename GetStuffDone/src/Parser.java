@@ -1,15 +1,37 @@
 
 /*
-	keywords demarked by (case sensitive):
+	<------------------------------------------------------->
+	Command keywords demarked by (case insensitive)
+	Adding of task				add			-a
+	Deleting of task			delete		-d
+	Displaying of task			display
+	Marking task as done		done
+	Displaying help manual		help
+	Redo last action			redo
+	Search task					search		-s
+	Undo last action			undo
+	Editing an existing task	update	-u
+	
+	<------------------------------------------------------->
+	Venue keywords demarked by (case sensitive)
+	Specifying venue			AT
+	
+	<------------------------------------------------------->
+	Priority keywords demarked by (case sensitive)
+	Specifying priority
+	
+	<------------------------------------------------------->
+	Time keywords demarked by (case sensitive):
 	Start date and time - FROM
 	End date and time - BY/TO
 	Priority - PRIORITY
 	Venue - AT
 	
-	eg. add do homework AT School of Computing FROM 12.30pm 6/10/15 TO 6pm 6/10/15 PRIORITY high
-	
 	Date and time format - <time><date>
-	time format - HHmm		2359
+	
+	Supported time format 
+	
+				- HHmm		2359
 				- HH.mm		23.59
 				- HH:mm		23:59
 				- hhmma		1159pm
@@ -17,7 +39,9 @@
 				- hh.mma	11.59pm
 				- hh:mma	11:59pm
 				
-	date format - dd MMMM yy	01 April 15		01 Apr 15
+	Supported date format 
+	
+				- dd MMMM yy	01 April 15		01 Apr 15
 				- dd MM yy		01 04 15
 				- dd MMMM yyyy	01 April 2015	01 Apr 2015
 				- dd MM yyyy	01 04 2015
@@ -37,7 +61,15 @@
 				- dd/MM/yyyy	01/04/2015
 				- dd/MMMM		01/April		01/Apr
 				- dd/MM			01/04
+	
+	Supported NLI date	
+	
+				- today			today			<time> today
+				- tomorrow		tomorrow		<time> tomorrow
 				
+				
+		<Command> <TaskID (if applicable)> <Time, Venue, Priority, description of task>
+	eg. -U 2 do homework AT School of Computing FROM 12.30pm 6/10/15 TO 6pm 6/10/15 PRIORITY high
 */
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -82,26 +114,14 @@ public class Parser {
 			"hh.mma dd-MMMM", "hh:mma dd-MMMM", "dd-MMMM",
 
 			"HHmm dd-MM", "HH.mm dd-MM", "HH:mm dd-MM", "hhmma dd-MM", "hha dd-MM", "hmma dd-MM", "hh.mma dd-MM",
-			"hh:mma dd-MM", "dd-MM","HHmm","HH.mm","HH:mm","hhmma","hha","hmma","hh.mma","hh:mma",
+			"hh:mma dd-MM", "dd-MM", "HHmm", "HH.mm", "HH:mm", "hhmma", "hha", "hmma", "hh.mma", "hh:mma",
 
 	};
-	
-	private static ArrayList<String> keyWords = new ArrayList<String>() {
-		{
-			add("AT");
-			add("BY");
-			add("FROM");
-			add("TO");
-			add("PRIORITY");
-		}
-	};
 
-	/*
-	public enum COMMANDS {
-		ADD, DELETE, DONE, UNDO, REDO, SEARCH, HELP,DISPLAY, UPDATE
-	}*/
+	private final static String[] keyWord = { "AT", "BY", "FROM", "TO", "PRIORITY" };
 
 	private final static int NO_NEXT_KEYWORD = -2;
+	private final static int NO_ID = -10;
 	private final static int NO_KEYWORD = -1;
 	private final static int NO_YEAR_INPUT = 1970;
 
@@ -111,14 +131,11 @@ public class Parser {
 		int indexOfNextKeyWord = NO_NEXT_KEYWORD;
 
 		if (notContainsKeyword(indexOfKeyWord)) {
-			//System.out.print("no start date, default set as today ");
-			return createDate(result);
+			return new Date();
 		} else {
 			indexOfNextKeyWord = findNextKeyword(input, indexOfKeyWord, indexOfNextKeyWord);
 		}
-
 		indexOfNextKeyWord = checkLastIndex(input, indexOfNextKeyWord);
-
 		result = getInputBetweenArrayList(input, indexOfKeyWord, indexOfNextKeyWord);
 		return createDate(result);
 	}
@@ -135,7 +152,6 @@ public class Parser {
 		int indexOfNextKeyWord = NO_NEXT_KEYWORD;
 		int indexOfKeyWordTO = input.lastIndexOf("TO");
 		int indexOfKeyWordBY = input.lastIndexOf("BY");
-
 		if (notContainsKeyword(indexOfKeyWordTO) && notContainsKeyword(indexOfKeyWordBY)) {
 			return null;
 		} else if (notContainsKeyword(indexOfKeyWordTO) && !notContainsKeyword(indexOfKeyWordBY)) {
@@ -157,8 +173,8 @@ public class Parser {
 	}
 
 	private static boolean isKeyWord(String input) {
-		for (int i = 0; i < keyWords.size(); i++) {
-			if (keyWords.get(i).equals(input)) {
+		for (int i = 0; i < keyWord.length; i++) {
+			if (keyWord[i].equals(input)) {
 				return true;
 			}
 		}
@@ -208,7 +224,6 @@ public class Parser {
 		String result = "";
 
 		if (input.isEmpty()) {
-			// System.out.println("please include a description for task");
 			return null;
 		}
 
@@ -222,7 +237,6 @@ public class Parser {
 	private static String parsePriority(ArrayList<String> input) {
 
 		if (input.lastIndexOf("PRIORITY") == NO_KEYWORD) {
-			//System.out.println("No Priority found");
 			return null;
 		} else {
 			int keyWordLocation = input.lastIndexOf("PRIORITY");
@@ -255,7 +269,15 @@ public class Parser {
 			System.out.println("ADD command");
 			input.remove(0);
 			return CommandDetails.COMMANDS.ADD;
+		case "-A":
+			System.out.println("ADD command");
+			input.remove(0);
+			return CommandDetails.COMMANDS.ADD;
 		case "DELETE":
+			System.out.println("DELETE command");
+			input.remove(0);
+			return CommandDetails.COMMANDS.DELETE;
+		case "-D":
 			System.out.println("DELETE command");
 			input.remove(0);
 			return CommandDetails.COMMANDS.DELETE;
@@ -279,6 +301,10 @@ public class Parser {
 			System.out.println("SEARCH command");
 			input.remove(0);
 			return CommandDetails.COMMANDS.SEARCH;
+		case "-S":
+			System.out.println("SEARCH command");
+			input.remove(0);
+			return CommandDetails.COMMANDS.SEARCH;
 		case "UNDO":
 			System.out.println("UNDO command");
 			input.remove(0);
@@ -287,23 +313,14 @@ public class Parser {
 			System.out.println("UPDATE command");
 			input.remove(0);
 			return CommandDetails.COMMANDS.UPDATE;
+		case "-U":
+			System.out.println("UPDATE command");
+			input.remove(0);
+			return CommandDetails.COMMANDS.UPDATE;
 		}
 		return null;
 	}
 
-	// creating and sending commandDetails object to logic class
-	//static Logic commandDetailsObject = null;
-
-	/*Parser(Logic obj) {
-		this.commandDetailsObject = obj;
-	}*/
-
-	/*
-	public static void sendToLogic(CommandDetails cmdDetails) {
-		commandDetailsObject.setCmdDetailsObj(cmdDetails);
-	}
-	*/
-	
 	static Date createDate(String input) {
 		for (String temp : DATE_FORMAT) {
 			try {
@@ -312,50 +329,68 @@ public class Parser {
 				Date mydate = possibleFormats.parse(input);
 				Calendar cal = Calendar.getInstance();
 				cal.setTime(mydate);
-				
-				if (cal.get(Calendar.YEAR) == NO_YEAR_INPUT && cal.get(Calendar.MONTH) == 0 && cal.get(Calendar.DATE) == 1) {
+				if (cal.get(Calendar.YEAR) == NO_YEAR_INPUT && cal.get(Calendar.MONTH) == 0
+						&& cal.get(Calendar.DATE) == 1) {
 					cal.setTime(mydate);
 					cal.set(Calendar.DATE, Calendar.getInstance().get(Calendar.DATE));
 					cal.set(Calendar.MONTH, Calendar.getInstance().get(Calendar.MONTH));
 					cal.set(Calendar.YEAR, Calendar.getInstance().get(Calendar.YEAR));
-					if(input.toUpperCase().contains("TOMORROW")){
+					if (input.toUpperCase().contains("TOMORROW")) {
 						cal.add(Calendar.DATE, 1);
 					}
-					if(input.toUpperCase().contains("NEXT WEEK")){
+					if (input.toUpperCase().contains("NEXT WEEK")) {
 						cal.add(Calendar.DATE, 7);
 					}
-					
+
 					mydate = cal.getTime();
 					return mydate;
 				}
-				
 				if (cal.get(Calendar.YEAR) == NO_YEAR_INPUT) {
 					cal.setTime(mydate);
 					cal.set(Calendar.YEAR, Calendar.getInstance().get(Calendar.YEAR));
 					mydate = cal.getTime();
 					return mydate;
 				}
-				
-				
-				if(input.toUpperCase().contains("TODAY")){
-					cal.setTime(mydate);
-					cal.set(Calendar.DATE, Calendar.getInstance().get(Calendar.DATE));
-					cal.set(Calendar.MONTH, Calendar.getInstance().get(Calendar.MONTH));
-					cal.set(Calendar.YEAR, Calendar.getInstance().get(Calendar.YEAR));
-					mydate = cal.getTime();
-					return mydate;
-				}
-
-				
-				//System.out.println(temp +" match");
 				return mydate;
 			} catch (ParseException e) {
-				//System.out.println(temp +" dont match, "+ input + " next!");
-			}catch (NullPointerException f){
-				// System.out.println("no date given");
+				//Does not match format, proceed to compare next format
 			}
 		}
+
+		if (input.toUpperCase().equals("TODAY") || input.toUpperCase().equals("TOMORROW")) {
+			SimpleDateFormat format = new SimpleDateFormat("HHmm");
+			try {
+				Date mydate = specialDateKeyWords(input, format);
+				return mydate;
+			} catch (ParseException e) {
+				//self set time format, ignore
+			}
+		}
+
 		return null;
+	}
+
+	private static Date specialDateKeyWords(String input, SimpleDateFormat today) throws ParseException {
+		String endTimeOfDay = "2359";
+		Date mydate = today.parse(endTimeOfDay);
+		Calendar cal = Calendar.getInstance();
+		cal.setTime(mydate);
+		cal.set(Calendar.DATE, Calendar.getInstance().get(Calendar.DATE));
+		cal.set(Calendar.MONTH, Calendar.getInstance().get(Calendar.MONTH));
+		cal.set(Calendar.YEAR, Calendar.getInstance().get(Calendar.YEAR));
+		if (input.toUpperCase().contains("TOMORROW")) {
+			cal.add(Calendar.DATE, 1);
+		}
+		mydate = cal.getTime();
+		return mydate;
+	}
+
+	private static int parseID(ArrayList<String> input) {
+		try {
+			return Integer.parseInt(input.remove(0));
+		} catch (NumberFormatException e) {
+			return (Integer) null;
+		}
 	}
 
 	public static CommandDetails parse(String input) {
@@ -364,69 +399,29 @@ public class Parser {
 		String description;
 		Date start;
 		Date end;
+		int ID = NO_ID;
 
 		ArrayList<String> strTokens = new ArrayList<String>(Arrays.asList(input.split(" ")));
 		CommandDetails.COMMANDS command = parseCommandType(strTokens);
+
+		if (command == CommandDetails.COMMANDS.DELETE || command == CommandDetails.COMMANDS.DONE
+				|| command == CommandDetails.COMMANDS.UPDATE) {
+			ID = parseID(strTokens);
+		}
 		priority = parsePriority(strTokens);
-		System.out.println("Priority= " + priority);
+		//System.out.println("Priority= " + priority);
 		venue = parseVenue(strTokens);
-		System.out.println("Venue= " + venue);
+		//System.out.println("Venue= " + venue);
 		start = parseStartDate(strTokens);
-		System.out.println("Start= " + start);
+		//System.out.println("Start= " + start);
 		end = parseEndDate(strTokens);
-		System.out.println("End= " + end);
+		//System.out.println("End= " + end);
 		description = parseDescription(strTokens);
-		System.out.println("description= " + description);
-		return new CommandDetails(command, description, venue, start, end, priority);
+		//System.out.println("description= " + description);
+		
+		CommandDetails details = new CommandDetails(command, description, venue, start, end, priority, ID);
+		System.out.println(details);
+		return details;
+		//return new CommandDetails(command, description, venue, start, end, priority, ID);
 	}
-/*
-	public static void main(String[] args) {
-
-		String deadLine = null;
-		String startDate = null;
-		String venue = null;
-		String priority;
-		String description;
-
-		Scanner sc = new Scanner(System.in);
-
-		String input = sc.nextLine();
-		ArrayList<String> strTokens = new ArrayList<String>(Arrays.asList(input.split(" ")));
-
-		System.out.println(input);
-
-		COMMANDS command = parseCommandType(strTokens);
-		// System.out.println(strTokens);
-
-		priority = parsePriority(strTokens);
-		System.out.println("Priority= " + priority);
-		// System.out.println(strTokens);
-
-		venue = parseVenue(strTokens);
-		System.out.println("Venue= " + venue);
-		// System.out.println(strTokens);
-
-		startDate = parseStartDate(strTokens);
-		// System.out.println("Start= "+ startDate);
-		// System.out.println(strTokens);
-		Date start = createDate(startDate);
-		System.out.println("Start= " + start);
-
-		deadLine = parseEndDate(strTokens);
-		System.out.println("End= " + deadLine);
-		// System.out.println(strTokens);
-		Date end = createDate(deadLine);
-		System.out.println("End= " + end);
-
-		description = parseDescription(strTokens);
-		System.out.println("Description= " + description);
-
-		// create commandDetailsObject
-		// CommandDetails cmdDetails = new CommandDetails(end, start, venue,
-		// priority, description);
-		// sendToLogic(cmdDetails);
-
-	}
-	
-	*/
 }
