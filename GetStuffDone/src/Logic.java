@@ -65,31 +65,30 @@ public class Logic {
 
 	//Print task according to the given commandDetails
 	private String searchTask()	{
-		String display=null;
+		String display="";
 
 		for(int i = 0; i < tasks.size(); i++)	{
-			if(tasks.get(i).contains(commandDetails))	{
-				display.concat(i + tasks.get(i).toString());
+			if(tasks.get(i).getDescription().contains(commandDetails.getDescription()))	{
+				display += i+1 + " " + tasks.get(i).toString();
 			}
 		}
 
-		if(display == null)	{	
+		if(display.isEmpty())	{	
 			display = TASK_NOT_FOUND;
 		}
 		return display;
 	}
 
 	private String updateTask()	{
-		int index= 0;
+		Task task = null;
 		for(int i = 0; i < tasks.size(); i++)	{
-			if(tasks.get(i).contains(commandDetails))	{
-				index = i;
-				break;
+			if(tasks.get(i).getDescription().contains(commandDetails.getDescription()))	{
+				tasks.get(i).updateDetails(commandDetails);
+				return i+1 + " " + tasks.get(i).toString();
 			}
 		}
-		Task task = new Task(this.commandDetails);
-		tasks.set(index, task);
-		return index+1 + " " + task.toString();
+		
+		return TASK_NOT_FOUND;
 	}
 
 	private String deleteTask()	{
