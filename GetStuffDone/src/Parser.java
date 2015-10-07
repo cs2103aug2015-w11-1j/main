@@ -226,11 +226,9 @@ public class Parser {
 		if (input.isEmpty()) {
 			return null;
 		}
-
 		while (!input.isEmpty()) {
 			result = result + " " + input.remove(0);
 		}
-
 		return result.substring(1, result.length());
 	}
 
@@ -389,7 +387,7 @@ public class Parser {
 		try {
 			return Integer.parseInt(input.remove(0));
 		} catch (NumberFormatException e) {
-			return (Integer) null;
+			return -1;
 		}
 	}
 
@@ -409,19 +407,16 @@ public class Parser {
 			ID = parseID(strTokens);
 		}
 		priority = parsePriority(strTokens);
-		//System.out.println("Priority= " + priority);
 		venue = parseVenue(strTokens);
-		//System.out.println("Venue= " + venue);
 		start = parseStartDate(strTokens);
-		//System.out.println("Start= " + start);
 		end = parseEndDate(strTokens);
-		//System.out.println("End= " + end);
 		description = parseDescription(strTokens);
-		//System.out.println("description= " + description);
 		
+		
+		// to check if details correct
 		CommandDetails details = new CommandDetails(command, description, venue, start, end, priority, ID);
 		System.out.println(details);
-		return details;
-		//return new CommandDetails(command, description, venue, start, end, priority, ID);
+		
+		return new CommandDetails(command, description, venue, start, end, priority, ID);
 	}
 }

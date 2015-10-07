@@ -5,20 +5,22 @@ public class CommandDetails {
 	private Date startDate;
 	private String venue, priority, description;
 	private COMMANDS command;
-
+	private int ID;
+	
 	public enum COMMANDS {
 		ADD, DELETE, SEARCH, UPDATE, DONE, UNDO, REDO, HELP,DISPLAY
 	}
 
 	//constructor
 	public CommandDetails(COMMANDS command, String description, String venue, Date startDate, Date deadline,
-			String priority) {
+			String priority, int ID) {
 		this.deadline = deadline;
 		this.startDate = startDate;
 		this.venue = venue;
 		this.priority = priority;
 		this.description = description;
 		this.command = command;
+		this.ID = ID;
 	}
 	
 	public COMMANDS getCommand()	{
@@ -43,5 +45,21 @@ public class CommandDetails {
 
 	public String getDescription() {
 		return this.description;
+	}
+	
+	public int getID() {
+		return this.ID;
+	}
+	
+	public String toString(){
+		String result = "";
+		result= "command = " + command + "\n" + 
+				"ID = " + ID + "\n" +
+				"description = " + description + "\n" +
+				"venue = " + venue + "\n" +
+				"startDate = " + startDate + "\n" +
+				"deadline = " + deadline + "\n" +
+				"priority = " + priority;
+		return result;
 	}
 }
