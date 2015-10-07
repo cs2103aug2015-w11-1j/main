@@ -170,7 +170,7 @@ public class Parser {
 		int indexOfKeyWord = input.lastIndexOf("AT");
 		int indexOfNextKeyWord = NO_NEXT_KEYWORD;
 		if (notContainsKeyword(indexOfKeyWord)) {
-			return result;
+			return null;
 		} else {
 			indexOfNextKeyWord = findNextKeyword(input, indexOfKeyWord, indexOfNextKeyWord);
 		}
@@ -209,7 +209,7 @@ public class Parser {
 
 		if (input.isEmpty()) {
 			// System.out.println("please include a description for task");
-			return result;
+			return null;
 		}
 
 		while (!input.isEmpty()) {
@@ -223,7 +223,7 @@ public class Parser {
 
 		if (input.lastIndexOf("PRIORITY") == NO_KEYWORD) {
 			//System.out.println("No Priority found");
-			return "";
+			return null;
 		} else {
 			int keyWordLocation = input.lastIndexOf("PRIORITY");
 			int priorityLocate = keyWordLocation + 1;
@@ -318,6 +318,13 @@ public class Parser {
 					cal.set(Calendar.DATE, Calendar.getInstance().get(Calendar.DATE));
 					cal.set(Calendar.MONTH, Calendar.getInstance().get(Calendar.MONTH));
 					cal.set(Calendar.YEAR, Calendar.getInstance().get(Calendar.YEAR));
+					if(input.toUpperCase().contains("TOMORROW")){
+						cal.add(Calendar.DATE, 1);
+					}
+					if(input.toUpperCase().contains("NEXT WEEK")){
+						cal.add(Calendar.DATE, 7);
+					}
+					
 					mydate = cal.getTime();
 					return mydate;
 				}
@@ -338,26 +345,7 @@ public class Parser {
 					mydate = cal.getTime();
 					return mydate;
 				}
-				
-				if(input.toUpperCase().contains("TOMORROW")){
-					cal.setTime(mydate);
-					cal.set(Calendar.DATE, Calendar.getInstance().get(Calendar.DATE));
-					cal.add(Calendar.DATE, 1);
-					cal.set(Calendar.MONTH, Calendar.getInstance().get(Calendar.MONTH));
-					cal.set(Calendar.YEAR, Calendar.getInstance().get(Calendar.YEAR));
-					mydate = cal.getTime();
-					return mydate;
-				}
-				
-				if(input.toUpperCase().contains("NEXT WEEK")){
-					cal.setTime(mydate);
-					cal.set(Calendar.DATE, Calendar.getInstance().get(Calendar.DATE));
-					cal.add(Calendar.DATE, 7);
-					cal.set(Calendar.MONTH, Calendar.getInstance().get(Calendar.MONTH));
-					cal.set(Calendar.YEAR, Calendar.getInstance().get(Calendar.YEAR));
-					mydate = cal.getTime();
-					return mydate;
-				}
+
 				
 				//System.out.println(temp +" match");
 				return mydate;
