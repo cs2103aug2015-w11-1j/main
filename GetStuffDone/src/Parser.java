@@ -351,17 +351,18 @@ public class Parser {
 				}
 				return mydate;
 			} catch (ParseException e) {
-				//Does not match format, proceed to compare next format
+				// Does not match format, proceed to compare next format
 			}
 		}
-
+		// if today exist, time is default 2359 !!!!! need edit!!!! Split into 2
+		// create date format to support more specific keywords
 		if (input.toUpperCase().equals("TODAY") || input.toUpperCase().equals("TOMORROW")) {
 			SimpleDateFormat format = new SimpleDateFormat("HHmm");
 			try {
 				Date mydate = specialDateKeyWords(input, format);
 				return mydate;
 			} catch (ParseException e) {
-				//self set time format, ignore
+				// self set time format, ignore
 			}
 		}
 
@@ -397,6 +398,8 @@ public class Parser {
 		String description;
 		Date start;
 		Date end;
+		boolean containSearchTime = false;
+
 		int ID = NO_ID;
 
 		ArrayList<String> strTokens = new ArrayList<String>(Arrays.asList(input.split(" ")));
@@ -406,17 +409,45 @@ public class Parser {
 				|| command == CommandDetails.COMMANDS.UPDATE) {
 			ID = parseID(strTokens);
 		}
+
+		if (command == CommandDetails.COMMANDS.SEARCH) {
+			containSearchTime = parseSearchTime(strTokens);
+		}
+
 		priority = parsePriority(strTokens);
 		venue = parseVenue(strTokens);
 		start = parseStartDate(strTokens);
 		end = parseEndDate(strTokens);
 		description = parseDescription(strTokens);
-		
-		
+
 		// to check if details correct
-		CommandDetails details = new CommandDetails(command, description, venue, start, end, priority, ID);
+		CommandDetails details = new CommandDetails(command, description, venue, start, end, priority, ID,
+				containSearchTime);
 		System.out.println(details);
-		
-		return new CommandDetails(command, description, venue, start, end, priority, ID);
+
+		return new CommandDetails(command, description, venue, start, end, priority, ID, containSearchTime);
+	}
+
+	private static boolean parseSearchTime(ArrayList<String> input) {
+		String[] timeFormat = { "HHmm", "HH.mm", "HH:mm", "hhmma", "hha", "hmma", "hh.mma", "hh:mma" };
+
+		if (input.indexOf("FROM") != -1) {
+			String result = (input.get(input.indexOf("FROM") + 1));
+			System.out.println("result here here " + result);
+			
+			for (String temp :timeFormat) {
+				try {
+					SimpleDateFormat possibleFormats = new SimpleDateFormat(temp);
+					possibleFormats.setLenient(false);
+					possibleFormats.parse(result);
+					return true;
+				} catch (ParseException e) {
+					//// next;
+				}
+			}
+
+
+		}
+		return false;
 	}
 }

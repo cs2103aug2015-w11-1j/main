@@ -6,6 +6,7 @@ public class CommandDetails {
 	private String venue, priority, description;
 	private COMMANDS command;
 	private int ID;
+	private boolean hasSearchTIme;
 	
 	public enum COMMANDS {
 		ADD, DELETE, SEARCH, UPDATE, DONE, UNDO, REDO, HELP,DISPLAY
@@ -13,7 +14,7 @@ public class CommandDetails {
 
 	//constructor
 	public CommandDetails(COMMANDS command, String description, String venue, Date startDate, Date deadline,
-			String priority, int ID) {
+			String priority, int ID, boolean containSearchTime) {
 		this.deadline = deadline;
 		this.startDate = startDate;
 		this.venue = venue;
@@ -21,6 +22,7 @@ public class CommandDetails {
 		this.description = description;
 		this.command = command;
 		this.ID = ID;
+		this.hasSearchTIme = containSearchTime;
 	}
 	
 	public COMMANDS getCommand()	{
@@ -51,6 +53,10 @@ public class CommandDetails {
 		return this.ID;
 	}
 	
+	public boolean getHasSearchTime(){
+		return this.hasSearchTIme;
+	}
+	
 	public String toString(){
 		String result = "";
 		result= "command = " + command + "\n" + 
@@ -59,7 +65,8 @@ public class CommandDetails {
 				"venue = " + venue + "\n" +
 				"startDate = " + startDate + "\n" +
 				"deadline = " + deadline + "\n" +
-				"priority = " + priority;
+				"priority = " + priority +"\n" +
+				"Search time = " + hasSearchTIme;
 		return result;
 	}
 }
