@@ -12,10 +12,12 @@ public class History {
 	}
 
 	//this method inserts a CommandDetails object into the undoStack
+	//clears redo stack of obsolete commands
 	//returns 1 if successful, 0 if unsuccessful
 	public int insert(CommandDetails cmdDetObj) {
 		try {
 			undoStack.push(cmdDetObj);
+			redoStack.clear();
 			return 1;
 		}
 		
