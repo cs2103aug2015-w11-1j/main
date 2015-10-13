@@ -10,7 +10,7 @@
 	Redo last action			redo
 	Search task					search		-s
 	Undo last action			undo
-	Editing an existing task	update	-u
+	Editing an existing task	update		-u
 	
 	<------------------------------------------------------->
 	Venue keywords demarked by (case sensitive)
