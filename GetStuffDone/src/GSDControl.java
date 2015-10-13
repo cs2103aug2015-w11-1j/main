@@ -139,16 +139,9 @@ public class GSDControl {
 	}
 
 	private String deleteTask(int ID)	{
-		try	{
 			tasks.remove(ID);
 			storage.save(tasks);
 			return displayAllTasks();
-		}	catch (IndexOutOfBoundsException e)	{
-				throw new IndexOutOfBoundsException();
-		}	finally	{
-				return "Invalid Task Number\n";
-		}
-		
 	}
 	
 	private String completeTask(int ID)	{
@@ -176,6 +169,12 @@ public class GSDControl {
 		System.out.println(commandDetails.toString());
 		return executeHistoryCommand();
 	}
+	
+	private String redoDeleteTask()	{
+		tasks.remove(tasks.size()-1);
+		storage.save(tasks);
+		return displayAllTasks();
+}
 	
 	private String displayAllTasks()	{
 		String display = "";
@@ -210,7 +209,7 @@ public class GSDControl {
 		case ADD:
 			return createTask();
 		case DELETE:
-			return deleteTask(commandDetails.getID());
+			return redoDeleteTask();
 		case UPDATE:
 			return updateTask(commandDetails.getID()-1);
 		case COMPLETE:
