@@ -327,8 +327,11 @@ public class Parser {
 			System.out.println("EXIT command");
 			input.remove(0);
 			return CommandDetails.COMMANDS.EXIT;
+		default:
+			System.out.print("Invalid Command");
+			input.remove(0);
+			return CommandDetails.COMMANDS.INVALID;
 		}
-		return null;
 	}
 
 	static Date createDate(String input) {

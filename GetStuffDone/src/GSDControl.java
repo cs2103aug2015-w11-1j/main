@@ -20,6 +20,8 @@ public class GSDControl {
 	private static final String FEEDBACK_REDO = "Last action redone";
 	private static final String FEEDBACK_DISPLAY = "All tasks displayed";
 	private static final String FEEDBACK_HELP = "Called for help!";
+	private static final String FEEDBACK_INVALID_COMMAND = "Invalid Command";
+	private static final String FEEDBACK_INVALID_TASK_NUMBER = "Invalid Task Number";
 	public ArrayList<Task> tasks = new ArrayList<Task>();
 	private Scanner sc = new Scanner(System.in);
 	public CommandDetails commandDetails;
@@ -27,7 +29,7 @@ public class GSDControl {
 	private Storage storage = new Storage();
 	private History history = new History();
 	
-	public Feedback processInput(String input)	{
+	public Feedback processInput(String input)	throws IndexOutOfBoundsException {
 		this.commandDetails = parser.parse(input);
 		Feedback feedback;
 		switch (this.commandDetails.getCommand()) {
@@ -36,26 +38,49 @@ public class GSDControl {
 			//history.insert(reverseCommandDetails(this.commandDetails.getID()));
 			return feedback = new Feedback(createTask(), FEEDBACK_ADD + commandDetails.getDescription());
 		case DELETE:
-			Task taskToDelete = tasks.get(this.commandDetails.getID()-1);
-			CommandDetails deletedDetails = new CommandDetails(CommandDetails.COMMANDS.DELETE, taskToDelete.getDescription(), 
-													taskToDelete.getVenue(), taskToDelete.getStartDate(),
-													taskToDelete.getdeadline(), taskToDelete.getPriority(),
-													this.commandDetails.getID()-1);
-			history.insert(deletedDetails);
-			//history.insert(reverseCommandDetails(this.commandDetails.getID()-1));
-			String taskDescription = tasks.get(commandDetails.getID()-1).getDescription();
-			return feedback = new Feedback(deleteTask(commandDetails.getID()-1), FEEDBACK_DELETE + taskDescription);
+			try	{
+				Task taskToDelete = tasks.get(this.commandDetails.getID()-1);
+				CommandDetails deletedDetails = new CommandDetails(CommandDetails.COMMANDS.DELETE, taskToDelete.getDescription(), 
+														taskToDelete.getVenue(), taskToDelete.getStartDate(),
+														taskToDelete.getdeadline(), taskToDelete.getPriority(),
+														this.commandDetails.getID()-1);
+				history.insert(deletedDetails);
+				String taskDescription = tasks.get(commandDetails.getID()-1).getDescription();
+				return feedback = new Feedback(deleteTask(commandDetails.getID()-1), FEEDBACK_DELETE + taskDescription);
+			}	catch (IndexOutOfBoundsException e)	{
+					throw new IndexOutOfBoundsException();
+			}	finally	{
+					return feedback = new Feedback(displayAllTasks(), FEEDBACK_INVALID_TASK_NUMBER);
+			}
 		case SEARCH:
 			return feedback = new Feedback(searchTask(), FEEDBACK_SEARCH + commandDetails.getDescription());
 		case UPDATE:
+			try	{
 			history.insert(reverseCommandDetails(this.commandDetails.getID()-1));
 			return feedback = new Feedback(updateTask(commandDetails.getID()-1), FEEDBACK_UPDATE + commandDetails.getDescription());
+			}	catch (IndexOutOfBoundsException e)	{
+					throw new IndexOutOfBoundsException();
+			}	finally	{
+					return feedback = new Feedback(displayAllTasks(), FEEDBACK_INVALID_TASK_NUMBER);
+			}
 		case COMPLETE:
-			history.insert(reverseCommandDetails(this.commandDetails.getID()-1));
-			return feedback = new Feedback(completeTask(commandDetails.getID()-1), FEEDBACK_COMPLETE + commandDetails.getDescription());
+			try	{
+				history.insert(reverseCommandDetails(this.commandDetails.getID()-1));
+				return feedback = new Feedback(completeTask(commandDetails.getID()-1), FEEDBACK_COMPLETE + commandDetails.getDescription());
+			}	catch (IndexOutOfBoundsException e)	{
+				throw new IndexOutOfBoundsException();
+			}	finally	{
+				return feedback = new Feedback(displayAllTasks(), FEEDBACK_INVALID_TASK_NUMBER);
+			}
 		case INCOMPLETE:
-			history.insert(reverseCommandDetails(this.commandDetails.getID()-1));
-			return feedback = new Feedback(incompleteTask(commandDetails.getID()-1), FEEDBACK_INCOMPLETE + commandDetails.getDescription());
+			try	{
+				history.insert(reverseCommandDetails(this.commandDetails.getID()-1));
+				return feedback = new Feedback(incompleteTask(commandDetails.getID()-1), FEEDBACK_INCOMPLETE + commandDetails.getDescription());
+			}	catch (IndexOutOfBoundsException e)	{
+				throw new IndexOutOfBoundsException();
+			}	finally	{
+				return feedback = new Feedback(displayAllTasks(), FEEDBACK_INVALID_TASK_NUMBER);
+			}
 		case REDO:
 			return feedback = new Feedback(redoLastAction(), FEEDBACK_REDO);
 		case UNDO:
@@ -69,7 +94,7 @@ public class GSDControl {
 		case EXIT:
 			
 		default:
-			return feedback = new Feedback(null, null);
+			return feedback = new Feedback(displayAllTasks(), FEEDBACK_INVALID_COMMAND);
 			
 		}
 	}
@@ -114,9 +139,16 @@ public class GSDControl {
 	}
 
 	private String deleteTask(int ID)	{
-		tasks.remove(ID);
-		storage.save(tasks);
-		return displayAllTasks();
+		try	{
+			tasks.remove(ID);
+			storage.save(tasks);
+			return displayAllTasks();
+		}	catch (IndexOutOfBoundsException e)	{
+				throw new IndexOutOfBoundsException();
+		}	finally	{
+				return "Invalid Task Number\n";
+		}
+		
 	}
 	
 	private String completeTask(int ID)	{
