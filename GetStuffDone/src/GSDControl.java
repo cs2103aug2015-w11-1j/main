@@ -32,10 +32,17 @@ public class GSDControl {
 		Feedback feedback;
 		switch (this.commandDetails.getCommand()) {
 		case ADD:
-			history.insert(reverseCommandDetails(this.commandDetails.getID()));
+			history.insert(this.commandDetails);
+			//history.insert(reverseCommandDetails(this.commandDetails.getID()));
 			return feedback = new Feedback(createTask(), FEEDBACK_ADD + commandDetails.getDescription());
 		case DELETE:
-			history.insert(reverseCommandDetails(this.commandDetails.getID()-1));
+			Task taskToDelete = tasks.get(this.commandDetails.getID()-1);
+			CommandDetails deletedDetails = new CommandDetails(CommandDetails.COMMANDS.DELETE, taskToDelete.getDescription(), 
+													taskToDelete.getVenue(), taskToDelete.getStartDate(),
+													taskToDelete.getdeadline(), taskToDelete.getPriority(),
+													this.commandDetails.getID()-1);
+			history.insert(deletedDetails);
+			//history.insert(reverseCommandDetails(this.commandDetails.getID()-1));
 			String taskDescription = tasks.get(commandDetails.getID()-1).getDescription();
 			return feedback = new Feedback(deleteTask(commandDetails.getID()-1), FEEDBACK_DELETE + taskDescription);
 		case SEARCH:
@@ -126,6 +133,9 @@ public class GSDControl {
 	
 	private String undoLastAction()	{
 		this.commandDetails = history.undo();
+		System.out.println(commandDetails.toString());
+		this.commandDetails = reverseCommandDetails(this.commandDetails.getID());
+		System.out.println(commandDetails.toString());
 		return executeHistoryCommand();
 	}
 
@@ -200,17 +210,12 @@ public class GSDControl {
 	 
 	private CommandDetails reverseAdd()	{
 		CommandDetails addToDelete;
-		return addToDelete = new CommandDetails(CommandDetails.COMMANDS.DELETE, tasks.size());
+		return addToDelete = new CommandDetails(CommandDetails.COMMANDS.DELETE, tasks.size()-1);
 	}
 	
 	private CommandDetails reverseDelete(int ID)	{
-		Task taskToDelete = tasks.get(ID);
-		int dummyID = -10;
-		CommandDetails deleteToAdd;
-		return deleteToAdd = new CommandDetails(CommandDetails.COMMANDS.ADD, taskToDelete.getDescription(), 
-												taskToDelete.getVenue(), taskToDelete.getStartDate(),
-												taskToDelete.getdeadline(), taskToDelete.getPriority(),
-												dummyID);
+		this.commandDetails.setCommand(CommandDetails.COMMANDS.ADD);
+		return this.commandDetails;
 	}
 	
 	private CommandDetails reverseUpdate(int ID)	{
