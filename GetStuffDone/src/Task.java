@@ -5,7 +5,7 @@ import java.util.Date;
 
 /*
  * Task is an object used in GetStuffDone
- * Task does not know the existence of UI, Logic, Parser, History and Storage
+ * Task does not know the existence of UI, GSDControl, Parser, History and Storage
  * Task knows the existence of commandDetails object
  */
 
@@ -16,6 +16,7 @@ public class Task {
 	private Date deadline;
 	private String venue;
 	private String priority;
+	private boolean isDone;
 	
 	//Constructors
 	
@@ -26,6 +27,7 @@ public class Task {
 		deadline = null;
 		venue = null;
 		priority = null;
+		isDone = false;
 	}
 	
 	public Task(CommandDetails details)	{
@@ -34,6 +36,7 @@ public class Task {
 		this.deadline = details.getDeadline();
 		this.venue = details.getVenue();
 		this.priority = details.getPriority();
+		isDone = false;
 	}
 	
 	
@@ -106,7 +109,13 @@ public class Task {
 		}
 	}
 	
+	public void markAsDone()	{
+		isDone = true;
+	}
 	
+	public void markAsUndone()	{
+		isDone = false;
+	}
 	//Overriding methods
 	
 	public boolean contains(CommandDetails details)	{
@@ -121,24 +130,18 @@ public class Task {
 			return true;
 		}
 		
-		if(details.getStartDate().equals(startDateCal.DATE))	{
-			if(!details.getIsTimeSpecific())	{
+		if(details.getStartDate() != null)	{
+			if(details.getStartDate().equals(startDateCal.DATE))	{
 				return true;
 			}
-			else	{
-				if(details.getStartDate().equals(startDateCal.DATE))	{
-					return true;
-				}
+		}
+		
+		if(details.getDeadline() != null)	{
+			if(details.getDeadline().equals(deadlineCal.DATE))	{
+				return true;
 			}
 		}
 		
-		if(details.getDeadline().equals(deadlineCal.getDate()))	{
-			return true;
-		
-		if(details.getDeadline().equals(deadlineCal.getTime()))	{
-			return true;
-		}
-		}
 		if(details.getVenue().contains(this.venue))	{
 			return true;
 		}
