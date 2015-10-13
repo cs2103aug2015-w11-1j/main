@@ -1,5 +1,6 @@
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
 
 /*
@@ -110,23 +111,39 @@ public class Task {
 	
 	public boolean contains(CommandDetails details)	{
 		
-		if(details.getDescription().equals(this.description))	{
+		Calendar startDateCal = Calendar.getInstance();
+		startDateCal.setTime(this.startDate);
+		
+		Calendar deadlineCal = Calendar.getInstance();
+		deadlineCal.setTime(this.deadline);
+				
+		if(details.getDescription().contains(this.description))	{
 			return true;
 		}
 		
-		if(details.getStartDate().equals(this.startDate))	{
+		if(details.getStartDate().equals(startDateCal.DATE))	{
+			if(!details.getIsTimeSpecific())	{
+				return true;
+			}
+			else	{
+				if(details.getStartDate().equals(startDateCal.DATE))	{
+					return true;
+				}
+			}
+		}
+		
+		if(details.getDeadline().equals(deadlineCal.getDate()))	{
+			return true;
+		
+		if(details.getDeadline().equals(deadlineCal.getTime()))	{
+			return true;
+		}
+		}
+		if(details.getVenue().contains(this.venue))	{
 			return true;
 		}
 		
-		if(details.getDeadline().equals(this.deadline))	{
-			return true;
-		}
-		
-		if(details.getVenue().equals(this.venue))	{
-			return true;
-		}
-		
-		if(details.getPriority().equals(this.priority))	{
+		if(details.getPriority().contains(this.priority))	{
 			return true;
 		}
 		
