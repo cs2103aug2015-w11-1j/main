@@ -9,14 +9,19 @@ import java.util.*;
 public class GSDControl {
 
 	private static final String TASK_NOT_FOUND = "Task was not found";
-	private static final String DEFAULT_FILE_NAME = "mytextfile.txt";
+	private static final String NO_TASKS = "No tasks recorded";
 	private static final String FEEDBACK_ADD = "ADDED ";
 	private static final String FEEDBACK_SEARCH = "SEARCH for ";
 	private static final String FEEDBACK_UPDATE = "UPDATED ";
 	private static final String FEEDBACK_DELETE = "DELETED ";
-	private static final String FEEDBACK_DONE = "DONE ";
+	private static final String FEEDBACK_COMPLETE = "COMPLETED ";
+	private static final String FEEDBACK_INCOMPLETE = "INCOMPLETE ";
 	private static final String FEEDBACK_UNDO = "Last action undone";
+	private static final String FEEDBACK_REDO = "Last action redone";
+	private static final String FEEDBACK_DISPLAY = "All tasks displayed";
+	private static final String FEEDBACK_HELP = "Called for help!";
 	public ArrayList<Task> tasks = new ArrayList<Task>();
+	private Scanner sc = new Scanner(System.in);
 	public CommandDetails commandDetails;
 	private Parser parser = new Parser();
 	private Storage storage = new Storage();
@@ -31,21 +36,31 @@ public class GSDControl {
 			return feedback = new Feedback(createTask(), FEEDBACK_ADD + commandDetails.getDescription());
 		case DELETE:
 			history.insert(reverseCommandDetails(this.commandDetails.getID()-1));
-			return feedback = new Feedback(deleteTask(commandDetails.getID()-1), FEEDBACK_DELETE + commandDetails.getDescription());
+			String taskDescription = tasks.get(commandDetails.getID()-1).getDescription();
+			return feedback = new Feedback(deleteTask(commandDetails.getID()-1), FEEDBACK_DELETE + taskDescription);
 		case SEARCH:
 			return feedback = new Feedback(searchTask(), FEEDBACK_SEARCH + commandDetails.getDescription());
 		case UPDATE:
 			history.insert(reverseCommandDetails(this.commandDetails.getID()-1));
 			return feedback = new Feedback(updateTask(commandDetails.getID()-1), FEEDBACK_UPDATE + commandDetails.getDescription());
-		case DONE:
+		case COMPLETE:
 			history.insert(reverseCommandDetails(this.commandDetails.getID()-1));
-			return feedback = new Feedback(doneTask(commandDetails.getID()-1), FEEDBACK_DONE + commandDetails.getDescription());
-		case HELP:
-			
+			return feedback = new Feedback(completeTask(commandDetails.getID()-1), FEEDBACK_COMPLETE + commandDetails.getDescription());
+		case INCOMPLETE:
+			history.insert(reverseCommandDetails(this.commandDetails.getID()-1));
+			return feedback = new Feedback(incompleteTask(commandDetails.getID()-1), FEEDBACK_INCOMPLETE + commandDetails.getDescription());
 		case REDO:
-			
+			return feedback = new Feedback(redoLastAction(), FEEDBACK_REDO);
 		case UNDO:
 			return feedback = new Feedback(undoLastAction(), FEEDBACK_UNDO);
+		case DISPLAY:
+			return feedback = new Feedback(displayAllTasks(), FEEDBACK_DISPLAY);
+		case FLOATING:
+			
+		case HELP:
+			return feedback = new Feedback(help(), FEEDBACK_HELP);
+		case EXIT:
+			
 		default:
 			return feedback = new Feedback(null, null);
 			
@@ -64,62 +79,102 @@ public class GSDControl {
 		Task task = new Task(this.commandDetails);
 		tasks.add(task);
 		storage.save(tasks);
-		return tasks.size() + " " + task.toString();
+		return displayAllTasks();
+		//return tasks.size() + " " + task.toString();
 	}
 
 	//Print task according to the given commandDetails
 	private String searchTask()	{
-		String display="";
+		String search = "";
 
 		for(int i = 0; i < tasks.size(); i++)	{
 			if(tasks.get(i).getDescription().contains(commandDetails.getDescription()))	{
-				display += i+1 + " " + tasks.get(i).toString();
+				search += i+1 + ". " + tasks.get(i).toString();
 			}
 		}
 
-		if(display.isEmpty())	{	
-			display = TASK_NOT_FOUND;
+		if(search.isEmpty())	{	
+			search = TASK_NOT_FOUND;
 		}
-		return display;
+		return search;
 	}
 
 	private String updateTask(int ID)	{
 		tasks.get(ID).updateDetails(commandDetails);
 		storage.save(tasks);
-		return ID+1 + " " + tasks.get(ID).toString();
+		return displayAllTasks();
+		//return ID+1 + " " + tasks.get(ID).toString();
 	}
 
 	private String deleteTask(int ID)	{
 		tasks.remove(ID);
 		storage.save(tasks);
-		return null;
+		return displayAllTasks();
 	}
 	
-	private String doneTask(int ID)	{
-		tasks.get(ID).markAsDone();
+	private String completeTask(int ID)	{
+		tasks.get(ID).markAsComplete();
 		storage.save(tasks);
-		return null;
+		return displayAllTasks();
 	}
 	
-	private String undoneTask(int ID)	{
-		tasks.get(ID).markAsUndone();
+	private String incompleteTask(int ID)	{
+		tasks.get(ID).markAsIncomplete();
 		storage.save(tasks);;
-		return null;
+		return displayAllTasks();
 	}
 	
 	private String undoLastAction()	{
 		this.commandDetails = history.undo();
+		return executeHistoryCommand();
+	}
+
+	private String redoLastAction()	{
+		this.commandDetails = history.redo();
+		System.out.println(commandDetails.toString());
+		return executeHistoryCommand();
+	}
+	
+	private String displayAllTasks()	{
+		String display = "";
+
+		for(int i = 0; i < tasks.size(); i++)	{
+			display += i+1 + ". " + tasks.get(i).toString();
+		}
+
+		if(display.isEmpty())	{	
+			display = NO_TASKS;
+		}
+		return display;
+	}
+	
+	private String help()	{
+		return "Add a floating task - add <description> AT <venue> PRIORITY <priority>\n"
+				+ "Add a deadline task - add <description> BY <deadline> AT <venue> PRIORITY <priority>\n"
+				+ "Add an event - add <description> FROM <start date/time> TO <end date/time> AT <venue> PRIORITY <priority>\n"
+				+ "Search for task - search <keyword/day/date>\n"
+				+ "Update a task - update <ID> <description> FROM <start date/time> TO <end date/time> AT <venue> PRIORITY <priority>\n"
+				+ "Delete a task - delete <ID>\n"
+				+ "Mark a task as complete - complete <ID>\n"
+				+ "Mark a task as incomplete - incomplete <ID>\n"
+				+ "Undo last action - undo\n"
+				+ "Display all tasks - display\n"
+				+ "Display floating tasks - floating\n"
+				+ "Exit GSD - exit\n";
+	}
+	
+	private String executeHistoryCommand() {
 		switch (this.commandDetails.getCommand())	{
 		case ADD:
 			return createTask();
 		case DELETE:
-			return deleteTask(commandDetails.getID()-1);
+			return deleteTask(commandDetails.getID());
 		case UPDATE:
 			return updateTask(commandDetails.getID()-1);
-		case DONE:
-			return doneTask(commandDetails.getID()-1);
-		case UNDONE:
-			return undoneTask(commandDetails.getID()-1);
+		case COMPLETE:
+			return completeTask(commandDetails.getID()-1);
+		case INCOMPLETE:
+			return incompleteTask(commandDetails.getID()-1);
 		default:
 			return null;
 		}
@@ -133,8 +188,10 @@ public class GSDControl {
 			return reverseDelete(ID);
 		case UPDATE:
 			return reverseUpdate(ID);
-		case DONE:
-			return reverseDone(ID);
+		case COMPLETE:
+			return reverseComplete(ID);
+		case INCOMPLETE:
+			return reverseIncomplete(ID);
 		default:
 			return commandDetails;
 			
@@ -148,7 +205,7 @@ public class GSDControl {
 	
 	private CommandDetails reverseDelete(int ID)	{
 		Task taskToDelete = tasks.get(ID);
-		int dummyID = (Integer) null;
+		int dummyID = -10;
 		CommandDetails deleteToAdd;
 		return deleteToAdd = new CommandDetails(CommandDetails.COMMANDS.ADD, taskToDelete.getDescription(), 
 												taskToDelete.getVenue(), taskToDelete.getStartDate(),
@@ -165,9 +222,14 @@ public class GSDControl {
 											ID);
 	}
 	
-	private CommandDetails reverseDone(int ID)	{
-		CommandDetails doneToUndone;
-		return doneToUndone = new CommandDetails(CommandDetails.COMMANDS.UNDONE, tasks.size());
+	private CommandDetails reverseComplete(int ID)	{
+		CommandDetails completeToIncomplete;
+		return completeToIncomplete = new CommandDetails(CommandDetails.COMMANDS.INCOMPLETE, tasks.size());
+	}
+	
+	private CommandDetails reverseIncomplete(int ID)	{
+		CommandDetails incompleteToComplete;
+		return incompleteToComplete = new CommandDetails(CommandDetails.COMMANDS.COMPLETE, tasks.size());
 	}
 	
 }

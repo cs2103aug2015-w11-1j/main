@@ -16,7 +16,7 @@ public class Task {
 	private Date deadline;
 	private String venue;
 	private String priority;
-	private boolean isDone;
+	private boolean isComplete;
 	
 	//Constructors
 	
@@ -27,7 +27,7 @@ public class Task {
 		deadline = null;
 		venue = null;
 		priority = null;
-		isDone = false;
+		isComplete = false;
 	}
 	
 	public Task(CommandDetails details)	{
@@ -36,7 +36,7 @@ public class Task {
 		this.deadline = details.getDeadline();
 		this.venue = details.getVenue();
 		this.priority = details.getPriority();
-		isDone = false;
+		isComplete = false;
 	}
 	
 	
@@ -109,12 +109,12 @@ public class Task {
 		}
 	}
 	
-	public void markAsDone()	{
-		isDone = true;
+	public void markAsComplete()	{
+		isComplete = true;
 	}
 	
-	public void markAsUndone()	{
-		isDone = false;
+	public void markAsIncomplete()	{
+		isComplete = false;
 	}
 	//Overriding methods
 	
@@ -169,7 +169,7 @@ public class Task {
 		}else{
 			end = df.format(deadline);
 		}
-		return (description + "\n" + start + "\n" + end + "\n" + venue + "\n" + priority);
+		return (description + "\nStart Date: " + start + "\nDeadline: " + end + "\nVenue: " + venue + "\nPriority: " + priority + "\n");
 	}
 }
 

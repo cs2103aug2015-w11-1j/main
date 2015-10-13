@@ -8,7 +8,7 @@ public class CommandDetails {
 	private int ID;
 	
 	public enum COMMANDS {
-		ADD, DELETE, SEARCH, UPDATE, DONE, UNDONE, UNDO, REDO, HELP, DISPLAY
+		ADD, DELETE, SEARCH, UPDATE, COMPLETE, INCOMPLETE, UNDO, REDO, HELP, DISPLAY, FLOATING, EXIT
 	}
 
 	//constructor

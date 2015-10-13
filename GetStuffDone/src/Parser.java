@@ -5,7 +5,7 @@
 	Adding of task				add			-a
 	Deleting of task			delete		-d
 	Displaying of task			display
-	Marking task as done		done
+	Marking task as complete	complete
 	Displaying help manual		help
 	Redo last action			redo
 	Search task					search		-s
@@ -267,7 +267,7 @@ public class Parser {
 			System.out.println("ADD command");
 			input.remove(0);
 			return CommandDetails.COMMANDS.ADD;
-		case "-A":
+		case "a":
 			System.out.println("ADD command");
 			input.remove(0);
 			return CommandDetails.COMMANDS.ADD;
@@ -275,18 +275,18 @@ public class Parser {
 			System.out.println("DELETE command");
 			input.remove(0);
 			return CommandDetails.COMMANDS.DELETE;
-		case "-D":
+		case "d":
 			System.out.println("DELETE command");
 			input.remove(0);
 			return CommandDetails.COMMANDS.DELETE;
-		case "DISPLAY":
-			System.out.println("DISPLAY command");
+		case "COMPLETE":
+			System.out.println("COMPLETE command");
 			input.remove(0);
-			return CommandDetails.COMMANDS.DISPLAY;
-		case "DONE":
-			System.out.println("DONE command");
+			return CommandDetails.COMMANDS.COMPLETE;
+		case "INCOMPLETE":
+			System.out.println("INCOMPLETE command");
 			input.remove(0);
-			return CommandDetails.COMMANDS.DONE;
+			return CommandDetails.COMMANDS.INCOMPLETE;
 		case "HELP":
 			System.out.println("HELP command");
 			input.remove(0);
@@ -299,7 +299,7 @@ public class Parser {
 			System.out.println("SEARCH command");
 			input.remove(0);
 			return CommandDetails.COMMANDS.SEARCH;
-		case "-S":
+		case "s":
 			System.out.println("SEARCH command");
 			input.remove(0);
 			return CommandDetails.COMMANDS.SEARCH;
@@ -307,14 +307,26 @@ public class Parser {
 			System.out.println("UNDO command");
 			input.remove(0);
 			return CommandDetails.COMMANDS.UNDO;
+		case "DISPLAY":
+			System.out.println("DISPLAY command");
+			input.remove(0);
+			return CommandDetails.COMMANDS.DISPLAY;
 		case "UPDATE":
 			System.out.println("UPDATE command");
 			input.remove(0);
 			return CommandDetails.COMMANDS.UPDATE;
-		case "-U":
+		case "u":
 			System.out.println("UPDATE command");
 			input.remove(0);
 			return CommandDetails.COMMANDS.UPDATE;
+		case "FLOATING":
+			System.out.println("FLOATING command");
+			input.remove(0);
+			return CommandDetails.COMMANDS.FLOATING;
+		case "EXIT":
+			System.out.println("EXIT command");
+			input.remove(0);
+			return CommandDetails.COMMANDS.EXIT;
 		}
 		return null;
 	}
@@ -398,21 +410,21 @@ public class Parser {
 		String description;
 		Date start;
 		Date end;
-		boolean containSearchTime = false;
+		//boolean containSearchTime = false;
 
 		int ID = NO_ID;
 
 		ArrayList<String> strTokens = new ArrayList<String>(Arrays.asList(input.split(" ")));
 		CommandDetails.COMMANDS command = parseCommandType(strTokens);
 
-		if (command == CommandDetails.COMMANDS.DELETE || command == CommandDetails.COMMANDS.DONE
-				|| command == CommandDetails.COMMANDS.UPDATE) {
+		if (command == CommandDetails.COMMANDS.DELETE || command == CommandDetails.COMMANDS.COMPLETE
+				|| command == CommandDetails.COMMANDS.INCOMPLETE || command == CommandDetails.COMMANDS.UPDATE) {
 			ID = parseID(strTokens);
 		}
 
-		if (command == CommandDetails.COMMANDS.SEARCH) {
+		/*if (command == CommandDetails.COMMANDS.SEARCH) {
 			containSearchTime = parseSearchTime(strTokens);
-		}
+		}*/
 
 		priority = parsePriority(strTokens);
 		venue = parseVenue(strTokens);
@@ -421,11 +433,10 @@ public class Parser {
 		description = parseDescription(strTokens);
 
 		// to check if details correct
-		CommandDetails details = new CommandDetails(command, description, venue, start, end, priority, ID,
-				containSearchTime);
+		CommandDetails details = new CommandDetails(command, description, venue, start, end, priority, ID);
 		System.out.println(details);
 
-		return new CommandDetails(command, description, venue, start, end, priority, ID, containSearchTime);
+		return new CommandDetails(command, description, venue, start, end, priority, ID);
 	}
 
 	private static boolean parseSearchTime(ArrayList<String> input) {
