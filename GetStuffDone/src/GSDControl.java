@@ -2,12 +2,12 @@ import java.util.*;
 
 
 /*
- * Logic deals with handling of input commands, CRUD of tasks, update of History and update of Storage
- * Logic knows the existence of Parser, Task, History and Storage
- * Logic does not know the existence of UI
+ * GSDControl deals with handling of input commands, CRUD of tasks, update of History and update of Storage
+ * GSDControl knows the existence of Parser, Task, History and Storage
+ * GSDControl does not know the existence of UI
  */
 
-public class Logic {
+public class GSDControl {
 
 	private static final String TASK_NOT_FOUND = "Task was not found";
 	private static final String DEFAULT_FILE_NAME = "mytextfile.txt";
@@ -18,23 +18,22 @@ public class Logic {
 	public ArrayList<Task> tasks = new ArrayList<Task>();
 	public static ArrayList<Integer> tasksInAction = new ArrayList<Integer>();
 	public CommandDetails commandDetails;
-	private Scanner sc;
 	private Parser parser = new Parser();
 	private Storage storage = new Storage();
 	private History history = new History();
 	
 	public Feedback processInput(String input)	{
-		this.commandDetails = Parser.parse(input);
+		this.commandDetails = parser.parse(input);
 		Feedback feedback;
 		switch (this.commandDetails.getCommand()) {
 		case ADD:
 			return feedback = new Feedback(createTask(), FEEDBACK_ADD + commandDetails.getDescription());
 		case DELETE:
-			return feedback = new Feedback(deleteTask(), FEEDBACK_DELETE + commandDetails.getDescription());
+			return feedback = new Feedback(deleteTask(commandDetails.getID()-1), FEEDBACK_DELETE + commandDetails.getDescription());
 		case SEARCH:
 			return feedback = new Feedback(searchTask(), FEEDBACK_SEARCH + commandDetails.getDescription());
 		case UPDATE:
-			return feedback = new Feedback(updateTask(), FEEDBACK_UPDATE + commandDetails.getDescription());
+			return feedback = new Feedback(updateTask(commandDetails.getID()-1), FEEDBACK_UPDATE + commandDetails.getDescription());
 		case DONE:
 			
 		case HELP:
@@ -51,7 +50,7 @@ public class Logic {
 
 	//Constructor
 
-	public Logic()	{
+	public GSDControl()	{
 		
 	}
 
@@ -79,24 +78,14 @@ public class Logic {
 		return display;
 	}
 
-	private String updateTask()	{
-		Task task = null;
-		for(int i = 0; i < tasks.size(); i++)	{
-			if(tasks.get(i).getDescription().contains(commandDetails.getDescription()))	{
-				tasks.get(i).updateDetails(commandDetails);
-				return i+1 + " " + tasks.get(i).toString();
-			}
-		}
-		
-		return TASK_NOT_FOUND;
+	private String updateTask(int index)	{
+		//Task task = null;
+		tasks.get(index).updateDetails(commandDetails);
+		return index+1 + " " + tasks.get(index).toString();
 	}
 
-	private String deleteTask()	{
-		for(int i = 0; i < tasks.size(); i++)	{
-			if(tasks.get(i).contains(commandDetails))	{
-				tasks.remove(i);
-				}
-		}
+	private String deleteTask(int index)	{
+		tasks.remove(index);
 		return null;
 	}
 

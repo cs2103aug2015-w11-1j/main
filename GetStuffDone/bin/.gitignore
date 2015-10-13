@@ -1,13 +1,12 @@
-<<<<<<< HEAD
-/CommandDetails.class
-/Logic.class
-/Parser$COMMANDS.class
-/Parser.class
-/Task.class
-/UI.class
-/Feedback.class
-/Storage.class
-=======
 /CommandDetails$COMMANDS.class
+/CommandDetails.class
+/Feedback.class
+/GSDControl.class
 /History.class
->>>>>>> origin/master
+/Parser.class
+/Storage.class
+/Task.class
+/TextView.class
+/UI.class
+/testParser.class
+/UI$1.class

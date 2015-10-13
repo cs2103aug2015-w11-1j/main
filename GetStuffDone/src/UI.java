@@ -25,7 +25,7 @@ public class UI {
 
 	public UI() {
 
-		Logic logic = new Logic();
+		GSDControl gsd = new GSDControl();
 
 		// Initialize the main window
 		frame.setLayout(new BorderLayout());
@@ -46,7 +46,7 @@ public class UI {
 				String input = commandBar.getText();
 				commandBar.setText("");
 
-				Feedback feedback = logic.processInput(input);
+				Feedback feedback = gsd.processInput(input);
 
 				feedbackBox.display(input);
 
