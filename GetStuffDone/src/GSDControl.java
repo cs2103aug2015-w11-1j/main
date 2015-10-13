@@ -214,8 +214,16 @@ public class GSDControl {
 	}
 	
 	private CommandDetails reverseDelete(int ID)	{
-		this.commandDetails.setCommand(CommandDetails.COMMANDS.ADD);
-		return this.commandDetails;
+//		this.commandDetails.setCommand(CommandDetails.COMMANDS.ADD);
+//		return this.commandDetails;
+		CommandDetails taskDelete = new CommandDetails(CommandDetails.COMMANDS.ADD, 
+				this.commandDetails.getDescription(), 
+				this.commandDetails.getVenue(), 
+				this.commandDetails.getStartDate(), 
+				this.commandDetails.getDeadline(), 
+				this.commandDetails.getPriority(), 
+				this.commandDetails.getID());
+		return taskDelete;
 	}
 	
 	private CommandDetails reverseUpdate(int ID)	{
