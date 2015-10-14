@@ -425,9 +425,7 @@ public class Parser {
 			ID = parseID(strTokens);
 		}
 
-		/*if (command == CommandDetails.COMMANDS.SEARCH) {
-			containSearchTime = parseSearchTime(strTokens);
-		}*/
+
 
 		priority = parsePriority(strTokens);
 		venue = parseVenue(strTokens);
@@ -442,26 +440,4 @@ public class Parser {
 		return new CommandDetails(command, description, venue, start, end, priority, ID);
 	}
 
-	private static boolean parseSearchTime(ArrayList<String> input) {
-		String[] timeFormat = { "HHmm", "HH.mm", "HH:mm", "hhmma", "hha", "hmma", "hh.mma", "hh:mma" };
-
-		if (input.indexOf("FROM") != -1) {
-			String result = (input.get(input.indexOf("FROM") + 1));
-			System.out.println("result here here " + result);
-			
-			for (String temp :timeFormat) {
-				try {
-					SimpleDateFormat possibleFormats = new SimpleDateFormat(temp);
-					possibleFormats.setLenient(false);
-					possibleFormats.parse(result);
-					return true;
-				} catch (ParseException e) {
-					//// next;
-				}
-			}
-
-
-		}
-		return false;
-	}
 }
