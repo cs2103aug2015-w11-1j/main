@@ -36,7 +36,7 @@ public class Task {
 		this.deadline = details.getDeadline();
 		this.venue = details.getVenue();
 		this.priority = details.getPriority();
-		isComplete = false;
+		this.isComplete = false;
 	}
 	
 	
@@ -61,6 +61,9 @@ public class Task {
 	public void setPriority(String priority)	{
 		this.priority = priority;
 	}
+	public void setIsComplete(boolean isComplete)	{
+		this.isComplete = isComplete;
+	}
 	
 	//Accessors
 	
@@ -82,6 +85,10 @@ public class Task {
 	
 	public String getPriority()	{
 		return this.priority;
+	}
+	
+	public boolean getIsComplete()	{
+		return this.isComplete;
 	}
 	
 	//Behavioural methods
