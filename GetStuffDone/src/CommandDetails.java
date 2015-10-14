@@ -68,6 +68,30 @@ public class CommandDetails {
 		this.command = command;
 	}
 	
+	public Date setDeadline(Date deadline) {
+		return this.deadline = deadline;
+	}
+
+	public Date setStartDate(Date startDate) {
+		return this.startDate = startDate;
+	}
+
+	public String setVenue(String venue) {
+		return this.venue = venue;
+	}
+
+	public String setPriority(String priority) {
+		return this.priority = priority;
+	}
+	
+	public void setID(int ID)	{
+		this.ID = ID;
+	}
+	
+	public void setDescription(String description)	{
+		this.description = description;
+	}
+	
 	
 	//Overriding methods
 	public String toString(){

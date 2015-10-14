@@ -28,12 +28,14 @@ public class GSDControl {
 	private Parser parser = new Parser();
 	private Storage storage = new Storage();
 	private History history = new History();
+	private boolean isValidTaskNo = true;
 	
 	public Feedback processInput(String input)	throws IndexOutOfBoundsException {
 		this.commandDetails = parser.parse(input);
 		Feedback feedback;
 		switch (this.commandDetails.getCommand()) {
 		case ADD:
+			this.commandDetails.setID(tasks.size());
 			history.insert(this.commandDetails);
 			//history.insert(reverseCommandDetails(this.commandDetails.getID()));
 			return feedback = new Feedback(createTask(), FEEDBACK_ADD + commandDetails.getDescription());
@@ -42,44 +44,66 @@ public class GSDControl {
 				Task taskToDelete = tasks.get(this.commandDetails.getID()-1);
 				CommandDetails deletedDetails = new CommandDetails(CommandDetails.COMMANDS.DELETE, taskToDelete.getDescription(), 
 														taskToDelete.getVenue(), taskToDelete.getStartDate(),
-														taskToDelete.getdeadline(), taskToDelete.getPriority(),
+														taskToDelete.getDeadline(), taskToDelete.getPriority(),
 														this.commandDetails.getID()-1);
 				history.insert(deletedDetails);
 				String taskDescription = tasks.get(commandDetails.getID()-1).getDescription();
 				return feedback = new Feedback(deleteTask(commandDetails.getID()-1), FEEDBACK_DELETE + taskDescription);
 			}	catch (IndexOutOfBoundsException e)	{
+					isValidTaskNo = false;
 					throw new IndexOutOfBoundsException();
 			}	finally	{
-					return feedback = new Feedback(displayAllTasks(), FEEDBACK_INVALID_TASK_NUMBER);
+					if(!isValidTaskNo)	{
+						isValidTaskNo = true;
+						return feedback = new Feedback(displayAllTasks(), FEEDBACK_INVALID_TASK_NUMBER);
+					}
 			}
 		case SEARCH:
 			return feedback = new Feedback(searchTask(), FEEDBACK_SEARCH + commandDetails.getDescription());
 		case UPDATE:
 			try	{
-			history.insert(reverseCommandDetails(this.commandDetails.getID()-1));
+				Task taskToUpdate = tasks.get(this.commandDetails.getID()-1);
+				CommandDetails updatedDetails = new CommandDetails(CommandDetails.COMMANDS.UPDATE, taskToUpdate.getDescription(), 
+														taskToUpdate.getVenue(), taskToUpdate.getStartDate(),
+														taskToUpdate.getDeadline(), taskToUpdate.getPriority(),
+														this.commandDetails.getID()-1);
+				history.insert(updatedDetails);
+				//history.insert(reverseCommandDetails(this.commandDetails.getID()-1));
 			return feedback = new Feedback(updateTask(commandDetails.getID()-1), FEEDBACK_UPDATE + commandDetails.getDescription());
 			}	catch (IndexOutOfBoundsException e)	{
+					isValidTaskNo = false;
 					throw new IndexOutOfBoundsException();
 			}	finally	{
-					return feedback = new Feedback(displayAllTasks(), FEEDBACK_INVALID_TASK_NUMBER);
+					if(!isValidTaskNo)	{
+						isValidTaskNo = true;
+						return feedback = new Feedback(displayAllTasks(), FEEDBACK_INVALID_TASK_NUMBER);
+				}
 			}
 		case COMPLETE:
 			try	{
-				history.insert(reverseCommandDetails(this.commandDetails.getID()-1));
-				return feedback = new Feedback(completeTask(commandDetails.getID()-1), FEEDBACK_COMPLETE + commandDetails.getDescription());
+				history.insert(this.commandDetails);
+				return feedback = new Feedback(completeTask(commandDetails.getID()-1), FEEDBACK_COMPLETE + tasks.get(this.commandDetails.getID()-1).getDescription());
 			}	catch (IndexOutOfBoundsException e)	{
-				throw new IndexOutOfBoundsException();
+					isValidTaskNo = false;
+					throw new IndexOutOfBoundsException();
 			}	finally	{
-				return feedback = new Feedback(displayAllTasks(), FEEDBACK_INVALID_TASK_NUMBER);
+				if(!isValidTaskNo)	{
+					isValidTaskNo = true;
+					return feedback = new Feedback(displayAllTasks(), FEEDBACK_INVALID_TASK_NUMBER);
+				}
 			}
 		case INCOMPLETE:
 			try	{
-				history.insert(reverseCommandDetails(this.commandDetails.getID()-1));
-				return feedback = new Feedback(incompleteTask(commandDetails.getID()-1), FEEDBACK_INCOMPLETE + commandDetails.getDescription());
+				history.insert(this.commandDetails);
+				return feedback = new Feedback(incompleteTask(commandDetails.getID()-1), FEEDBACK_INCOMPLETE + tasks.get(this.commandDetails.getID()-1).getDescription());
 			}	catch (IndexOutOfBoundsException e)	{
-				throw new IndexOutOfBoundsException();
+					isValidTaskNo = false;
+					throw new IndexOutOfBoundsException();
 			}	finally	{
-				return feedback = new Feedback(displayAllTasks(), FEEDBACK_INVALID_TASK_NUMBER);
+				if(!isValidTaskNo)	{
+					isValidTaskNo = true;
+					return feedback = new Feedback(displayAllTasks(), FEEDBACK_INVALID_TASK_NUMBER);
+				}
 			}
 		case REDO:
 			return feedback = new Feedback(redoLastAction(), FEEDBACK_REDO);
@@ -169,9 +193,16 @@ public class GSDControl {
 		System.out.println(commandDetails.toString());
 		return executeHistoryCommand();
 	}
-	
-	private String redoDeleteTask()	{
-		tasks.remove(tasks.size()-1);
+	private String undoRedoCreateTask()	{
+		Task task = new Task(this.commandDetails);
+		tasks.add(this.commandDetails.getID(), task);
+		storage.save(tasks);
+		return displayAllTasks();
+		//return tasks.size() + " " + task.toString();
+	}
+		
+	private String undoRedoDeleteTask()	{
+		tasks.remove(this.commandDetails.getID());
 		storage.save(tasks);
 		return displayAllTasks();
 }
@@ -207,9 +238,9 @@ public class GSDControl {
 	private String executeHistoryCommand() {
 		switch (this.commandDetails.getCommand())	{
 		case ADD:
-			return createTask();
+			return undoRedoCreateTask();
 		case DELETE:
-			return redoDeleteTask();
+			return undoRedoDeleteTask();
 		case UPDATE:
 			return updateTask(commandDetails.getID()-1);
 		case COMPLETE:
@@ -262,7 +293,7 @@ public class GSDControl {
 		CommandDetails unUpdate;
 		return unUpdate = new CommandDetails(CommandDetails.COMMANDS.UPDATE, taskToUpdate.getDescription(),
 											taskToUpdate.getVenue(), taskToUpdate.getStartDate(),
-											taskToUpdate.getdeadline(), taskToUpdate.getPriority(),
+											taskToUpdate.getDeadline(), taskToUpdate.getPriority(),
 											ID);
 	}
 	

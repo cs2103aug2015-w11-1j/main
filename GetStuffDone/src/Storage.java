@@ -49,7 +49,7 @@ public class Storage {
 			for (Task task : tasks) {
 				writeString(writer, task.getDescription());
 				writeDate(writer, task.getStartDate());
-				writeDate(writer, task.getdeadline());
+				writeDate(writer, task.getDeadline());
 				writeString(writer, task.getVenue());
 				writeString(writer, task.getPriority());
 			}
@@ -90,7 +90,7 @@ public class Storage {
 
 			task.setDescription(parseString(lines.get(i * LINES_PER_TASK + OFFSET_DESCRIPTION)));
 			task.setStartDate(parseDate(lines.get(i * LINES_PER_TASK + OFFSET_DATE_START)));
-			task.setdeadline(parseDate(lines.get(i * LINES_PER_TASK + OFFSET_DATE_END)));
+			task.setDeadline(parseDate(lines.get(i * LINES_PER_TASK + OFFSET_DATE_END)));
 			task.setVenue(parseString(lines.get(i * LINES_PER_TASK + OFFSET_VENUE)));
 			task.setPriority(parseString(lines.get(i * LINES_PER_TASK + OFFSET_PRIORITY)));
 

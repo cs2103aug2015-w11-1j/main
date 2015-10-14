@@ -50,7 +50,7 @@ public class Task {
 		this.startDate = startDate;
 	}
 	
-	public void setdeadline(Date deadline)	{
+	public void setDeadline(Date deadline)	{
 		this.deadline = deadline;
 	}
 	
@@ -75,7 +75,7 @@ public class Task {
 		return this.startDate;
 	}
 	
-	public Date getdeadline()	{
+	public Date getDeadline()	{
 		return this.deadline;
 	}
 	
