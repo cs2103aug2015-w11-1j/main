@@ -67,6 +67,7 @@ public class GSDControl {
 														taskToUpdate.getVenue(), taskToUpdate.getStartDate(),
 														taskToUpdate.getDeadline(), taskToUpdate.getPriority(),
 														this.commandDetails.getID()-1);
+				System.out.println(updatedDetails.getDescription());
 				history.insert(updatedDetails);
 				//history.insert(reverseCommandDetails(this.commandDetails.getID()-1));
 			return feedback = new Feedback(updateTask(commandDetails.getID()-1), FEEDBACK_UPDATE + commandDetails.getDescription());
@@ -242,7 +243,7 @@ public class GSDControl {
 		case DELETE:
 			return undoRedoDeleteTask();
 		case UPDATE:
-			return updateTask(commandDetails.getID()-1);
+			return updateTask(commandDetails.getID());
 		case COMPLETE:
 			return completeTask(commandDetails.getID()-1);
 		case INCOMPLETE:
@@ -259,7 +260,7 @@ public class GSDControl {
 		case DELETE:
 			return reverseDelete(ID);
 		case UPDATE:
-			return reverseUpdate(ID);
+			return this.commandDetails;	//don't need to reverse engineer
 		case COMPLETE:
 			return reverseComplete(ID);
 		case INCOMPLETE:
