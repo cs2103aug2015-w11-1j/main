@@ -18,15 +18,21 @@ public class GSDControl {
 	private static final String FEEDBACK_INCOMPLETE = ">> INCOMPLETE ";
 	private static final String FEEDBACK_UNDO = ">> Last action undone";
 	private static final String FEEDBACK_REDO = ">> Last action redone";
-	private static final String FEEDBACK_DISPLAY = ">> All tasks displayed";
+	private static final String FEEDBACK_ALL = ">> All tasks displayed";
+	private static final String FEEDBACK_FLOATING = ">> Floating Tasks displayed";
+	private static final String FEEDBACK_EVENTS = ">> Events displayed";
+	private static final String FEEDBACK_DEADLINES = ">> Deadlines displayed";
 	private static final String FEEDBACK_HELP = ">> Called for help!";
+	private static final String FEEDBACK_SET = ">> File path set to ";
 	private static final String FEEDBACK_INVALID_COMMAND = ">> Invalid Command";
 	private static final String FEEDBACK_INVALID_TASK_NUMBER = ">> Invalid Task Number";
 	private static final String FEEDBACK_UNDO_ERROR = ">> Nothing to undo";
 	private static final String FEEDBACK_REDO_ERROR = ">> Nothing to redo";
-	public ArrayList<Task> tasks = new ArrayList<Task>();
+	private ArrayList<Task> floating = new ArrayList<Task>();
+	private ArrayList<Task> events = new ArrayList<Task>();
+	private ArrayList<Task> deadlines = new ArrayList<Task>();
 	private Scanner sc = new Scanner(System.in);
-	public CommandDetails commandDetails;
+	private CommandDetails commandDetails;
 	private Parser parser = new Parser();
 	private Storage storage = new Storage();
 	private History history = new History();
@@ -118,14 +124,20 @@ public class GSDControl {
 				return feedback = new Feedback(displayAllTasks(), FEEDBACK_UNDO_ERROR);
 			}
 			return feedback = new Feedback(undoLastAction(), FEEDBACK_UNDO);
-		case DISPLAY:
-			return feedback = new Feedback(displayAllTasks(), FEEDBACK_DISPLAY);
+		case ALL:
+			return feedback = new Feedback(displayAllTasks(), FEEDBACK_ALL);
 		case FLOATING:
-			
+			return feedback = new Feedback(displayFloatingTasks(), FEEDBACK_FLOATING);
+		case EVENTS:
+			return feedback = new Feedback(displayEvents(), FEEDBACK_EVENTS);
+		case DEADLINES:
+			return feedback = new Feedback(displayDeadlines(), FEEDBACK_DEADLINES);
 		case HELP:
 			return feedback = new Feedback(help(), FEEDBACK_HELP);
 		case EXIT:
 			
+		case SET:
+			//return feedback = new Feedback(setFilePath(), FEEDBACK_SET + this.commandDetails.getDescription());
 		default:
 			return feedback = new Feedback(displayAllTasks(), FEEDBACK_INVALID_COMMAND);
 			
@@ -200,6 +212,12 @@ public class GSDControl {
 		System.out.println(commandDetails.toString());
 		return executeHistoryCommand();
 	}
+	
+	/*private String setFilePath()	{
+		storage.setFilePath(this.commandDetails.getDescription());
+		return displayAllTasks();
+	}*/
+	
 	private String undoRedoCreateTask()	{
 		Task task = new Task(this.commandDetails);
 		tasks.add(this.commandDetails.getID(), task);

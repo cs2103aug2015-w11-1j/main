@@ -4,7 +4,7 @@
 	Command keywords demarked by (case insensitive)
 	Adding of task				add			-a
 	Deleting of task			delete		-d
-	Displaying of task			display
+	Displaying of task			all
 	Marking task as complete	complete
 	Displaying help manual		help
 	Redo last action			redo
@@ -256,10 +256,10 @@ public class Parser {
 			System.out.println("UNDO command");
 			input.remove(0);
 			return CommandDetails.COMMANDS.UNDO;
-		case "DISPLAY":
-			System.out.println("DISPLAY command");
+		case "ALL":
+			System.out.println("ALL command");
 			input.remove(0);
-			return CommandDetails.COMMANDS.DISPLAY;
+			return CommandDetails.COMMANDS.ALL;
 		case "UPDATE":
 			System.out.println("UPDATE command");
 			input.remove(0);
@@ -268,10 +268,22 @@ public class Parser {
 			System.out.println("UPDATE command");
 			input.remove(0);
 			return CommandDetails.COMMANDS.UPDATE;
+		case "SET":
+			System.out.println("SET command");
+			input.remove(0);
+			return CommandDetails.COMMANDS.SET;
 		case "FLOATING":
 			System.out.println("FLOATING command");
 			input.remove(0);
 			return CommandDetails.COMMANDS.FLOATING;
+		case "EVENTS":
+			System.out.println("EVENTS command");
+			input.remove(0);
+			return CommandDetails.COMMANDS.EVENTS;
+		case "DEADLINES":
+			System.out.println("DEADLINES command");
+			input.remove(0);
+			return CommandDetails.COMMANDS.DEADLINES;
 		case "EXIT":
 			System.out.println("EXIT command");
 			input.remove(0);
