@@ -25,8 +25,6 @@ public class Storage {
 	private static final int OFFSET_DESCRIPTION = 0;
 	private static final int OFFSET_DATE_START = 1;
 	private static final int OFFSET_DATE_END = 2;
-	private static final int OFFSET_VENUE = 3;
-	private static final int OFFSET_PRIORITY = 4;
 
 	private SimpleDateFormat formatter = new SimpleDateFormat(DATE_FORMAT);
 
@@ -50,8 +48,6 @@ public class Storage {
 				writeString(writer, task.getDescription());
 				writeDate(writer, task.getStartDate());
 				writeDate(writer, task.getDeadline());
-				writeString(writer, task.getVenue());
-				writeString(writer, task.getPriority());
 			}
 			
 			writer.close();
@@ -91,9 +87,6 @@ public class Storage {
 			task.setDescription(parseString(lines.get(i * LINES_PER_TASK + OFFSET_DESCRIPTION)));
 			task.setStartDate(parseDate(lines.get(i * LINES_PER_TASK + OFFSET_DATE_START)));
 			task.setDeadline(parseDate(lines.get(i * LINES_PER_TASK + OFFSET_DATE_END)));
-			task.setVenue(parseString(lines.get(i * LINES_PER_TASK + OFFSET_VENUE)));
-			task.setPriority(parseString(lines.get(i * LINES_PER_TASK + OFFSET_PRIORITY)));
-
 			tasks.add(task);
 		}
 

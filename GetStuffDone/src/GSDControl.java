@@ -8,22 +8,22 @@ import java.util.*;
 
 public class GSDControl {
 
-	private static final String TASK_NOT_FOUND = "Task was not found";
-	private static final String NO_TASKS = "No tasks recorded";
-	private static final String FEEDBACK_ADD = "ADDED ";
-	private static final String FEEDBACK_SEARCH = "SEARCH for ";
-	private static final String FEEDBACK_UPDATE = "UPDATED ";
-	private static final String FEEDBACK_DELETE = "DELETED ";
-	private static final String FEEDBACK_COMPLETE = "COMPLETED ";
-	private static final String FEEDBACK_INCOMPLETE = "INCOMPLETE ";
-	private static final String FEEDBACK_UNDO = "Last action undone";
-	private static final String FEEDBACK_REDO = "Last action redone";
-	private static final String FEEDBACK_DISPLAY = "All tasks displayed";
-	private static final String FEEDBACK_HELP = "Called for help!";
-	private static final String FEEDBACK_INVALID_COMMAND = "Invalid Command";
-	private static final String FEEDBACK_INVALID_TASK_NUMBER = "Invalid Task Number";
-	private static final String FEEDBACK_UNDO_ERROR = "Nothing to undo";
-	private static final String FEEDBACK_REDO_ERROR = "Nothing to redo";
+	private static final String TASK_NOT_FOUND = ">> Task was not found";
+	private static final String NO_TASKS = ">> No tasks recorded";
+	private static final String FEEDBACK_ADD = ">> ADDED ";
+	private static final String FEEDBACK_SEARCH = ">> SEARCH for ";
+	private static final String FEEDBACK_UPDATE = ">> UPDATED ";
+	private static final String FEEDBACK_DELETE = ">> DELETED ";
+	private static final String FEEDBACK_COMPLETE = ">> COMPLETED ";
+	private static final String FEEDBACK_INCOMPLETE = ">> INCOMPLETE ";
+	private static final String FEEDBACK_UNDO = ">> Last action undone";
+	private static final String FEEDBACK_REDO = ">> Last action redone";
+	private static final String FEEDBACK_DISPLAY = ">> All tasks displayed";
+	private static final String FEEDBACK_HELP = ">> Called for help!";
+	private static final String FEEDBACK_INVALID_COMMAND = ">> Invalid Command";
+	private static final String FEEDBACK_INVALID_TASK_NUMBER = ">> Invalid Task Number";
+	private static final String FEEDBACK_UNDO_ERROR = ">> Nothing to undo";
+	private static final String FEEDBACK_REDO_ERROR = ">> Nothing to redo";
 	public ArrayList<Task> tasks = new ArrayList<Task>();
 	private Scanner sc = new Scanner(System.in);
 	public CommandDetails commandDetails;
@@ -45,8 +45,7 @@ public class GSDControl {
 			try	{
 				Task taskToDelete = tasks.get(this.commandDetails.getID()-1);
 				CommandDetails deletedDetails = new CommandDetails(CommandDetails.COMMANDS.DELETE, taskToDelete.getDescription(), 
-														taskToDelete.getVenue(), taskToDelete.getStartDate(),
-														taskToDelete.getDeadline(), taskToDelete.getPriority(),
+														taskToDelete.getStartDate(), taskToDelete.getDeadline(),
 														this.commandDetails.getID()-1);
 				history.insert(deletedDetails);
 				String taskDescription = tasks.get(commandDetails.getID()-1).getDescription();
@@ -66,8 +65,7 @@ public class GSDControl {
 			try	{
 				Task taskToUpdate = tasks.get(this.commandDetails.getID()-1);
 				CommandDetails updatedDetails = new CommandDetails(CommandDetails.COMMANDS.UPDATE, taskToUpdate.getDescription(), 
-														taskToUpdate.getVenue(), taskToUpdate.getStartDate(),
-														taskToUpdate.getDeadline(), taskToUpdate.getPriority(),
+														taskToUpdate.getStartDate(), taskToUpdate.getDeadline(),
 														this.commandDetails.getID()-1);
 				System.out.println(updatedDetails.getDescription());
 				history.insert(updatedDetails);
@@ -289,10 +287,8 @@ public class GSDControl {
 //		return this.commandDetails;
 		CommandDetails taskDelete = new CommandDetails(CommandDetails.COMMANDS.ADD, 
 				this.commandDetails.getDescription(), 
-				this.commandDetails.getVenue(), 
 				this.commandDetails.getStartDate(), 
 				this.commandDetails.getDeadline(), 
-				this.commandDetails.getPriority(), 
 				this.commandDetails.getID());
 		return taskDelete;
 	}
@@ -301,8 +297,7 @@ public class GSDControl {
 		Task taskToUpdate = tasks.get(ID);
 		CommandDetails unUpdate;
 		return unUpdate = new CommandDetails(CommandDetails.COMMANDS.UPDATE, taskToUpdate.getDescription(),
-											taskToUpdate.getVenue(), taskToUpdate.getStartDate(),
-											taskToUpdate.getDeadline(), taskToUpdate.getPriority(),
+											taskToUpdate.getStartDate(), taskToUpdate.getDeadline(),
 											ID);
 	}
 	

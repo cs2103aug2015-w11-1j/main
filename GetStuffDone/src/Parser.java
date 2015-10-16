@@ -13,19 +13,10 @@
 	Editing an existing task	update		-u
 	
 	<------------------------------------------------------->
-	Venue keywords demarked by (case sensitive)
-	Specifying venue			AT
-	
-	<------------------------------------------------------->
-	Priority keywords demarked by (case sensitive)
-	Specifying priority
-	
-	<------------------------------------------------------->
 	Time keywords demarked by (case sensitive):
 	Start date and time - FROM
 	End date and time - BY/TO
-	Priority - PRIORITY
-	Venue - AT
+
 	
 	Date and time format - <time><date>
 	
@@ -68,8 +59,8 @@
 				- tomorrow		tomorrow		<time> tomorrow
 				
 				
-		<Command> <TaskID (if applicable)> <Time, Venue, Priority, description of task>
-	eg. -U 2 do homework AT School of Computing FROM 12.30pm 6/10/15 TO 6pm 6/10/15 PRIORITY high
+		<Command> <TaskID (if applicable)> <Time, description of task>
+	eg. -U 2 do homework FROM 12.30pm 6/10/15 TO 6pm 6/10/15 
 */
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -118,7 +109,7 @@ public class Parser {
 
 	};
 
-	private final static String[] keyWord = { "AT", "BY", "FROM", "TO", "PRIORITY" };
+	private final static String[] keyWord = { "BY", "FROM", "TO", };
 
 	private final static int NO_NEXT_KEYWORD = -2;
 	private final static int NO_ID = -10;
@@ -181,20 +172,6 @@ public class Parser {
 		return false;
 	}
 
-	private static String parseVenue(ArrayList<String> input) {
-		String result = "";
-		int indexOfKeyWord = input.lastIndexOf("AT");
-		int indexOfNextKeyWord = NO_NEXT_KEYWORD;
-		if (notContainsKeyword(indexOfKeyWord)) {
-			return null;
-		} else {
-			indexOfNextKeyWord = findNextKeyword(input, indexOfKeyWord, indexOfNextKeyWord);
-		}
-		indexOfNextKeyWord = checkLastIndex(input, indexOfNextKeyWord);
-		result = getInputBetweenArrayList(input, indexOfKeyWord, indexOfNextKeyWord);
-		return result;
-	}
-
 	private static int findNextKeyword(ArrayList<String> input, int indexOfKeyWord, int indexOfNextKeyWord) {
 		for (int i = indexOfKeyWord + 1; i < input.size(); i++) {
 			if (isKeyWord(input.get(i))) {
@@ -230,34 +207,6 @@ public class Parser {
 			result = result + " " + input.remove(0);
 		}
 		return result.substring(1, result.length());
-	}
-
-	private static String parsePriority(ArrayList<String> input) {
-
-		if (input.lastIndexOf("PRIORITY") == NO_KEYWORD) {
-			return null;
-		} else {
-			int keyWordLocation = input.lastIndexOf("PRIORITY");
-			int priorityLocate = keyWordLocation + 1;
-			String priority = input.get(priorityLocate).toUpperCase();
-
-			switch (priority) {
-			case "HIGH":
-				input.remove(priorityLocate);
-				input.remove(keyWordLocation);
-				return "HIGH";
-			case "MEDIUM":
-				input.remove(priorityLocate);
-				input.remove(keyWordLocation);
-				return "MEDIUM";
-			case "LOW":
-				input.remove(priorityLocate);
-				input.remove(keyWordLocation);
-				return "LOW";
-			default:
-				return null;
-			}
-		}
 	}
 
 	private static CommandDetails.COMMANDS parseCommandType(ArrayList<String> input) {
@@ -408,8 +357,6 @@ public class Parser {
 	}
 
 	public static CommandDetails parse(String input) {
-		String venue;
-		String priority;
 		String description;
 		Date start;
 		Date end;
@@ -427,17 +374,15 @@ public class Parser {
 
 
 
-		priority = parsePriority(strTokens);
-		venue = parseVenue(strTokens);
 		start = parseStartDate(strTokens);
 		end = parseEndDate(strTokens);
 		description = parseDescription(strTokens);
 
 		// to check if details correct
-		CommandDetails details = new CommandDetails(command, description, venue, start, end, priority, ID);
+		CommandDetails details = new CommandDetails(command, description, start, end,  ID);
 		System.out.println(details);
 
-		return new CommandDetails(command, description, venue, start, end, priority, ID);
+		return new CommandDetails(command, description, start, end, ID);
 	}
 
 }
