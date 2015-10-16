@@ -22,6 +22,8 @@ public class GSDControl {
 	private static final String FEEDBACK_HELP = "Called for help!";
 	private static final String FEEDBACK_INVALID_COMMAND = "Invalid Command";
 	private static final String FEEDBACK_INVALID_TASK_NUMBER = "Invalid Task Number";
+	private static final String FEEDBACK_UNDO_ERROR = "Nothing to undo";
+	private static final String FEEDBACK_REDO_ERROR = "Nothing to redo";
 	public ArrayList<Task> tasks = new ArrayList<Task>();
 	private Scanner sc = new Scanner(System.in);
 	public CommandDetails commandDetails;
@@ -107,8 +109,16 @@ public class GSDControl {
 				}
 			}
 		case REDO:
+			this.commandDetails = history.redo();
+			if(this.commandDetails == null)	{
+				return feedback = new Feedback(displayAllTasks(), FEEDBACK_REDO_ERROR);
+			}
 			return feedback = new Feedback(redoLastAction(), FEEDBACK_REDO);
 		case UNDO:
+			this.commandDetails = history.undo();
+			if(this.commandDetails == null)	{
+				return feedback = new Feedback(displayAllTasks(), FEEDBACK_UNDO_ERROR);
+			}
 			return feedback = new Feedback(undoLastAction(), FEEDBACK_UNDO);
 		case DISPLAY:
 			return feedback = new Feedback(displayAllTasks(), FEEDBACK_DISPLAY);
@@ -182,7 +192,6 @@ public class GSDControl {
 	}
 	
 	private String undoLastAction()	{
-		this.commandDetails = history.undo();
 		System.out.println(commandDetails.toString());
 		this.commandDetails = reverseCommandDetails(this.commandDetails.getID());
 		System.out.println(commandDetails.toString());
@@ -190,7 +199,6 @@ public class GSDControl {
 	}
 
 	private String redoLastAction()	{
-		this.commandDetails = history.redo();
 		System.out.println(commandDetails.toString());
 		return executeHistoryCommand();
 	}
