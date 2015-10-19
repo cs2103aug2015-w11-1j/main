@@ -48,6 +48,8 @@ public class GSDControl {
 			//id not int
 		} catch(invalidDateFormat g){
 			//illogical date format
+		}catch (invalidCommand h){
+			//invalid command
 		}
 		Feedback feedback;
 		switch (this.commandDetails.getCommand()) {

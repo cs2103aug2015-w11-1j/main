@@ -117,7 +117,7 @@ public class Parser {
 	private final static int NO_KEYWORD = -1;
 	private final static int NO_YEAR_INPUT = 1970;
 
-	private static Date parseStartDate(ArrayList<String> input) throws ParseException, invalidDateFormat {
+	static Date parseStartDate(ArrayList<String> input) throws ParseException, invalidDateFormat {
 		String result = "";
 		int indexOfNextKeyWord = NO_NEXT_KEYWORD;
 		int indexOfKeyWordFROM = input.lastIndexOf("FROM");
@@ -220,7 +220,7 @@ public class Parser {
 		return result.substring(1, result.length());
 	}
 
-	private static CommandDetails.COMMANDS parseCommandType(ArrayList<String> input) {
+	private static CommandDetails.COMMANDS parseCommandType(ArrayList<String> input) throws invalidCommand {
 
 		switch (input.get(0).toUpperCase()) {
 		case "ADD":
@@ -301,8 +301,9 @@ public class Parser {
 			return CommandDetails.COMMANDS.EXIT;
 		default:
 			System.out.print("Invalid Command");
-			input.remove(0);
-			return CommandDetails.COMMANDS.INVALID;
+			// input.remove(0);
+			throw new invalidCommand(input.remove(0));
+			// return CommandDetails.COMMANDS.INVALID;
 		}
 	}
 
@@ -314,9 +315,18 @@ public class Parser {
 				Date mydate = possibleFormats.parse(input);
 				Calendar cal = Calendar.getInstance();
 				cal.setTime(mydate);
-
-				if (cal.get(Calendar.YEAR) == NO_YEAR_INPUT && cal.get(Calendar.MONTH) == 0
-						&& cal.get(Calendar.DATE) == 1) {
+				/*
+				 * if (cal.get(Calendar.YEAR) == NO_YEAR_INPUT &&
+				 * cal.get(Calendar.MONTH) == 0 && cal.get(Calendar.DATE) == 1
+				 * && cal.get(Calendar.HOUR_OF_DAY) == 0 &&
+				 * cal.get(Calendar.MILLISECOND) == 0 &&
+				 * cal.get(Calendar.MINUTE) == 0)
+				 */
+				if (cal.get(Calendar.YEAR) == NO_YEAR_INPUT && (input.toUpperCase().contains("TODAY")
+						|| input.toUpperCase().contains("TOMORROW") || input.toUpperCase().contains("MONDAY")
+						|| input.toUpperCase().contains("TUESDAY") || input.toUpperCase().contains("WEDNESDAY")
+						|| input.toUpperCase().contains("THURSDAY") || input.toUpperCase().contains("FRIDAY")
+						|| input.toUpperCase().contains("SATURDAY") || input.toUpperCase().contains("SUNDAY"))) {
 					cal.setTime(mydate);
 					cal.set(Calendar.DATE, Calendar.getInstance().get(Calendar.DATE));
 					cal.set(Calendar.MONTH, Calendar.getInstance().get(Calendar.MONTH));
@@ -328,7 +338,7 @@ public class Parser {
 
 					return mydate;
 				}
-				
+
 				for (int i = 0; i < TimekeyWord.length; i++) {
 					if (input.toUpperCase().contains(TimekeyWord[i])) {
 						throw new invalidDateFormat(input);
@@ -529,7 +539,8 @@ public class Parser {
 		return ID;
 	}
 
-	public static CommandDetails parse(String input) throws ParseException, NumberFormatException, invalidDateFormat {
+	public static CommandDetails parse(String input)
+			throws ParseException, NumberFormatException, invalidDateFormat, invalidCommand {
 		String description;
 		Date start;
 		Date end;
@@ -558,8 +569,6 @@ public class Parser {
 		}
 		description = parseDescription(strTokens);
 
-		
-		
 		// to check if details correct
 
 		CommandDetails details = new CommandDetails(command, description, start, end, ID);
@@ -592,14 +601,23 @@ public class Parser {
 	}
 }
 
-class invalidDateFormat extends Exception
-{
-      //Parameterless Constructor
-      public invalidDateFormat() {}
+class invalidDateFormat extends Exception {
+	// Parameterless Constructor
+	public invalidDateFormat() {
+	}
 
-      //Constructor that accepts a message
-      public invalidDateFormat(String message)
-      {
-         super(message);
-      }
- }
+	// Constructor that accepts a message
+	public invalidDateFormat(String message) {
+		super(message);
+	}
+}
+
+class invalidCommand extends Exception {
+
+	public invalidCommand() {
+	}
+
+	public invalidCommand(String message) {
+		super(message);
+	}
+}
