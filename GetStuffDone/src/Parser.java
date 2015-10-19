@@ -110,7 +110,7 @@ public class Parser {
 
 	private final static String[] keyWord = { "BY", "FROM", "TO", "AT" };
 	private final static String[] TimekeyWord = { "MONDAY", "TUESDAY", "WEDNESDAY", "THURSDAY", "FRIDAY", "SATURDAY",
-			"SUNDAY" };
+			"SUNDAY", "TODAY", "TOMORROW" };
 
 	private final static int NO_NEXT_KEYWORD = -2;
 	private final static int NO_ID = -10;
@@ -321,21 +321,9 @@ public class Parser {
 					cal.set(Calendar.DATE, Calendar.getInstance().get(Calendar.DATE));
 					cal.set(Calendar.MONTH, Calendar.getInstance().get(Calendar.MONTH));
 					cal.set(Calendar.YEAR, Calendar.getInstance().get(Calendar.YEAR));
-
-					if (input.toUpperCase().contains("TOMORROW")) {
-						cal.add(Calendar.DATE, 1);
-					}
-
-					if (input.toUpperCase().contains("WEDNESDAY")) {
-						int weekday = cal.get(Calendar.DAY_OF_WEEK);
-						if (weekday != Calendar.MONDAY) {
-							int days = (Calendar.SATURDAY - weekday + 2) % 7;
-							cal.add(Calendar.DAY_OF_YEAR, days);
-						} else {
-							cal.add(Calendar.DAY_OF_YEAR, 7);
-						}
-					}
-
+					////////////////////////////////////////////////////////////////////////////////////////////
+					keyWords(input, cal);
+					//////////////////////////////////////////////////////////////////////////////////////////////////
 					mydate = cal.getTime();
 
 					return mydate;
@@ -353,18 +341,113 @@ public class Parser {
 				// Does not match format, proceed to compare next format
 			}
 		}
-		// if today exist, time is default 2359 !!!!! need edit!!!! Split into 2
-		// create date format to support more specific keywords
-		if (input.toUpperCase().equals("TODAY") || input.toUpperCase().equals("TOMORROW")) {
-			SimpleDateFormat format = new SimpleDateFormat("HHmm");
-			try {
-				Date mydate = specialStartDateKeyWords(input, format);
-				return mydate;
-			} catch (ParseException e) {
-				// self set time format, ignore
+
+		for (int i = 0; i < TimekeyWord.length; i++) {
+
+			if (input.toUpperCase().equals(TimekeyWord[i])) {
+				// input.toUpperCase().equals("TOMORROW")) {
+				SimpleDateFormat format = new SimpleDateFormat("HHmm");
+				try {
+					String endTimeOfDay = "0000";
+					Date mydate = format.parse(endTimeOfDay);
+					Calendar cal = Calendar.getInstance();
+					cal.setTime(mydate);
+					cal.set(Calendar.DATE, Calendar.getInstance().get(Calendar.DATE));
+					cal.set(Calendar.MONTH, Calendar.getInstance().get(Calendar.MONTH));
+					cal.set(Calendar.YEAR, Calendar.getInstance().get(Calendar.YEAR));
+
+					keyWords(input, cal);
+
+					mydate = cal.getTime();
+					return mydate;
+				} catch (ParseException e) {
+					// self set time format, ignore
+				}
 			}
 		}
 		throw new ParseException(input, 0);
+	}
+
+	private static void keyWords(String input, Calendar cal) {
+		Calendar now = Calendar.getInstance();
+		int weekday = cal.get(Calendar.DAY_OF_WEEK);
+		int HOUR_OF_DAY = cal.get(Calendar.HOUR_OF_DAY);
+		int MINUTE = cal.get(Calendar.MINUTE);
+		int NOW_HOUR_OF_DAY = now.get(Calendar.HOUR_OF_DAY);
+		int NOW_MINUTE = now.get(Calendar.MINUTE);
+
+		if (input.toUpperCase().contains("TOMORROW")) {
+			cal.add(Calendar.DATE, 1);
+		}
+
+		if (input.toUpperCase().contains("MONDAY")) {
+			if (weekday != Calendar.MONDAY) {
+				int days = (Calendar.MONDAY - weekday) % 7;
+				cal.add(Calendar.DAY_OF_YEAR, days);
+			} else if (HOUR_OF_DAY < NOW_HOUR_OF_DAY || (HOUR_OF_DAY == NOW_HOUR_OF_DAY && MINUTE < NOW_MINUTE)) {
+				cal.add(Calendar.DAY_OF_YEAR, 7);
+			}
+		}
+
+		if (input.toUpperCase().contains("TUESDAY")) {
+			weekday = cal.get(Calendar.DAY_OF_WEEK);
+			if (weekday != Calendar.TUESDAY) {
+				int days = (Calendar.TUESDAY - weekday) % 7;
+				cal.add(Calendar.DAY_OF_YEAR, days);
+			} else if (HOUR_OF_DAY < NOW_HOUR_OF_DAY || (HOUR_OF_DAY == NOW_HOUR_OF_DAY && MINUTE < NOW_MINUTE)) {
+				cal.add(Calendar.DAY_OF_YEAR, 7);
+			}
+		}
+
+		if (input.toUpperCase().contains("WEDNESDAY")) {
+			weekday = cal.get(Calendar.DAY_OF_WEEK);
+			if (weekday != Calendar.WEDNESDAY) {
+				int days = (Calendar.WEDNESDAY - weekday) % 7;
+				cal.add(Calendar.DAY_OF_YEAR, days);
+			} else if (HOUR_OF_DAY < NOW_HOUR_OF_DAY || (HOUR_OF_DAY == NOW_HOUR_OF_DAY && MINUTE < NOW_MINUTE)) {
+				cal.add(Calendar.DAY_OF_YEAR, 7);
+			}
+		}
+
+		if (input.toUpperCase().contains("THURSDAY")) {
+			weekday = cal.get(Calendar.DAY_OF_WEEK);
+			if (weekday != Calendar.THURSDAY) {
+				int days = (Calendar.THURSDAY - weekday) % 7;
+				cal.add(Calendar.DAY_OF_YEAR, days);
+			} else if (HOUR_OF_DAY < NOW_HOUR_OF_DAY || (HOUR_OF_DAY == NOW_HOUR_OF_DAY && MINUTE < NOW_MINUTE)) {
+				cal.add(Calendar.DAY_OF_YEAR, 7);
+			}
+		}
+
+		if (input.toUpperCase().contains("FRIDAY")) {
+			weekday = cal.get(Calendar.DAY_OF_WEEK);
+			if (weekday != Calendar.FRIDAY) {
+				int days = (Calendar.FRIDAY - weekday) % 7;
+				cal.add(Calendar.DAY_OF_YEAR, days);
+			} else if (HOUR_OF_DAY < NOW_HOUR_OF_DAY || (HOUR_OF_DAY == NOW_HOUR_OF_DAY && MINUTE < NOW_MINUTE)) {
+				cal.add(Calendar.DAY_OF_YEAR, 7);
+			}
+		}
+
+		if (input.toUpperCase().contains("SATURDAY")) {
+			weekday = cal.get(Calendar.DAY_OF_WEEK);
+			if (weekday != Calendar.SATURDAY) {
+				int days = (Calendar.SATURDAY - weekday) % 7;
+				cal.add(Calendar.DAY_OF_YEAR, days);
+			} else if (HOUR_OF_DAY < NOW_HOUR_OF_DAY || (HOUR_OF_DAY == NOW_HOUR_OF_DAY && MINUTE < NOW_MINUTE)) {
+				cal.add(Calendar.DAY_OF_YEAR, 7);
+			}
+		}
+
+		if (input.toUpperCase().contains("SUNDAY")) {
+			weekday = cal.get(Calendar.DAY_OF_WEEK);
+			if (weekday != Calendar.SUNDAY) {
+				int days = (Calendar.SUNDAY - weekday) % 7;
+				cal.add(Calendar.DAY_OF_YEAR, days + 7);
+			} else if (HOUR_OF_DAY < NOW_HOUR_OF_DAY || (HOUR_OF_DAY == NOW_HOUR_OF_DAY && MINUTE < NOW_MINUTE)) {
+				cal.add(Calendar.DAY_OF_YEAR, 7);
+			}
+		}
 	}
 
 	static Date createEndDate(String input) throws ParseException {
@@ -384,13 +467,15 @@ public class Parser {
 					cal.set(Calendar.MONTH, Calendar.getInstance().get(Calendar.MONTH));
 					cal.set(Calendar.YEAR, Calendar.getInstance().get(Calendar.YEAR));
 
-					if (input.toUpperCase().contains("TOMORROW")) {
-						cal.add(Calendar.DATE, 1);
-					}
-
+					keyWords(input, cal);
 					mydate = cal.getTime();
-
 					return mydate;
+				}
+
+				for (int i = 0; i < TimekeyWord.length; i++) {
+					if (input.toUpperCase().equals(TimekeyWord[i])) {
+						throw new ParseException(input, 0);
+					}
 				}
 
 				if (cal.get(Calendar.YEAR) == NO_YEAR_INPUT) {
@@ -405,48 +490,31 @@ public class Parser {
 				// Does not match format, proceed to compare next format
 			}
 		}
-		// if today exist, time is default 2359 !!!!! need edit!!!! Split into 2
-		// create date format to support more specific keywords
-		if (input.toUpperCase().equals("TODAY") || input.toUpperCase().equals("TOMORROW")) {
-			SimpleDateFormat format = new SimpleDateFormat("HHmm");
-			try {
-				Date mydate = specialEndDateKeyWords(input, format);
-				return mydate;
-			} catch (ParseException e) {
-				// self set time format, ignore
+
+		for (int i = 0; i < TimekeyWord.length; i++) {
+
+			if (input.toUpperCase().equals(TimekeyWord[i])) {
+				// input.toUpperCase().equals("TOMORROW")) {
+				SimpleDateFormat format = new SimpleDateFormat("HHmm");
+				try {
+					String endTimeOfDay = "2359";
+					Date mydate = format.parse(endTimeOfDay);
+					Calendar cal = Calendar.getInstance();
+					cal.setTime(mydate);
+					cal.set(Calendar.DATE, Calendar.getInstance().get(Calendar.DATE));
+					cal.set(Calendar.MONTH, Calendar.getInstance().get(Calendar.MONTH));
+					cal.set(Calendar.YEAR, Calendar.getInstance().get(Calendar.YEAR));
+
+					keyWords(input, cal);
+
+					mydate = cal.getTime();
+					return mydate;
+				} catch (ParseException e) {
+					// self set time format, ignore
+				}
 			}
 		}
 		throw new ParseException(input, 0);
-	}
-
-	private static Date specialStartDateKeyWords(String input, SimpleDateFormat today) throws ParseException {
-		String endTimeOfDay = "0000";
-		Date mydate = today.parse(endTimeOfDay);
-		Calendar cal = Calendar.getInstance();
-		cal.setTime(mydate);
-		cal.set(Calendar.DATE, Calendar.getInstance().get(Calendar.DATE));
-		cal.set(Calendar.MONTH, Calendar.getInstance().get(Calendar.MONTH));
-		cal.set(Calendar.YEAR, Calendar.getInstance().get(Calendar.YEAR));
-		if (input.toUpperCase().contains("TOMORROW")) {
-			cal.add(Calendar.DATE, 1);
-		}
-		mydate = cal.getTime();
-		return mydate;
-	}
-
-	private static Date specialEndDateKeyWords(String input, SimpleDateFormat today) throws ParseException {
-		String endTimeOfDay = "2359";
-		Date mydate = today.parse(endTimeOfDay);
-		Calendar cal = Calendar.getInstance();
-		cal.setTime(mydate);
-		cal.set(Calendar.DATE, Calendar.getInstance().get(Calendar.DATE));
-		cal.set(Calendar.MONTH, Calendar.getInstance().get(Calendar.MONTH));
-		cal.set(Calendar.YEAR, Calendar.getInstance().get(Calendar.YEAR));
-		if (input.toUpperCase().contains("TOMORROW")) {
-			cal.add(Calendar.DATE, 1);
-		}
-		mydate = cal.getTime();
-		return mydate;
 	}
 
 	private static int parseID(ArrayList<String> input) {
