@@ -42,7 +42,6 @@ public class CommandDetails {
 		return this.startDate;
 	}
 
-
 	public String getDescription() {
 		return this.description;
 	}
@@ -57,6 +56,22 @@ public class CommandDetails {
 		this.command = command;
 	}
 	
+	public Date setDeadline(Date deadline) {
+		return this.deadline = deadline;
+	}
+
+	public Date setStartDate(Date startDate) {
+		return this.startDate = startDate;
+	}
+	
+	public void setID(int ID)	{
+		this.ID = ID;
+	}
+	
+	public void setDescription(String description)	{
+		this.description = description;
+	}
+	
 	
 	//Overriding methods
 	public String toString(){
@@ -66,7 +81,6 @@ public class CommandDetails {
 				"description = " + description + "\n" +
 				"startDate = " + startDate + "\n" +
 				"deadline = " + deadline + "\n";
-		
 		return result;
 	}
 }

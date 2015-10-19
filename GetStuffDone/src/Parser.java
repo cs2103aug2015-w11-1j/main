@@ -16,7 +16,6 @@
 	Time keywords demarked by (case sensitive):
 	Start date and time - FROM
 	End date and time - BY/TO
-
 	
 	Date and time format - <time><date>
 	
@@ -109,12 +108,27 @@ public class Parser {
 
 	};
 
-	private final static String[] keyWord = { "BY", "FROM", "TO" };
+	private final static String[] keyWord = { "BY", "FROM", "TO", };
 
 	private final static int NO_NEXT_KEYWORD = -2;
 	private final static int NO_ID = -10;
 	private final static int NO_KEYWORD = -1;
 	private final static int NO_YEAR_INPUT = 1970;
+
+	private static Date parseStartDate(ArrayList<String> input) {
+		String result = "";
+		int indexOfKeyWord = input.lastIndexOf("FROM");
+		int indexOfNextKeyWord = NO_NEXT_KEYWORD;
+
+		if (notContainsKeyword(indexOfKeyWord)) {
+			return new Date();
+		} else {
+			indexOfNextKeyWord = findNextKeyword(input, indexOfKeyWord, indexOfNextKeyWord);
+		}
+		indexOfNextKeyWord = checkLastIndex(input, indexOfNextKeyWord);
+		result = getInputBetweenArrayList(input, indexOfKeyWord, indexOfNextKeyWord);
+		return createDate(result);
+	}
 
 	private static int checkLastIndex(ArrayList<String> input, int indexOfNextKeyWord) {
 		if (indexOfNextKeyWord == NO_NEXT_KEYWORD) {
@@ -123,32 +137,7 @@ public class Parser {
 		return indexOfNextKeyWord;
 	}
 
-	private static Date parseStartDate(ArrayList<String> input) throws ParseException {
-		String result = "";
-		int indexOfNextKeyWord = NO_NEXT_KEYWORD;
-		int indexOfKeyWordFROM = input.lastIndexOf("FROM");
-		int indexOfKeyWordAT = input.lastIndexOf("AT");
-		if (notContainsKeyword(indexOfKeyWordFROM) && notContainsKeyword(indexOfKeyWordAT)) {
-			return null;
-		} else if (notContainsKeyword(indexOfKeyWordFROM) && !notContainsKeyword(indexOfKeyWordAT)) {
-			indexOfNextKeyWord = NO_NEXT_KEYWORD;
-			indexOfNextKeyWord = findNextKeyword(input, indexOfKeyWordAT, indexOfNextKeyWord);
-		} else {
-			indexOfNextKeyWord = findNextKeyword(input, indexOfKeyWordFROM, indexOfNextKeyWord);
-		}
-		indexOfNextKeyWord = checkLastIndex(input, indexOfNextKeyWord);
-		// end date is AT
-		if (notContainsKeyword(indexOfKeyWordAT)) {
-			result = getInputBetweenArrayList(input, indexOfKeyWordFROM, indexOfNextKeyWord);
-		}
-		// end date is FROM
-		if (notContainsKeyword(indexOfKeyWordFROM)) {
-			result = getInputBetweenArrayList(input, indexOfKeyWordAT, indexOfNextKeyWord);
-		}
-		return createStartDate(result);
-	}
-
-	private static Date parseEndDate(ArrayList<String> input) throws ParseException {
+	private static Date parseEndDate(ArrayList<String> input) {
 		String result = "";
 		int indexOfNextKeyWord = NO_NEXT_KEYWORD;
 		int indexOfKeyWordTO = input.lastIndexOf("TO");
@@ -169,8 +158,8 @@ public class Parser {
 		// end date is BY
 		if (notContainsKeyword(indexOfKeyWordTO)) {
 			result = getInputBetweenArrayList(input, indexOfKeyWordBY, indexOfNextKeyWord);
-		} ///////////
-		return createEndDate(result);
+		}
+		return createDate(result);
 	}
 
 	private static boolean isKeyWord(String input) {
@@ -305,7 +294,7 @@ public class Parser {
 		}
 	}
 
-	static Date createStartDate(String input) throws ParseException {
+	static Date createDate(String input) {
 		for (String temp : DATE_FORMAT) {
 			try {
 				SimpleDateFormat possibleFormats = new SimpleDateFormat(temp);
@@ -313,30 +302,28 @@ public class Parser {
 				Date mydate = possibleFormats.parse(input);
 				Calendar cal = Calendar.getInstance();
 				cal.setTime(mydate);
-
 				if (cal.get(Calendar.YEAR) == NO_YEAR_INPUT && cal.get(Calendar.MONTH) == 0
 						&& cal.get(Calendar.DATE) == 1) {
 					cal.setTime(mydate);
 					cal.set(Calendar.DATE, Calendar.getInstance().get(Calendar.DATE));
 					cal.set(Calendar.MONTH, Calendar.getInstance().get(Calendar.MONTH));
 					cal.set(Calendar.YEAR, Calendar.getInstance().get(Calendar.YEAR));
-
 					if (input.toUpperCase().contains("TOMORROW")) {
 						cal.add(Calendar.DATE, 1);
 					}
+					if (input.toUpperCase().contains("NEXT WEEK")) {
+						cal.add(Calendar.DATE, 7);
+					}
 
 					mydate = cal.getTime();
-
 					return mydate;
 				}
-
 				if (cal.get(Calendar.YEAR) == NO_YEAR_INPUT) {
 					cal.setTime(mydate);
 					cal.set(Calendar.YEAR, Calendar.getInstance().get(Calendar.YEAR));
 					mydate = cal.getTime();
 					return mydate;
 				}
-
 				return mydate;
 			} catch (ParseException e) {
 				// Does not match format, proceed to compare next format
@@ -347,97 +334,17 @@ public class Parser {
 		if (input.toUpperCase().equals("TODAY") || input.toUpperCase().equals("TOMORROW")) {
 			SimpleDateFormat format = new SimpleDateFormat("HHmm");
 			try {
-				Date mydate = specialStartDateKeyWords(input, format);
+				Date mydate = specialDateKeyWords(input, format);
 				return mydate;
 			} catch (ParseException e) {
 				// self set time format, ignore
 			}
 		}
 
-		SimpleDateFormat format = new SimpleDateFormat("hhmm");
-		format.setLenient(false);
-		Date mydate = format.parse(input);
-		Calendar cal = Calendar.getInstance();
-		cal.setTime(mydate);
-
 		return null;
 	}
 
-	static Date createEndDate(String input) throws ParseException {
-
-		for (String temp : DATE_FORMAT) {
-			try {
-				SimpleDateFormat possibleFormats = new SimpleDateFormat(temp);
-				possibleFormats.setLenient(false);
-				Date mydate = possibleFormats.parse(input);
-				Calendar cal = Calendar.getInstance();
-				cal.setTime(mydate);
-
-				if (cal.get(Calendar.YEAR) == NO_YEAR_INPUT && cal.get(Calendar.MONTH) == 0
-						&& cal.get(Calendar.DATE) == 1) {
-					cal.setTime(mydate);
-					cal.set(Calendar.DATE, Calendar.getInstance().get(Calendar.DATE));
-					cal.set(Calendar.MONTH, Calendar.getInstance().get(Calendar.MONTH));
-					cal.set(Calendar.YEAR, Calendar.getInstance().get(Calendar.YEAR));
-
-					if (input.toUpperCase().contains("TOMORROW")) {
-						cal.add(Calendar.DATE, 1);
-					}
-
-					mydate = cal.getTime();
-
-					return mydate;
-				}
-
-				if (cal.get(Calendar.YEAR) == NO_YEAR_INPUT) {
-					cal.setTime(mydate);
-					cal.set(Calendar.YEAR, Calendar.getInstance().get(Calendar.YEAR));
-					mydate = cal.getTime();
-					return mydate;
-				}
-
-				return mydate;
-			} catch (ParseException e) {
-				// Does not match format, proceed to compare next format
-			}
-		}
-		// if today exist, time is default 2359 !!!!! need edit!!!! Split into 2
-		// create date format to support more specific keywords
-		if (input.toUpperCase().equals("TODAY") || input.toUpperCase().equals("TOMORROW")) {
-			SimpleDateFormat format = new SimpleDateFormat("HHmm");
-			try {
-				Date mydate = specialEndDateKeyWords(input, format);
-				return mydate;
-			} catch (ParseException e) {
-				// self set time format, ignore
-			}
-		}
-
-		SimpleDateFormat format = new SimpleDateFormat("hhmm");
-		format.setLenient(false);
-		Date mydate = format.parse(input);
-		Calendar cal = Calendar.getInstance();
-		cal.setTime(mydate);
-
-		return null;
-	}
-
-	private static Date specialStartDateKeyWords(String input, SimpleDateFormat today) throws ParseException {
-		String endTimeOfDay = "0000";
-		Date mydate = today.parse(endTimeOfDay);
-		Calendar cal = Calendar.getInstance();
-		cal.setTime(mydate);
-		cal.set(Calendar.DATE, Calendar.getInstance().get(Calendar.DATE));
-		cal.set(Calendar.MONTH, Calendar.getInstance().get(Calendar.MONTH));
-		cal.set(Calendar.YEAR, Calendar.getInstance().get(Calendar.YEAR));
-		if (input.toUpperCase().contains("TOMORROW")) {
-			cal.add(Calendar.DATE, 1);
-		}
-		mydate = cal.getTime();
-		return mydate;
-	}
-
-	private static Date specialEndDateKeyWords(String input, SimpleDateFormat today) throws ParseException {
+	private static Date specialDateKeyWords(String input, SimpleDateFormat today) throws ParseException {
 		String endTimeOfDay = "2359";
 		Date mydate = today.parse(endTimeOfDay);
 		Calendar cal = Calendar.getInstance();
@@ -453,48 +360,37 @@ public class Parser {
 	}
 
 	private static int parseID(ArrayList<String> input) {
-		int ID;
-		ID = Integer.parseInt(input.remove(0));
-		return ID;
+		try {
+			return Integer.parseInt(input.remove(0));
+		} catch (NumberFormatException e) {
+			return -1;
+		}
 	}
 
-
-	public CommandDetails parse(String input) throws ParseException, NumberFormatException{
-
-
+	public static CommandDetails parse(String input) {
 		String description;
 		Date start;
 		Date end;
-		boolean copy = false;
+		//boolean containSearchTime = false;
+
 		int ID = NO_ID;
 
 		ArrayList<String> strTokens = new ArrayList<String>(Arrays.asList(input.split(" ")));
 		CommandDetails.COMMANDS command = parseCommandType(strTokens);
-		
+
 		if (command == CommandDetails.COMMANDS.DELETE || command == CommandDetails.COMMANDS.COMPLETE
 				|| command == CommandDetails.COMMANDS.INCOMPLETE || command == CommandDetails.COMMANDS.UPDATE) {
 			ID = parseID(strTokens);
 		}
 
-		end = parseEndDate(strTokens);
 
-
-		if (strTokens.contains("AT")) {
-			copy = true;
-		}
 
 		start = parseStartDate(strTokens);
-
-		if (copy) {
-			end = start;
-		}
-
+		end = parseEndDate(strTokens);
 		description = parseDescription(strTokens);
 
 		// to check if details correct
-
-		CommandDetails details = new CommandDetails(command, description, start, end, ID);
-
+		CommandDetails details = new CommandDetails(command, description, start, end,  ID);
 		System.out.println(details);
 
 		return new CommandDetails(command, description, start, end, ID);

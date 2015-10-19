@@ -14,8 +14,6 @@ public class Task {
 	private String description;
 	private Date startDate;
 	private Date deadline;
-	private String venue;
-	private String priority;
 	private boolean isComplete;
 	
 	//Constructors
@@ -25,8 +23,6 @@ public class Task {
 		description = null;
 		startDate = null;
 		deadline = null;
-		venue = null;
-		priority = null;
 		isComplete = false;
 	}
 	
@@ -34,9 +30,7 @@ public class Task {
 		this.description = details.getDescription();
 		this.startDate = details.getStartDate();
 		this.deadline = details.getDeadline();
-		this.venue = details.getVenue();
-		this.priority = details.getPriority();
-		isComplete = false;
+		this.isComplete = false;
 	}
 	
 	
@@ -50,16 +44,12 @@ public class Task {
 		this.startDate = startDate;
 	}
 	
-	public void setdeadline(Date deadline)	{
+	public void setDeadline(Date deadline)	{
 		this.deadline = deadline;
 	}
 	
-	public void setVenue(String venue)	{
-		this.venue = venue;
-	}
-	
-	public void setPriority(String priority)	{
-		this.priority = priority;
+	public void setIsComplete(boolean isComplete)	{
+		this.isComplete = isComplete;
 	}
 	
 	//Accessors
@@ -72,16 +62,12 @@ public class Task {
 		return this.startDate;
 	}
 	
-	public Date getdeadline()	{
+	public Date getDeadline()	{
 		return this.deadline;
 	}
 	
-	public String getVenue()	{
-		return this.venue;
-	}
-	
-	public String getPriority()	{
-		return this.priority;
+	public boolean getIsComplete()	{
+		return this.isComplete;
 	}
 	
 	//Behavioural methods
@@ -98,14 +84,6 @@ public class Task {
 		
 		if(details.getDeadline() != null)	{
 			this.deadline = details.getDeadline();
-		}
-		
-		if(details.getVenue() != null)	{
-			this.venue = details.getVenue();
-		}
-		
-		if(details.getPriority() != null){
-			this.priority = details.getPriority();
 		}
 	}
 	
@@ -141,15 +119,6 @@ public class Task {
 				return true;
 			}
 		}
-		
-		if(details.getVenue().contains(this.venue))	{
-			return true;
-		}
-		
-		if(details.getPriority().contains(this.priority))	{
-			return true;
-		}
-		
 		return false;
 	}
 	
@@ -169,7 +138,6 @@ public class Task {
 		}else{
 			end = df.format(deadline);
 		}
-		return (description + "\nStart Date: " + start + "\nDeadline: " + end + "\nVenue: " + venue + "\nPriority: " + priority + "\n");
+		return (description + "\nStart Date: " + start + "\nDeadline: " + end + "\n");
 	}
 }
-
