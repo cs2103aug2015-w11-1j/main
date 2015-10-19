@@ -3,7 +3,7 @@ import java.util.Date;
 public class CommandDetails {
 	private Date deadline;
 	private Date startDate;
-	private String venue, priority, description;
+	private String description;
 	private COMMANDS command;
 	private int ID;
 	
@@ -12,12 +12,9 @@ public class CommandDetails {
 	}
 
 	//constructor
-	public CommandDetails(COMMANDS command, String description, String venue, Date startDate, Date deadline,
-			String priority, int ID) {
+	public CommandDetails(COMMANDS command, String description, Date startDate, Date deadline, int ID) {
 		this.deadline = deadline;
 		this.startDate = startDate;
-		this.venue = venue;
-		this.priority = priority;
 		this.description = description;
 		this.command = command;
 		this.ID = ID;
@@ -26,8 +23,6 @@ public class CommandDetails {
 	public CommandDetails(COMMANDS command, int ID)	{
 		this.deadline = null;
 		this.startDate = null;
-		this.venue = null;
-		this.priority = null;
 		this.description = null;
 		this.command = command;
 		this.ID = ID;
@@ -46,13 +41,6 @@ public class CommandDetails {
 		return this.startDate;
 	}
 
-	public String getVenue() {
-		return this.venue;
-	}
-
-	public String getPriority() {
-		return this.priority;
-	}
 
 	public String getDescription() {
 		return this.description;
@@ -75,10 +63,9 @@ public class CommandDetails {
 		result= "command = " + command + "\n" + 
 				"ID = " + ID + "\n" +
 				"description = " + description + "\n" +
-				"venue = " + venue + "\n" +
 				"startDate = " + startDate + "\n" +
-				"deadline = " + deadline + "\n" +
-				"priority = " + priority +"\n";
+				"deadline = " + deadline + "\n";
+		
 		return result;
 	}
 }

@@ -1,15 +1,16 @@
+import java.text.ParseException;
 import java.util.Scanner;
 
 public class testParser{
 	
-	public static void main(String[] args){
-		
+	public static void main(String[] args) throws Exception{
+		Parser parser = new Parser();
 		Scanner sc = new Scanner(System.in);
 		
 		while(true){
 		
 		String input = sc.nextLine();
-		CommandDetails details = Parser.parse(input);
+		CommandDetails details = parser.parse(input);
 		}
 	}
 }

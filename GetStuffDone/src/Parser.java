@@ -125,21 +125,6 @@ public class Parser {
 	private final static int NO_KEYWORD = -1;
 	private final static int NO_YEAR_INPUT = 1970;
 
-	private static Date parseStartDate(ArrayList<String> input) {
-		String result = "";
-		int indexOfKeyWord = input.lastIndexOf("FROM");
-		int indexOfNextKeyWord = NO_NEXT_KEYWORD;
-
-		if (notContainsKeyword(indexOfKeyWord)) {
-			return new Date();
-		} else {
-			indexOfNextKeyWord = findNextKeyword(input, indexOfKeyWord, indexOfNextKeyWord);
-		}
-		indexOfNextKeyWord = checkLastIndex(input, indexOfNextKeyWord);
-		result = getInputBetweenArrayList(input, indexOfKeyWord, indexOfNextKeyWord);
-		return createDate(result);
-	}
-
 	private static int checkLastIndex(ArrayList<String> input, int indexOfNextKeyWord) {
 		if (indexOfNextKeyWord == NO_NEXT_KEYWORD) {
 			indexOfNextKeyWord = input.size();
@@ -147,7 +132,32 @@ public class Parser {
 		return indexOfNextKeyWord;
 	}
 
-	private static Date parseEndDate(ArrayList<String> input) {
+	private static Date parseStartDate(ArrayList<String> input) throws ParseException {
+		String result = "";
+		int indexOfNextKeyWord = NO_NEXT_KEYWORD;
+		int indexOfKeyWordFROM = input.lastIndexOf("FROM");
+		int indexOfKeyWordAT = input.lastIndexOf("AT");
+		if (notContainsKeyword(indexOfKeyWordFROM) && notContainsKeyword(indexOfKeyWordAT)) {
+			return null;
+		} else if (notContainsKeyword(indexOfKeyWordFROM) && !notContainsKeyword(indexOfKeyWordAT)) {
+			indexOfNextKeyWord = NO_NEXT_KEYWORD;
+			indexOfNextKeyWord = findNextKeyword(input, indexOfKeyWordAT, indexOfNextKeyWord);
+		} else {
+			indexOfNextKeyWord = findNextKeyword(input, indexOfKeyWordFROM, indexOfNextKeyWord);
+		}
+		indexOfNextKeyWord = checkLastIndex(input, indexOfNextKeyWord);
+		// end date is AT
+		if (notContainsKeyword(indexOfKeyWordAT)) {
+			result = getInputBetweenArrayList(input, indexOfKeyWordFROM, indexOfNextKeyWord);
+		}
+		// end date is FROM
+		if (notContainsKeyword(indexOfKeyWordFROM)) {
+			result = getInputBetweenArrayList(input, indexOfKeyWordAT, indexOfNextKeyWord);
+		}
+		return createStartDate(result);
+	}
+
+	private static Date parseEndDate(ArrayList<String> input) throws ParseException {
 		String result = "";
 		int indexOfNextKeyWord = NO_NEXT_KEYWORD;
 		int indexOfKeyWordTO = input.lastIndexOf("TO");
@@ -168,8 +178,8 @@ public class Parser {
 		// end date is BY
 		if (notContainsKeyword(indexOfKeyWordTO)) {
 			result = getInputBetweenArrayList(input, indexOfKeyWordBY, indexOfNextKeyWord);
-		}
-		return createDate(result);
+		} ///////////
+		return createEndDate(result);
 	}
 
 	private static boolean isKeyWord(String input) {
@@ -179,20 +189,6 @@ public class Parser {
 			}
 		}
 		return false;
-	}
-
-	private static String parseVenue(ArrayList<String> input) {
-		String result = "";
-		int indexOfKeyWord = input.lastIndexOf("AT");
-		int indexOfNextKeyWord = NO_NEXT_KEYWORD;
-		if (notContainsKeyword(indexOfKeyWord)) {
-			return null;
-		} else {
-			indexOfNextKeyWord = findNextKeyword(input, indexOfKeyWord, indexOfNextKeyWord);
-		}
-		indexOfNextKeyWord = checkLastIndex(input, indexOfNextKeyWord);
-		result = getInputBetweenArrayList(input, indexOfKeyWord, indexOfNextKeyWord);
-		return result;
 	}
 
 	private static int findNextKeyword(ArrayList<String> input, int indexOfKeyWord, int indexOfNextKeyWord) {
@@ -230,34 +226,6 @@ public class Parser {
 			result = result + " " + input.remove(0);
 		}
 		return result.substring(1, result.length());
-	}
-
-	private static String parsePriority(ArrayList<String> input) {
-
-		if (input.lastIndexOf("PRIORITY") == NO_KEYWORD) {
-			return null;
-		} else {
-			int keyWordLocation = input.lastIndexOf("PRIORITY");
-			int priorityLocate = keyWordLocation + 1;
-			String priority = input.get(priorityLocate).toUpperCase();
-
-			switch (priority) {
-			case "HIGH":
-				input.remove(priorityLocate);
-				input.remove(keyWordLocation);
-				return "HIGH";
-			case "MEDIUM":
-				input.remove(priorityLocate);
-				input.remove(keyWordLocation);
-				return "MEDIUM";
-			case "LOW":
-				input.remove(priorityLocate);
-				input.remove(keyWordLocation);
-				return "LOW";
-			default:
-				return null;
-			}
-		}
 	}
 
 	private static CommandDetails.COMMANDS parseCommandType(ArrayList<String> input) {
@@ -334,7 +302,7 @@ public class Parser {
 		}
 	}
 
-	static Date createDate(String input) {
+	static Date createStartDate(String input) throws ParseException {
 		for (String temp : DATE_FORMAT) {
 			try {
 				SimpleDateFormat possibleFormats = new SimpleDateFormat(temp);
@@ -342,28 +310,30 @@ public class Parser {
 				Date mydate = possibleFormats.parse(input);
 				Calendar cal = Calendar.getInstance();
 				cal.setTime(mydate);
+
 				if (cal.get(Calendar.YEAR) == NO_YEAR_INPUT && cal.get(Calendar.MONTH) == 0
 						&& cal.get(Calendar.DATE) == 1) {
 					cal.setTime(mydate);
 					cal.set(Calendar.DATE, Calendar.getInstance().get(Calendar.DATE));
 					cal.set(Calendar.MONTH, Calendar.getInstance().get(Calendar.MONTH));
 					cal.set(Calendar.YEAR, Calendar.getInstance().get(Calendar.YEAR));
+
 					if (input.toUpperCase().contains("TOMORROW")) {
 						cal.add(Calendar.DATE, 1);
 					}
-					if (input.toUpperCase().contains("NEXT WEEK")) {
-						cal.add(Calendar.DATE, 7);
-					}
 
 					mydate = cal.getTime();
+
 					return mydate;
 				}
+
 				if (cal.get(Calendar.YEAR) == NO_YEAR_INPUT) {
 					cal.setTime(mydate);
 					cal.set(Calendar.YEAR, Calendar.getInstance().get(Calendar.YEAR));
 					mydate = cal.getTime();
 					return mydate;
 				}
+
 				return mydate;
 			} catch (ParseException e) {
 				// Does not match format, proceed to compare next format
@@ -374,17 +344,97 @@ public class Parser {
 		if (input.toUpperCase().equals("TODAY") || input.toUpperCase().equals("TOMORROW")) {
 			SimpleDateFormat format = new SimpleDateFormat("HHmm");
 			try {
-				Date mydate = specialDateKeyWords(input, format);
+				Date mydate = specialStartDateKeyWords(input, format);
 				return mydate;
 			} catch (ParseException e) {
 				// self set time format, ignore
 			}
 		}
 
+		SimpleDateFormat format = new SimpleDateFormat("hhmm");
+		format.setLenient(false);
+		Date mydate = format.parse(input);
+		Calendar cal = Calendar.getInstance();
+		cal.setTime(mydate);
+
 		return null;
 	}
 
-	private static Date specialDateKeyWords(String input, SimpleDateFormat today) throws ParseException {
+	static Date createEndDate(String input) throws ParseException {
+
+		for (String temp : DATE_FORMAT) {
+			try {
+				SimpleDateFormat possibleFormats = new SimpleDateFormat(temp);
+				possibleFormats.setLenient(false);
+				Date mydate = possibleFormats.parse(input);
+				Calendar cal = Calendar.getInstance();
+				cal.setTime(mydate);
+
+				if (cal.get(Calendar.YEAR) == NO_YEAR_INPUT && cal.get(Calendar.MONTH) == 0
+						&& cal.get(Calendar.DATE) == 1) {
+					cal.setTime(mydate);
+					cal.set(Calendar.DATE, Calendar.getInstance().get(Calendar.DATE));
+					cal.set(Calendar.MONTH, Calendar.getInstance().get(Calendar.MONTH));
+					cal.set(Calendar.YEAR, Calendar.getInstance().get(Calendar.YEAR));
+
+					if (input.toUpperCase().contains("TOMORROW")) {
+						cal.add(Calendar.DATE, 1);
+					}
+
+					mydate = cal.getTime();
+
+					return mydate;
+				}
+
+				if (cal.get(Calendar.YEAR) == NO_YEAR_INPUT) {
+					cal.setTime(mydate);
+					cal.set(Calendar.YEAR, Calendar.getInstance().get(Calendar.YEAR));
+					mydate = cal.getTime();
+					return mydate;
+				}
+
+				return mydate;
+			} catch (ParseException e) {
+				// Does not match format, proceed to compare next format
+			}
+		}
+		// if today exist, time is default 2359 !!!!! need edit!!!! Split into 2
+		// create date format to support more specific keywords
+		if (input.toUpperCase().equals("TODAY") || input.toUpperCase().equals("TOMORROW")) {
+			SimpleDateFormat format = new SimpleDateFormat("HHmm");
+			try {
+				Date mydate = specialEndDateKeyWords(input, format);
+				return mydate;
+			} catch (ParseException e) {
+				// self set time format, ignore
+			}
+		}
+
+		SimpleDateFormat format = new SimpleDateFormat("hhmm");
+		format.setLenient(false);
+		Date mydate = format.parse(input);
+		Calendar cal = Calendar.getInstance();
+		cal.setTime(mydate);
+
+		return null;
+	}
+
+	private static Date specialStartDateKeyWords(String input, SimpleDateFormat today) throws ParseException {
+		String endTimeOfDay = "0000";
+		Date mydate = today.parse(endTimeOfDay);
+		Calendar cal = Calendar.getInstance();
+		cal.setTime(mydate);
+		cal.set(Calendar.DATE, Calendar.getInstance().get(Calendar.DATE));
+		cal.set(Calendar.MONTH, Calendar.getInstance().get(Calendar.MONTH));
+		cal.set(Calendar.YEAR, Calendar.getInstance().get(Calendar.YEAR));
+		if (input.toUpperCase().contains("TOMORROW")) {
+			cal.add(Calendar.DATE, 1);
+		}
+		mydate = cal.getTime();
+		return mydate;
+	}
+
+	private static Date specialEndDateKeyWords(String input, SimpleDateFormat today) throws ParseException {
 		String endTimeOfDay = "2359";
 		Date mydate = today.parse(endTimeOfDay);
 		Calendar cal = Calendar.getInstance();
@@ -400,21 +450,16 @@ public class Parser {
 	}
 
 	private static int parseID(ArrayList<String> input) {
-		try {
-			return Integer.parseInt(input.remove(0));
-		} catch (NumberFormatException e) {
-			return -1;
-		}
+		int ID;
+		ID = Integer.parseInt(input.remove(0));
+		return ID;
 	}
 
-	public static CommandDetails parse(String input) {
-		String venue;
-		String priority;
+	public CommandDetails parse(String input) throws ParseException, NumberFormatException{
 		String description;
 		Date start;
 		Date end;
-		//boolean containSearchTime = false;
-
+		boolean copy = false;
 		int ID = NO_ID;
 
 		ArrayList<String> strTokens = new ArrayList<String>(Arrays.asList(input.split(" ")));
@@ -425,19 +470,24 @@ public class Parser {
 			ID = parseID(strTokens);
 		}
 
-
-
-		priority = parsePriority(strTokens);
-		venue = parseVenue(strTokens);
-		start = parseStartDate(strTokens);
 		end = parseEndDate(strTokens);
+
+		if (strTokens.contains("AT")) {
+			copy = true;
+		}
+		start = parseStartDate(strTokens);
+
+		if (copy) {
+			end = start;
+		}
+
 		description = parseDescription(strTokens);
 
 		// to check if details correct
-		CommandDetails details = new CommandDetails(command, description, venue, start, end, priority, ID);
+		CommandDetails details = new CommandDetails(command, description, start, end, ID);
 		System.out.println(details);
 
-		return new CommandDetails(command, description, venue, start, end, priority, ID);
+		return new CommandDetails(command, description, start, end, ID);
 	}
 
 }
