@@ -104,7 +104,7 @@ public class Parser {
 			"hh.mma dd-MMMM", "hh:mma dd-MMMM", "dd-MMMM",
 
 			"HHmm dd-MM", "HH.mm dd-MM", "HH:mm dd-MM", "hhmma dd-MM", "hha dd-MM", "hmma dd-MM", "hh.mma dd-MM",
-			"hh:mma dd-MM", "dd-MM", "HHmm", "HH.mm", "HH:mm", "hhmma", "hha", "hmma", "hh.mma", "hh:mma",
+			"hh:mma dd-MM", "dd-MM",  "hhmma", "hha", "hmma", "hh.mma", "hh:mma","HH.mm", "HH:mm", "HHmm",
 
 	};
 
@@ -149,7 +149,7 @@ public class Parser {
 		return indexOfNextKeyWord;
 	}
 
-	private static Date parseEndDate(ArrayList<String> input) throws ParseException, invalidDateFormat {
+	static Date parseEndDate(ArrayList<String> input) throws ParseException, invalidDateFormat {
 		String result = "";
 		int indexOfNextKeyWord = NO_NEXT_KEYWORD;
 		int indexOfKeyWordTO = input.lastIndexOf("TO");
@@ -220,7 +220,7 @@ public class Parser {
 		return result.substring(1, result.length());
 	}
 
-	private static CommandDetails.COMMANDS parseCommandType(ArrayList<String> input) throws invalidCommand {
+	static CommandDetails.COMMANDS parseCommandType(ArrayList<String> input) throws invalidCommand {
 
 		switch (input.get(0).toUpperCase()) {
 		case "ADD":
@@ -542,7 +542,7 @@ public class Parser {
 		throw new ParseException(input, 0);
 	}
 
-	private static int parseID(ArrayList<String> input) {
+	static int parseID(ArrayList<String> input) {
 		int ID;
 		ID = Integer.parseInt(input.remove(0));
 		return ID;
