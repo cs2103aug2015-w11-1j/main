@@ -2,7 +2,6 @@ import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
 import java.util.Date;
-import java.util.Stack;
 
 
 public class testHistory {
@@ -99,7 +98,6 @@ public class testHistory {
 		assertEquals(history.getUndoStack().peek(), cmdDet);
 		assertEquals(temp, cmdDet);
 		history.clear();
-		
 	}
 	
 
