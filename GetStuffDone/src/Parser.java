@@ -4,7 +4,7 @@
 	Command keywords demarked by (case insensitive)
 	Adding of task				add			-a
 	Deleting of task			delete		-d
-	Displaying of task			display
+	Displaying of task			all
 	Marking task as complete	complete
 	Displaying help manual		help
 	Redo last action			redo
@@ -13,19 +13,10 @@
 	Editing an existing task	update		-u
 	
 	<------------------------------------------------------->
-	Venue keywords demarked by (case sensitive)
-	Specifying venue			AT
-	
-	<------------------------------------------------------->
-	Priority keywords demarked by (case sensitive)
-	Specifying priority
-	
-	<------------------------------------------------------->
 	Time keywords demarked by (case sensitive):
 	Start date and time - FROM
 	End date and time - BY/TO
-	Priority - PRIORITY
-	Venue - AT
+
 	
 	Date and time format - <time><date>
 	
@@ -68,8 +59,8 @@
 				- tomorrow		tomorrow		<time> tomorrow
 				
 				
-		<Command> <TaskID (if applicable)> <Time, Venue, Priority, description of task>
-	eg. -U 2 do homework AT School of Computing FROM 12.30pm 6/10/15 TO 6pm 6/10/15 PRIORITY high
+		<Command> <TaskID (if applicable)> <Time, description of task>
+	eg. -U 2 do homework FROM 12.30pm 6/10/15 TO 6pm 6/10/15 
 */
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -118,7 +109,7 @@ public class Parser {
 
 	};
 
-	private final static String[] keyWord = { "AT", "BY", "FROM", "TO", "PRIORITY" };
+	private final static String[] keyWord = { "BY", "FROM", "TO" };
 
 	private final static int NO_NEXT_KEYWORD = -2;
 	private final static int NO_ID = -10;
@@ -275,10 +266,10 @@ public class Parser {
 			System.out.println("UNDO command");
 			input.remove(0);
 			return CommandDetails.COMMANDS.UNDO;
-		case "DISPLAY":
-			System.out.println("DISPLAY command");
+		case "ALL":
+			System.out.println("ALL command");
 			input.remove(0);
-			return CommandDetails.COMMANDS.DISPLAY;
+			return CommandDetails.COMMANDS.ALL;
 		case "UPDATE":
 			System.out.println("UPDATE command");
 			input.remove(0);
@@ -287,10 +278,22 @@ public class Parser {
 			System.out.println("UPDATE command");
 			input.remove(0);
 			return CommandDetails.COMMANDS.UPDATE;
+		case "SET":
+			System.out.println("SET command");
+			input.remove(0);
+			return CommandDetails.COMMANDS.SET;
 		case "FLOATING":
 			System.out.println("FLOATING command");
 			input.remove(0);
 			return CommandDetails.COMMANDS.FLOATING;
+		case "EVENTS":
+			System.out.println("EVENTS command");
+			input.remove(0);
+			return CommandDetails.COMMANDS.EVENTS;
+		case "DEADLINES":
+			System.out.println("DEADLINES command");
+			input.remove(0);
+			return CommandDetails.COMMANDS.DEADLINES;
 		case "EXIT":
 			System.out.println("EXIT command");
 			input.remove(0);
@@ -455,7 +458,10 @@ public class Parser {
 		return ID;
 	}
 
+
 	public CommandDetails parse(String input) throws ParseException, NumberFormatException{
+
+
 		String description;
 		Date start;
 		Date end;
@@ -464,7 +470,7 @@ public class Parser {
 
 		ArrayList<String> strTokens = new ArrayList<String>(Arrays.asList(input.split(" ")));
 		CommandDetails.COMMANDS command = parseCommandType(strTokens);
-
+		
 		if (command == CommandDetails.COMMANDS.DELETE || command == CommandDetails.COMMANDS.COMPLETE
 				|| command == CommandDetails.COMMANDS.INCOMPLETE || command == CommandDetails.COMMANDS.UPDATE) {
 			ID = parseID(strTokens);
@@ -472,9 +478,11 @@ public class Parser {
 
 		end = parseEndDate(strTokens);
 
+
 		if (strTokens.contains("AT")) {
 			copy = true;
 		}
+
 		start = parseStartDate(strTokens);
 
 		if (copy) {
@@ -484,7 +492,9 @@ public class Parser {
 		description = parseDescription(strTokens);
 
 		// to check if details correct
+
 		CommandDetails details = new CommandDetails(command, description, start, end, ID);
+
 		System.out.println(details);
 
 		return new CommandDetails(command, description, start, end, ID);
