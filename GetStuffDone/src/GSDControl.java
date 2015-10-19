@@ -37,90 +37,100 @@ public class GSDControl {
 	private Storage storage = new Storage();
 	private History history = new History();
 	private boolean isValidTaskNo = true;
-	
-	public Feedback processInput(String input)	throws IndexOutOfBoundsException {
-		this.commandDetails = parser.parse(input);
+
+	public Feedback processInput(String input) throws IndexOutOfBoundsException {
+		try {
+			this.commandDetails = parser.parse(input);
+		} catch (ParseException e) {
+			//Wrong date
+		} catch (NumberFormatException f) {
+			//id not int
+		}
 		Feedback feedback;
 		switch (this.commandDetails.getCommand()) {
 		case ADD:
 			this.commandDetails.setID(tasks.size());
 			history.insert(this.commandDetails);
-			//history.insert(reverseCommandDetails(this.commandDetails.getID()));
+			// history.insert(reverseCommandDetails(this.commandDetails.getID()));
 			return feedback = new Feedback(createTask(), FEEDBACK_ADD + commandDetails.getDescription());
 		case DELETE:
-			try	{
-				Task taskToDelete = tasks.get(this.commandDetails.getID()-1);
-				CommandDetails deletedDetails = new CommandDetails(CommandDetails.COMMANDS.DELETE, taskToDelete.getDescription(), 
-														taskToDelete.getStartDate(), taskToDelete.getDeadline(),
-														this.commandDetails.getID()-1);
+			try {
+				Task taskToDelete = tasks.get(this.commandDetails.getID() - 1);
+				CommandDetails deletedDetails = new CommandDetails(CommandDetails.COMMANDS.DELETE,
+						taskToDelete.getDescription(), taskToDelete.getStartDate(), taskToDelete.getDeadline(),
+						this.commandDetails.getID() - 1);
 				history.insert(deletedDetails);
-				String taskDescription = tasks.get(commandDetails.getID()-1).getDescription();
-				return feedback = new Feedback(deleteTask(commandDetails.getID()-1), FEEDBACK_DELETE + taskDescription);
-			}	catch (IndexOutOfBoundsException e)	{
-					isValidTaskNo = false;
-					throw new IndexOutOfBoundsException();
-			}	finally	{
-					if(!isValidTaskNo)	{
-						isValidTaskNo = true;
-						return feedback = new Feedback(displayAllTasks(), FEEDBACK_INVALID_TASK_NUMBER);
-					}
+				String taskDescription = tasks.get(commandDetails.getID() - 1).getDescription();
+				return feedback = new Feedback(deleteTask(commandDetails.getID() - 1),
+						FEEDBACK_DELETE + taskDescription);
+			} catch (IndexOutOfBoundsException e) {
+				isValidTaskNo = false;
+				throw new IndexOutOfBoundsException();
+			} finally {
+				if (!isValidTaskNo) {
+					isValidTaskNo = true;
+					return feedback = new Feedback(displayAllTasks(), FEEDBACK_INVALID_TASK_NUMBER);
+				}
 			}
 		case SEARCH:
 			return feedback = new Feedback(searchTask(), FEEDBACK_SEARCH + commandDetails.getDescription());
 		case UPDATE:
-			try	{
-				Task taskToUpdate = tasks.get(this.commandDetails.getID()-1);
-				CommandDetails updatedDetails = new CommandDetails(CommandDetails.COMMANDS.UPDATE, taskToUpdate.getDescription(), 
-														taskToUpdate.getStartDate(), taskToUpdate.getDeadline(),
-														this.commandDetails.getID()-1);
+			try {
+				Task taskToUpdate = tasks.get(this.commandDetails.getID() - 1);
+				CommandDetails updatedDetails = new CommandDetails(CommandDetails.COMMANDS.UPDATE,
+						taskToUpdate.getDescription(), taskToUpdate.getStartDate(), taskToUpdate.getDeadline(),
+						this.commandDetails.getID() - 1);
 				System.out.println(updatedDetails.getDescription());
 				history.insert(updatedDetails);
-				//history.insert(reverseCommandDetails(this.commandDetails.getID()-1));
-			return feedback = new Feedback(updateTask(commandDetails.getID()-1), FEEDBACK_UPDATE + commandDetails.getDescription());
-			}	catch (IndexOutOfBoundsException e)	{
-					isValidTaskNo = false;
-					throw new IndexOutOfBoundsException();
-			}	finally	{
-					if(!isValidTaskNo)	{
-						isValidTaskNo = true;
-						return feedback = new Feedback(displayAllTasks(), FEEDBACK_INVALID_TASK_NUMBER);
+				// history.insert(reverseCommandDetails(this.commandDetails.getID()-1));
+				return feedback = new Feedback(updateTask(commandDetails.getID() - 1),
+						FEEDBACK_UPDATE + commandDetails.getDescription());
+			} catch (IndexOutOfBoundsException e) {
+				isValidTaskNo = false;
+				throw new IndexOutOfBoundsException();
+			} finally {
+				if (!isValidTaskNo) {
+					isValidTaskNo = true;
+					return feedback = new Feedback(displayAllTasks(), FEEDBACK_INVALID_TASK_NUMBER);
 				}
 			}
 		case COMPLETE:
-			try	{
+			try {
 				history.insert(this.commandDetails);
-				return feedback = new Feedback(completeTask(commandDetails.getID()-1), FEEDBACK_COMPLETE + tasks.get(this.commandDetails.getID()-1).getDescription());
-			}	catch (IndexOutOfBoundsException e)	{
-					isValidTaskNo = false;
-					throw new IndexOutOfBoundsException();
-			}	finally	{
-				if(!isValidTaskNo)	{
+				return feedback = new Feedback(completeTask(commandDetails.getID() - 1),
+						FEEDBACK_COMPLETE + tasks.get(this.commandDetails.getID() - 1).getDescription());
+			} catch (IndexOutOfBoundsException e) {
+				isValidTaskNo = false;
+				throw new IndexOutOfBoundsException();
+			} finally {
+				if (!isValidTaskNo) {
 					isValidTaskNo = true;
 					return feedback = new Feedback(displayAllTasks(), FEEDBACK_INVALID_TASK_NUMBER);
 				}
 			}
 		case INCOMPLETE:
-			try	{
+			try {
 				history.insert(this.commandDetails);
-				return feedback = new Feedback(incompleteTask(commandDetails.getID()-1), FEEDBACK_INCOMPLETE + tasks.get(this.commandDetails.getID()-1).getDescription());
-			}	catch (IndexOutOfBoundsException e)	{
-					isValidTaskNo = false;
-					throw new IndexOutOfBoundsException();
-			}	finally	{
-				if(!isValidTaskNo)	{
+				return feedback = new Feedback(incompleteTask(commandDetails.getID() - 1),
+						FEEDBACK_INCOMPLETE + tasks.get(this.commandDetails.getID() - 1).getDescription());
+			} catch (IndexOutOfBoundsException e) {
+				isValidTaskNo = false;
+				throw new IndexOutOfBoundsException();
+			} finally {
+				if (!isValidTaskNo) {
 					isValidTaskNo = true;
 					return feedback = new Feedback(displayAllTasks(), FEEDBACK_INVALID_TASK_NUMBER);
 				}
 			}
 		case REDO:
 			this.commandDetails = history.redo();
-			if(this.commandDetails == null)	{
+			if (this.commandDetails == null) {
 				return feedback = new Feedback(displayAllTasks(), FEEDBACK_REDO_ERROR);
 			}
 			return feedback = new Feedback(redoLastAction(), FEEDBACK_REDO);
 		case UNDO:
 			this.commandDetails = history.undo();
-			if(this.commandDetails == null)	{
+			if (this.commandDetails == null) {
 				return feedback = new Feedback(displayAllTasks(), FEEDBACK_UNDO_ERROR);
 			}
 			return feedback = new Feedback(undoLastAction(), FEEDBACK_UNDO);
@@ -135,133 +145,132 @@ public class GSDControl {
 		case HELP:
 			return feedback = new Feedback(help(), FEEDBACK_HELP);
 		case EXIT:
-			
+
 		case SET:
-			//return feedback = new Feedback(setFilePath(), FEEDBACK_SET + this.commandDetails.getDescription());
+			// return feedback = new Feedback(setFilePath(), FEEDBACK_SET +
+			// this.commandDetails.getDescription());
 		default:
 			return feedback = new Feedback(displayAllTasks(), FEEDBACK_INVALID_COMMAND);
-			
+
 		}
 	}
 
-	//Constructor
+	// Constructor
 
-	public GSDControl()	{
-		
+	public GSDControl() {
+
 	}
 
-	//Behavioural Methods
+	// Behavioural Methods
 
-	private String createTask()	{
+	private String createTask() {
 		Task task = new Task(this.commandDetails);
 		tasks.add(task);
 		storage.save(tasks);
 		return displayAllTasks();
-		//return tasks.size() + " " + task.toString();
+		// return tasks.size() + " " + task.toString();
 	}
 
-	//Print task according to the given commandDetails
-	private String searchTask()	{
+	// Print task according to the given commandDetails
+	private String searchTask() {
 		String search = "";
 
-		for(int i = 0; i < tasks.size(); i++)	{
-			if(tasks.get(i).getDescription().contains(commandDetails.getDescription()))	{
-				search += i+1 + ". " + tasks.get(i).toString();
+		for (int i = 0; i < tasks.size(); i++) {
+			if (tasks.get(i).getDescription().contains(commandDetails.getDescription())) {
+				search += i + 1 + ". " + tasks.get(i).toString();
 			}
 		}
 
-		if(search.isEmpty())	{	
+		if (search.isEmpty()) {
 			search = TASK_NOT_FOUND;
 		}
 		return search;
 	}
 
-	private String updateTask(int ID)	{
+	private String updateTask(int ID) {
 		tasks.get(ID).updateDetails(commandDetails);
 		storage.save(tasks);
 		return displayAllTasks();
-		//return ID+1 + " " + tasks.get(ID).toString();
+		// return ID+1 + " " + tasks.get(ID).toString();
 	}
 
-	private String deleteTask(int ID)	{
-			tasks.remove(ID);
-			storage.save(tasks);
-			return displayAllTasks();
+	private String deleteTask(int ID) {
+		tasks.remove(ID);
+		storage.save(tasks);
+		return displayAllTasks();
 	}
-	
-	private String completeTask(int ID)	{
+
+	private String completeTask(int ID) {
 		tasks.get(ID).markAsComplete();
 		storage.save(tasks);
 		return displayAllTasks();
 	}
-	
-	private String incompleteTask(int ID)	{
+
+	private String incompleteTask(int ID) {
 		tasks.get(ID).markAsIncomplete();
-		storage.save(tasks);;
+		storage.save(tasks);
+		;
 		return displayAllTasks();
 	}
-	
-	private String undoLastAction()	{
+
+	private String undoLastAction() {
 		System.out.println(commandDetails.toString());
 		this.commandDetails = reverseCommandDetails(this.commandDetails.getID());
 		System.out.println(commandDetails.toString());
 		return executeHistoryCommand();
 	}
 
-	private String redoLastAction()	{
+	private String redoLastAction() {
 		System.out.println(commandDetails.toString());
 		return executeHistoryCommand();
 	}
-	
-	/*private String setFilePath()	{
-		storage.setFilePath(this.commandDetails.getDescription());
-		return displayAllTasks();
-	}*/
-	
-	private String undoRedoCreateTask()	{
+
+	/*
+	 * private String setFilePath() {
+	 * storage.setFilePath(this.commandDetails.getDescription()); return
+	 * displayAllTasks(); }
+	 */
+
+	private String undoRedoCreateTask() {
 		Task task = new Task(this.commandDetails);
 		tasks.add(this.commandDetails.getID(), task);
 		storage.save(tasks);
 		return displayAllTasks();
-		//return tasks.size() + " " + task.toString();
+		// return tasks.size() + " " + task.toString();
 	}
-		
-	private String undoRedoDeleteTask()	{
+
+	private String undoRedoDeleteTask() {
 		tasks.remove(this.commandDetails.getID());
 		storage.save(tasks);
 		return displayAllTasks();
-}
-	
-	private String displayAllTasks()	{
+	}
+
+	private String displayAllTasks() {
 		String display = "";
 
-		for(int i = 0; i < tasks.size(); i++)	{
-			display += i+1 + ". " + tasks.get(i).toString();
+		for (int i = 0; i < tasks.size(); i++) {
+			display += i + 1 + ". " + tasks.get(i).toString();
 		}
 
-		if(display.isEmpty())	{	
+		if (display.isEmpty()) {
 			display = NO_TASKS;
 		}
 		return display;
 	}
-	
-	private String help()	{
+
+	private String help() {
 		return "Add a floating task - add <description> AT <venue> PRIORITY <priority>\n"
 				+ "Add a deadline task - add <description> BY <deadline> AT <venue> PRIORITY <priority>\n"
 				+ "Add an event - add <description> FROM <start date/time> TO <end date/time> AT <venue> PRIORITY <priority>\n"
 				+ "Search for task - search <keyword/day/date>\n"
 				+ "Update a task - update <ID> <description> FROM <start date/time> TO <end date/time> AT <venue> PRIORITY <priority>\n"
-				+ "Delete a task - delete <ID>\n"
-				+ "Mark a task as complete - complete <ID>\n"
-				+ "Mark a task as incomplete - incomplete <ID>\n"
-				+ "Undo last action - undo\n"
-				+ "Display all tasks - display\n"
-				+ "Display floating tasks - floating\n"
-				+ "Exit GSD - exit\n";
+				+ "Delete a task - delete <ID>\n" + "Mark a task as complete - complete <ID>\n"
+				+ "Mark a task as incomplete - incomplete <ID>\n" + "Undo last action - undo\n"
+				+ "Display all tasks - display\n" + "Display floating tasks - floating\n" + "Exit GSD - exit\n";
 	}
-	
+
 	private String executeHistoryCommand() {
-		switch (this.commandDetails.getCommand())	{
+		switch (this.commandDetails.getCommand()) {
 		case ADD:
 			return undoRedoCreateTask();
 		case DELETE:
@@ -269,64 +278,61 @@ public class GSDControl {
 		case UPDATE:
 			return updateTask(commandDetails.getID());
 		case COMPLETE:
-			return completeTask(commandDetails.getID()-1);
+			return completeTask(commandDetails.getID() - 1);
 		case INCOMPLETE:
-			return incompleteTask(commandDetails.getID()-1);
+			return incompleteTask(commandDetails.getID() - 1);
 		default:
 			return null;
 		}
 	}
-	
-	private CommandDetails reverseCommandDetails(int ID)	{
+
+	private CommandDetails reverseCommandDetails(int ID) {
 		switch (this.commandDetails.getCommand()) {
 		case ADD:
 			return reverseAdd();
 		case DELETE:
 			return reverseDelete(ID);
 		case UPDATE:
-			return this.commandDetails;	//don't need to reverse engineer
+			return this.commandDetails; // don't need to reverse engineer
 		case COMPLETE:
 			return reverseComplete(ID);
 		case INCOMPLETE:
 			return reverseIncomplete(ID);
 		default:
 			return commandDetails;
-			
+
 		}
 	}
-	 
-	private CommandDetails reverseAdd()	{
+
+	private CommandDetails reverseAdd() {
 		CommandDetails addToDelete;
-		return addToDelete = new CommandDetails(CommandDetails.COMMANDS.DELETE, tasks.size()-1);
+		return addToDelete = new CommandDetails(CommandDetails.COMMANDS.DELETE, tasks.size() - 1);
 	}
-	
-	private CommandDetails reverseDelete(int ID)	{
-//		this.commandDetails.setCommand(CommandDetails.COMMANDS.ADD);
-//		return this.commandDetails;
-		CommandDetails taskDelete = new CommandDetails(CommandDetails.COMMANDS.ADD, 
-				this.commandDetails.getDescription(), 
-				this.commandDetails.getStartDate(), 
-				this.commandDetails.getDeadline(), 
-				this.commandDetails.getID());
+
+	private CommandDetails reverseDelete(int ID) {
+		// this.commandDetails.setCommand(CommandDetails.COMMANDS.ADD);
+		// return this.commandDetails;
+		CommandDetails taskDelete = new CommandDetails(CommandDetails.COMMANDS.ADD,
+				this.commandDetails.getDescription(), this.commandDetails.getStartDate(),
+				this.commandDetails.getDeadline(), this.commandDetails.getID());
 		return taskDelete;
 	}
-	
-	private CommandDetails reverseUpdate(int ID)	{
+
+	private CommandDetails reverseUpdate(int ID) {
 		Task taskToUpdate = tasks.get(ID);
 		CommandDetails unUpdate;
 		return unUpdate = new CommandDetails(CommandDetails.COMMANDS.UPDATE, taskToUpdate.getDescription(),
-											taskToUpdate.getStartDate(), taskToUpdate.getDeadline(),
-											ID);
+				taskToUpdate.getStartDate(), taskToUpdate.getDeadline(), ID);
 	}
-	
-	private CommandDetails reverseComplete(int ID)	{
+
+	private CommandDetails reverseComplete(int ID) {
 		CommandDetails completeToIncomplete;
 		return completeToIncomplete = new CommandDetails(CommandDetails.COMMANDS.INCOMPLETE, tasks.size());
 	}
-	
-	private CommandDetails reverseIncomplete(int ID)	{
+
+	private CommandDetails reverseIncomplete(int ID) {
 		CommandDetails incompleteToComplete;
 		return incompleteToComplete = new CommandDetails(CommandDetails.COMMANDS.COMPLETE, tasks.size());
 	}
-	
+
 }
