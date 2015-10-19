@@ -1,3 +1,4 @@
+import java.text.ParseException;
 import java.util.*;
 
 /*
@@ -45,6 +46,8 @@ public class GSDControl {
 			//Wrong date
 		} catch (NumberFormatException f) {
 			//id not int
+		} catch(invalidDateFormat g){
+			//illogical date format
 		}
 		Feedback feedback;
 		switch (this.commandDetails.getCommand()) {

@@ -117,7 +117,7 @@ public class Parser {
 	private final static int NO_KEYWORD = -1;
 	private final static int NO_YEAR_INPUT = 1970;
 
-	private static Date parseStartDate(ArrayList<String> input) throws ParseException {
+	private static Date parseStartDate(ArrayList<String> input) throws ParseException, invalidDateFormat {
 		String result = "";
 		int indexOfNextKeyWord = NO_NEXT_KEYWORD;
 		int indexOfKeyWordFROM = input.lastIndexOf("FROM");
@@ -149,7 +149,7 @@ public class Parser {
 		return indexOfNextKeyWord;
 	}
 
-	private static Date parseEndDate(ArrayList<String> input) throws ParseException {
+	private static Date parseEndDate(ArrayList<String> input) throws ParseException, invalidDateFormat {
 		String result = "";
 		int indexOfNextKeyWord = NO_NEXT_KEYWORD;
 		int indexOfKeyWordTO = input.lastIndexOf("TO");
@@ -306,7 +306,7 @@ public class Parser {
 		}
 	}
 
-	static Date createStartDate(String input) throws ParseException {
+	static Date createStartDate(String input) throws ParseException, invalidDateFormat {
 		for (String temp : DATE_FORMAT) {
 			try {
 				SimpleDateFormat possibleFormats = new SimpleDateFormat(temp);
@@ -327,6 +327,12 @@ public class Parser {
 					mydate = cal.getTime();
 
 					return mydate;
+				}
+				
+				for (int i = 0; i < TimekeyWord.length; i++) {
+					if (input.toUpperCase().contains(TimekeyWord[i])) {
+						throw new invalidDateFormat(input);
+					}
 				}
 
 				if (cal.get(Calendar.YEAR) == NO_YEAR_INPUT) {
@@ -450,7 +456,7 @@ public class Parser {
 		}
 	}
 
-	static Date createEndDate(String input) throws ParseException {
+	static Date createEndDate(String input) throws ParseException, invalidDateFormat {
 
 		for (String temp : DATE_FORMAT) {
 			try {
@@ -473,8 +479,8 @@ public class Parser {
 				}
 
 				for (int i = 0; i < TimekeyWord.length; i++) {
-					if (input.toUpperCase().equals(TimekeyWord[i])) {
-						throw new ParseException(input, 0);
+					if (input.toUpperCase().contains(TimekeyWord[i])) {
+						throw new invalidDateFormat(input);
 					}
 				}
 
@@ -523,7 +529,7 @@ public class Parser {
 		return ID;
 	}
 
-	public static CommandDetails parse(String input) throws ParseException, NumberFormatException {
+	public static CommandDetails parse(String input) throws ParseException, NumberFormatException, invalidDateFormat {
 		String description;
 		Date start;
 		Date end;
@@ -552,6 +558,8 @@ public class Parser {
 		}
 		description = parseDescription(strTokens);
 
+		
+		
 		// to check if details correct
 
 		CommandDetails details = new CommandDetails(command, description, start, end, ID);
@@ -564,17 +572,14 @@ public class Parser {
 	private static void validateInput(ArrayList<String> strTokens) throws ParseException {
 
 		int count = 0;
-
 		for (String temp : strTokens) {
 			if (temp == "FROM" || temp == "AT") {
 				count++;
 			}
 		}
-
 		if (count > 2) {
 			throw new ParseException(null, 0);
 		}
-
 		count = 0;
 		for (String temp : strTokens) {
 			if (temp == "BY" || temp == "TO") {
@@ -584,7 +589,17 @@ public class Parser {
 		if (count > 2) {
 			throw new ParseException(null, 0);
 		}
-
 	}
-
 }
+
+class invalidDateFormat extends Exception
+{
+      //Parameterless Constructor
+      public invalidDateFormat() {}
+
+      //Constructor that accepts a message
+      public invalidDateFormat(String message)
+      {
+         super(message);
+      }
+ }
