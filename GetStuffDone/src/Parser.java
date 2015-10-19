@@ -475,9 +475,18 @@ public class Parser {
 				Date mydate = possibleFormats.parse(input);
 				Calendar cal = Calendar.getInstance();
 				cal.setTime(mydate);
+				/*
+				 * if (cal.get(Calendar.YEAR) == NO_YEAR_INPUT &&
+				 * cal.get(Calendar.MONTH) == 0 && cal.get(Calendar.DATE) == 1)
+				 * {
+				 */
 
-				if (cal.get(Calendar.YEAR) == NO_YEAR_INPUT && cal.get(Calendar.MONTH) == 0
-						&& cal.get(Calendar.DATE) == 1) {
+				if (cal.get(Calendar.YEAR) == NO_YEAR_INPUT && (input.toUpperCase().contains("TODAY")
+						|| input.toUpperCase().contains("TOMORROW") || input.toUpperCase().contains("MONDAY")
+						|| input.toUpperCase().contains("TUESDAY") || input.toUpperCase().contains("WEDNESDAY")
+						|| input.toUpperCase().contains("THURSDAY") || input.toUpperCase().contains("FRIDAY")
+						|| input.toUpperCase().contains("SATURDAY") || input.toUpperCase().contains("SUNDAY"))) {
+
 					cal.setTime(mydate);
 					cal.set(Calendar.DATE, Calendar.getInstance().get(Calendar.DATE));
 					cal.set(Calendar.MONTH, Calendar.getInstance().get(Calendar.MONTH));
