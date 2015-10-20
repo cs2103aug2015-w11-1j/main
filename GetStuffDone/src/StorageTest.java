@@ -27,7 +27,7 @@ public class StorageTest {
 	@Before
 	public void setUp() {
 
-		storage.setPath(PATH_CURRENT + FILENAME);
+		storage.setFilePath(PATH_CURRENT + FILENAME);
 
 		tasks = new ArrayList<>();
 
@@ -40,19 +40,19 @@ public class StorageTest {
 		taskEvent.setDescription("Event Task");
 		taskEvent.setStartDate(new Date());
 		taskEvent.setDeadline(new Date());
-		taskFloating.setIsComplete(true);
+		taskEvent.setIsComplete(true);
 
 		taskDeadline = new Task();
 		taskDeadline.setDescription("Deadline Task");
 		taskDeadline.setDeadline(new Date());
 		taskDeadline.setIsComplete(false);
 	}
-	
+
 	@Test
 	public void saveNull() throws IOException, ParseException {
-		
+
 		storage.save(null);
-		
+
 		assertFalse((new File(PATH_CURRENT + FILENAME)).exists());
 	}
 
@@ -94,45 +94,32 @@ public class StorageTest {
 
 	@Test
 	public void setPathWithNull() {
-		assertFalse(storage.setPath(null));
+		assertFalse(storage.setFilePath(null));
 	}
 
 	@Test
 	public void setPathWithEmptyString() {
-		assertFalse(storage.setPath(""));
+		assertFalse(storage.setFilePath(""));
 	}
 
 	@Test
 	public void setPathWithIllegalCharacters() {
-		
-		char[] illegalCharacters = new char[]{'\n', '\t', '?', '*', '<', '\\', '<', '>', '|', '\"', ':'};
-		
+
+		char[] illegalCharacters = new char[] { '\n', '\t', '?', '*', '<', '\\', '<', '>', '|', '\"', ':' };
+
 		for (char c : illegalCharacters) {
-			assertFalse(storage.setPath(PATH_CURRENT + "save" + c + "file.txt"));
+			assertFalse(storage.setFilePath(PATH_CURRENT + "save" + c + "file.txt"));
 		}
 	}
 
 	@Test
 	public void setPathWithoutFilename() {
-		assertFalse(storage.setPath(PATH_CURRENT));
+		assertFalse(storage.setFilePath(PATH_CURRENT));
 	}
 
 	@Test
 	public void setPathWithOnlyFilename() {
-		assertFalse(storage.setPath(FILENAME));
-	}
-	
-	@Test(expected = IOException.class)
-	public void pathPersists() throws IOException, ParseException {
-		
-		tasks.add(taskFloating);
-		
-		storage.save(tasks);
-		storage.setPath(PATH_CURRENT + "anotherSaveFile.txt");
-		
-		storage = new Storage();
-		
-		storage.load();
+		assertFalse(storage.setFilePath(FILENAME));
 	}
 
 	@After
@@ -147,31 +134,6 @@ public class StorageTest {
 		assertTrue(isSame(task1.getStartDate(), task2.getStartDate()));
 		assertEquals(task1.getIsComplete(), task2.getIsComplete());
 	}
-
-	// private static boolean isSameTask(Task task1, Task task2) {
-	//
-	// if (!isSame(task1.getDescription(), task2.getDescription())) {
-	// return false;
-	// }
-	//
-	// if (!isSame(task1.getStartDate(), task2.getStartDate())) {
-	// return false;
-	// }
-	//
-	// if (!isSame(task1.getdeadline(), task2.getdeadline())) {
-	// return false;
-	// }
-	//
-	// if (!isSame(task1.getVenue(), task2.getVenue())) {
-	// return false;
-	// }
-	//
-	// if (!isSame(task1.getPriority(), task2.getPriority())) {
-	// return false;
-	// }
-	//
-	// return true;
-	// }
 
 	private static boolean isSame(String string1, String string2) {
 

@@ -4,17 +4,19 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.nio.file.Files;
 import java.nio.file.InvalidPathException;
-import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.prefs.Preferences;
 
 public class Storage {
 
-	private static final String DEFAULT_PATH = "GetStuffDone.sav";
+	private static final String KEY_PATH = "GetStuffDone.path";
+
+	private static final String DEFAULT_PATH = "GetStuffDone.txt";
 
 	private static final String DATE_FORMAT = "dd MMMM yy HH:mm:ss";
 
@@ -32,7 +34,11 @@ public class Storage {
 
 	private SimpleDateFormat formatter = new SimpleDateFormat(DATE_FORMAT);
 
-	private static Path path = (new File(DEFAULT_PATH)).toPath();
+	private Preferences preferences;
+
+	public Storage() {
+		preferences = Preferences.userNodeForPackage(this.getClass());
+	}
 
 	/**
 	 * Save the ArrayList of Task(s) into a file. If the ArrayList is null, do
@@ -49,7 +55,9 @@ public class Storage {
 
 		try {
 
-			PrintWriter writer = new PrintWriter(path.toFile());
+			String path = preferences.get(KEY_PATH, DEFAULT_PATH);
+
+			PrintWriter writer = new PrintWriter(new File(path));
 
 			for (Task task : tasks) {
 				writeString(writer, task.getDescription());
@@ -78,7 +86,9 @@ public class Storage {
 	 */
 	public ArrayList<Task> load() throws IOException, ParseException {
 
-		File savedFile = path.toFile();
+		String path = preferences.get(KEY_PATH, DEFAULT_PATH);
+
+		File savedFile = new File(path);
 
 		List<String> lines = Files.readAllLines(savedFile.toPath());
 
@@ -117,28 +127,30 @@ public class Storage {
 		}
 
 		int lastIndexOfSeparator = string.lastIndexOf(File.separatorChar);
-		
+
 		if (lastIndexOfSeparator == -1) {
 			return false;
 		}
-		
+
 		String folderName = string.substring(0, lastIndexOfSeparator + 1);
 		String fileName = string.replace(folderName, "");
 
 		if (folderName.isEmpty() || fileName.isEmpty()) {
 			return false;
 		}
-		
+
 		if (!(new File(folderName)).exists()) {
 			return false;
 		}
 
 		try {
-			path = Paths.get(string);
+			Paths.get(string);
 		} catch (InvalidPathException e) {
 			return false;
 		}
-		
+
+		preferences.put(KEY_PATH, DEFAULT_PATH);
+
 		return true;
 	}
 
