@@ -3,14 +3,19 @@ import java.util.*;
 
 /*
  * GSDControl deals with handling of input commands, CRUD of tasks, update of History and update of Storage
- * GSDControl knows the existence of Parser, Task, History and Storage
- * GSDControl does not know the existence of UI wutfaceS
+ * GSDControl knows the existence of the main components Parser, Task, History and Storage
+ * GSDControl knows the existence of stand-alone classes CommandDetails, Task and Feedback 
+ * GSDControl does not know the existence of UI
  */
 
 public class GSDControl {
 
-	private static final String TASK_NOT_FOUND = ">> Task was not found";
-	private static final String NO_TASKS = ">> No tasks recorded";
+	private static final String DISPLAY_TASK_NOT_FOUND = ">> Task was not found";
+	private static final String DISPLAY_NO_TASKS = ">> No tasks recorded";
+	private static final String DISPLAY_NO_FLOATING_TASKS = ">> No Floating Tasks";
+	private static final String DISPLAY_NO_EVENTS = ">> No Events";
+	private static final String DISPLAY_NO_DEADLINES = ">> No Deadlines";
+
 	private static final String FEEDBACK_ADD = ">> ADDED ";
 	private static final String FEEDBACK_SEARCH = ">> SEARCH for ";
 	private static final String FEEDBACK_UPDATE = ">> UPDATED ";
@@ -31,8 +36,8 @@ public class GSDControl {
 	private static final String FEEDBACK_REDO_ERROR = ">> ERROR: NOTHING TO REDO";
 	private static final String FEEDBACK_INVALID_DATE_FORMAT = ">> ERROR : INVALID DATE/TIME FORMAT";
 	private static final String FEEDBACK_INVALID_TIME_DATE_INPUT = ">> ERROR : INVALID DATE/TIME INPUT";
+	
 	private ArrayList<Task> tasks = new ArrayList<Task>();
-	private Scanner sc = new Scanner(System.in);
 	private CommandDetails commandDetails;
 	private Parser parser = new Parser();
 	private Storage storage = new Storage();
@@ -43,120 +48,120 @@ public class GSDControl {
 		Feedback feedback;
 		try {
 			this.commandDetails = parser.parse(input);
-			
-		} catch (ParseException e) {	//Invalid Date Format
-			return feedback = new Feedback(null, FEEDBACK_INVALID_DATE_FORMAT);
+		} catch (ParseException e) { // Invalid Date Format
+			return feedback = new Feedback(null, FEEDBACK_INVALID_DATE_FORMAT, generateInfoBox());
 		} catch (NumberFormatException f) {
-			return feedback = new Feedback(null, FEEDBACK_INVALID_TASK_NUMBER);
-		} catch(invalidTimeDateInput g){	//Not in the form [Time] [Date]
-			return feedback = new Feedback(null, FEEDBACK_INVALID_TIME_DATE_INPUT);
-		}catch (invalidCommand h){
-			return feedback = new Feedback(null, FEEDBACK_INVALID_COMMAND);
+			return feedback = new Feedback(null, FEEDBACK_INVALID_TASK_NUMBER, generateInfoBox());
+		} catch (invalidTimeDateInput g) { // Not in the form [Time] [Date]
+			return feedback = new Feedback(null, FEEDBACK_INVALID_TIME_DATE_INPUT, generateInfoBox());
+		} catch (invalidCommand h) {
+			return feedback = new Feedback(null, FEEDBACK_INVALID_COMMAND, generateInfoBox());
 		}
 		switch (this.commandDetails.getCommand()) {
 		case ADD:
 			this.commandDetails.setID(tasks.size());
 			history.insert(this.commandDetails);
-			// history.insert(reverseCommandDetails(this.commandDetails.getID()));
-			return feedback = new Feedback(createTask(), FEEDBACK_ADD + commandDetails.getDescription());
+			return feedback = new Feedback(createTask(), FEEDBACK_ADD + commandDetails.getDescription(),
+					generateInfoBox());
 		case DELETE:
 			try {
-				Task taskToDelete = tasks.get(this.commandDetails.getID() - 1);
-				CommandDetails deletedDetails = new CommandDetails(CommandDetails.COMMANDS.DELETE,
-						taskToDelete.getDescription(), taskToDelete.getStartDate(), taskToDelete.getDeadline(),
-						this.commandDetails.getID() - 1);
+				CommandDetails deletedDetails = generateDetails();
 				history.insert(deletedDetails);
 				String taskDescription = tasks.get(commandDetails.getID() - 1).getDescription();
 				return feedback = new Feedback(deleteTask(commandDetails.getID() - 1),
-						FEEDBACK_DELETE + taskDescription);
+						FEEDBACK_DELETE + taskDescription, generateInfoBox());
 			} catch (IndexOutOfBoundsException e) {
 				isValidTaskNo = false;
 				throw new IndexOutOfBoundsException();
 			} finally {
 				if (!isValidTaskNo) {
 					isValidTaskNo = true;
-					return feedback = new Feedback(displayAllTasks(), FEEDBACK_INVALID_TASK_NUMBER);
+					return feedback = new Feedback(displayAllTasks(), FEEDBACK_INVALID_TASK_NUMBER, generateInfoBox());
 				}
 			}
 		case SEARCH:
-			return feedback = new Feedback(searchTask(), FEEDBACK_SEARCH + commandDetails.getDescription());
+			return feedback = new Feedback(searchTask(), FEEDBACK_SEARCH + commandDetails.getDescription(),
+					generateInfoBox());
 		case UPDATE:
 			try {
-				Task oldTask = tasks.get(this.commandDetails.getID() - 1);
-				CommandDetails oldDetails = new CommandDetails(CommandDetails.COMMANDS.UPDATE,
-						oldTask.getDescription(), oldTask.getStartDate(), oldTask.getDeadline(),
-						this.commandDetails.getID() - 1);
+				CommandDetails oldDetails = generateDetails();
 				System.out.println(oldDetails.getDescription());
 				history.insert(oldDetails);
-				// history.insert(reverseCommandDetails(this.commandDetails.getID()-1));
+				if (this.commandDetails.getDescription() == null) {
+					return feedback = new Feedback(updateTask(commandDetails.getID() - 1),
+							FEEDBACK_UPDATE + oldDetails.getDescription(), generateInfoBox());
+				}
 				return feedback = new Feedback(updateTask(commandDetails.getID() - 1),
-						FEEDBACK_UPDATE + commandDetails.getDescription());
+						FEEDBACK_UPDATE + oldDetails.getDescription() + " to " + this.commandDetails.getDescription(),
+						generateInfoBox());
 			} catch (IndexOutOfBoundsException e) {
 				isValidTaskNo = false;
 				throw new IndexOutOfBoundsException();
 			} finally {
 				if (!isValidTaskNo) {
 					isValidTaskNo = true;
-					return feedback = new Feedback(displayAllTasks(), FEEDBACK_INVALID_TASK_NUMBER);
+					return feedback = new Feedback(displayAllTasks(), FEEDBACK_INVALID_TASK_NUMBER, generateInfoBox());
 				}
 			}
 		case COMPLETE:
 			try {
 				history.insert(this.commandDetails);
 				return feedback = new Feedback(completeTask(commandDetails.getID() - 1),
-						FEEDBACK_COMPLETE + tasks.get(this.commandDetails.getID() - 1).getDescription());
+						FEEDBACK_COMPLETE + tasks.get(this.commandDetails.getID() - 1).getDescription(),
+						generateInfoBox());
 			} catch (IndexOutOfBoundsException e) {
 				isValidTaskNo = false;
 				throw new IndexOutOfBoundsException();
 			} finally {
 				if (!isValidTaskNo) {
 					isValidTaskNo = true;
-					return feedback = new Feedback(displayAllTasks(), FEEDBACK_INVALID_TASK_NUMBER);
+					return feedback = new Feedback(displayAllTasks(), FEEDBACK_INVALID_TASK_NUMBER, generateInfoBox());
 				}
 			}
 		case INCOMPLETE:
 			try {
 				history.insert(this.commandDetails);
 				return feedback = new Feedback(incompleteTask(commandDetails.getID() - 1),
-						FEEDBACK_INCOMPLETE + tasks.get(this.commandDetails.getID() - 1).getDescription());
+						FEEDBACK_INCOMPLETE + tasks.get(this.commandDetails.getID() - 1).getDescription(),
+						generateInfoBox());
 			} catch (IndexOutOfBoundsException e) {
 				isValidTaskNo = false;
 				throw new IndexOutOfBoundsException();
 			} finally {
 				if (!isValidTaskNo) {
 					isValidTaskNo = true;
-					return feedback = new Feedback(displayAllTasks(), FEEDBACK_INVALID_TASK_NUMBER);
+					return feedback = new Feedback(displayAllTasks(), FEEDBACK_INVALID_TASK_NUMBER, generateInfoBox());
 				}
 			}
 		case REDO:
 			this.commandDetails = history.redo();
 			if (this.commandDetails == null) {
-				return feedback = new Feedback(displayAllTasks(), FEEDBACK_REDO_ERROR);
+				return feedback = new Feedback(displayAllTasks(), FEEDBACK_REDO_ERROR, generateInfoBox());
 			}
-			return feedback = new Feedback(redoLastAction(), FEEDBACK_REDO);
+			return feedback = new Feedback(redoLastAction(), FEEDBACK_REDO, generateInfoBox());
 		case UNDO:
 			this.commandDetails = history.undo();
 			if (this.commandDetails == null) {
-				return feedback = new Feedback(displayAllTasks(), FEEDBACK_UNDO_ERROR);
+				return feedback = new Feedback(displayAllTasks(), FEEDBACK_UNDO_ERROR, generateInfoBox());
 			}
-			return feedback = new Feedback(undoLastAction(), FEEDBACK_UNDO);
+			return feedback = new Feedback(undoLastAction(), FEEDBACK_UNDO, generateInfoBox());
 		case ALL:
-			return feedback = new Feedback(displayAllTasks(), FEEDBACK_ALL);
+			return feedback = new Feedback(displayAllTasks(), FEEDBACK_ALL, generateInfoBox());
 		case FLOATING:
-			//return feedback = new Feedback(displayFloatingTasks(), FEEDBACK_FLOATING);
+			return feedback = new Feedback(displayFloatingTasks(), FEEDBACK_FLOATING, generateInfoBox());
 		case EVENTS:
-			//return feedback = new Feedback(displayEvents(), FEEDBACK_EVENTS);
+			return feedback = new Feedback(displayEvents(), FEEDBACK_EVENTS, generateInfoBox());
 		case DEADLINES:
-			//return feedback = new Feedback(displayDeadlines(), FEEDBACK_DEADLINES);
+			return feedback = new Feedback(displayDeadlines(), FEEDBACK_DEADLINES, generateInfoBox());
 		case HELP:
-			return feedback = new Feedback(help(), FEEDBACK_HELP);
+			return feedback = new Feedback(help(), FEEDBACK_HELP, generateInfoBox());
 		case EXIT:
 
 		case SET:
 			// return feedback = new Feedback(setFilePath(), FEEDBACK_SET +
 			// this.commandDetails.getDescription());
 		default:
-			return feedback = new Feedback(displayAllTasks(), FEEDBACK_INVALID_COMMAND);
+			return feedback = new Feedback(displayAllTasks(), FEEDBACK_INVALID_COMMAND, generateInfoBox());
 
 		}
 	}
@@ -171,13 +176,12 @@ public class GSDControl {
 
 	private String createTask() {
 		Task task = new Task(this.commandDetails);
+		determineTaskType(task);
 		tasks.add(task);
 		storage.save(tasks);
 		return displayAllTasks();
-		// return tasks.size() + " " + task.toString();
 	}
 
-	// Print task according to the given commandDetails
 	private String searchTask() {
 		String search = "";
 
@@ -188,17 +192,17 @@ public class GSDControl {
 		}
 
 		if (search.isEmpty()) {
-			search = TASK_NOT_FOUND;
+			search = DISPLAY_TASK_NOT_FOUND;
 		}
 		return search;
 	}
 
 	private String updateTask(int ID) {
 		tasks.get(ID).updateDetails(commandDetails);
+		determineTaskType(tasks.get(ID));
 		Task updatedTask = tasks.get(ID);
-		CommandDetails updatedDetails = new CommandDetails(CommandDetails.COMMANDS.UPDATE,
-				updatedTask.getDescription(), updatedTask.getStartDate(), updatedTask.getDeadline(),
-				ID);
+		CommandDetails updatedDetails = new CommandDetails(CommandDetails.COMMANDS.UPDATE, updatedTask.getDescription(),
+				updatedTask.getStartDate(), updatedTask.getDeadline(), ID);
 		history.insert(updatedDetails);
 		storage.save(tasks);
 		return displayAllTasks();
@@ -237,17 +241,15 @@ public class GSDControl {
 
 	/*
 	 * private String setFilePath() {
-	 * storage.setFilePath(this.commandDetails.getDescription()); 
-	 * return null;
-	 *  }
+	 * storage.setFilePath(this.commandDetails.getDescription()); return null; }
 	 */
 
 	private String undoRedoCreateTask() {
 		Task task = new Task(this.commandDetails);
+		determineTaskType(task);
 		tasks.add(this.commandDetails.getID(), task);
 		storage.save(tasks);
 		return displayAllTasks();
-		// return tasks.size() + " " + task.toString();
 	}
 
 	private String undoRedoDeleteTask() {
@@ -255,35 +257,116 @@ public class GSDControl {
 		storage.save(tasks);
 		return displayAllTasks();
 	}
-	
+
 	private String undoRedoUpdateTask(int ID) {
 		tasks.get(ID).updateDetails(commandDetails);
+		determineTaskType(tasks.get(ID));
 		storage.save(tasks);
 		return displayAllTasks();
 	}
 
+	private CommandDetails generateDetails() {
+		Task task = tasks.get(this.commandDetails.getID() - 1);
+		switch (this.commandDetails.getCommand()) {
+		case DELETE:
+			CommandDetails deletedDetails = new CommandDetails(CommandDetails.COMMANDS.DELETE, task.getDescription(),
+					task.getStartDate(), task.getDeadline(), this.commandDetails.getID() - 1);
+			return deletedDetails;
+		case UPDATE:
+			CommandDetails oldDetails = new CommandDetails(CommandDetails.COMMANDS.UPDATE, task.getDescription(),
+					task.getStartDate(), task.getDeadline(), this.commandDetails.getID() - 1);
+			return oldDetails;
+		default:
+			return null;
+		}
+	}
+
 	private String displayAllTasks() {
-		String display = "";
+		String displayAll = "";
 
 		for (int i = 0; i < tasks.size(); i++) {
-			display += i + 1 + ". " + tasks.get(i).toString();
+			displayAll += i + 1 + ". " + tasks.get(i).toString();
 		}
 
-		if (display.isEmpty()) {
-			display = NO_TASKS;
+		if (displayAll.isEmpty()) {
+			displayAll = DISPLAY_NO_TASKS;
 		}
-		return display;
+		return displayAll;
+	}
+
+	private String displayFloatingTasks() {
+		String floating = "";
+
+		for (int i = 0; i < tasks.size(); i++) {
+			if (tasks.get(i).getIsFloating()) {
+				floating += i + 1 + ". " + tasks.get(i).toString();
+			}
+		}
+
+		if (floating.isEmpty()) {
+			floating = DISPLAY_NO_FLOATING_TASKS;
+		}
+		return floating;
+	}
+
+	private String displayEvents() {
+		String events = "";
+
+		for (int i = 0; i < tasks.size(); i++) {
+			if (tasks.get(i).getIsEvent()) {
+				events += i + 1 + ". " + tasks.get(i).toString();
+			}
+		}
+
+		if (events.isEmpty()) {
+			events = DISPLAY_NO_EVENTS;
+		}
+		return events;
+	}
+
+	private String displayDeadlines() {
+		String deadlines = "";
+
+		for (int i = 0; i < tasks.size(); i++) {
+			if (tasks.get(i).getIsDeadline()) {
+				deadlines += i + 1 + ". " + tasks.get(i).toString();
+			}
+		}
+
+		if (deadlines.isEmpty()) {
+			deadlines = DISPLAY_NO_DEADLINES;
+		}
+		return deadlines;
+	}
+
+	private String generateInfoBox() {
+		int floating = 0, events = 0, deadlines = 0, totalTasks = tasks.size();
+
+		for (int i = 0; i < tasks.size(); i++) {
+			if (tasks.get(i).getIsDeadline()) {
+				deadlines++;
+			}
+			if (tasks.get(i).getIsEvent()) {
+				events++;
+			}
+			if (tasks.get(i).getIsFloating()) {
+				floating++;
+			}
+		}
+		return "Floating Tasks = " + floating + "\nEvents = " + events + "\nDeadlines = " + deadlines
+				+ "\nTotal No. of Tasks = " + totalTasks + "\n";
 	}
 
 	private String help() {
-		return "Add a floating task - add <description> AT <venue> PRIORITY <priority>\n"
-				+ "Add a deadline task - add <description> BY <deadline> AT <venue> PRIORITY <priority>\n"
-				+ "Add an event - add <description> FROM <start date/time> TO <end date/time> AT <venue> PRIORITY <priority>\n"
+		return "Add a floating task - add <description> \n"
+				+ "Add a deadline task - add <description> BY <time> <date>\n"
+				+ "Add an event - add <description> FROM <start time> <start date> TO <end time> <end date>\n"
 				+ "Search for task - search <keyword/day/date>\n"
-				+ "Update a task - update <ID> <description> FROM <start date/time> TO <end date/time> AT <venue> PRIORITY <priority>\n"
+				+ "Update a task - update <ID> <description> FROM <start time> <start date> TO <end time> <end date>\n"
 				+ "Delete a task - delete <ID>\n" + "Mark a task as complete - complete <ID>\n"
 				+ "Mark a task as incomplete - incomplete <ID>\n" + "Undo last action - undo\n"
-				+ "Display all tasks - display\n" + "Display floating tasks - floating\n" + "Exit GSD - exit\n";
+				+ "Display all tasks - all\n" + "Display floating tasks - floating\n" + "Display events - events\n"
+				+ "Display deadlines - deadlines\n" + "Set file path - set <file path>\n" + "Exit GSD - exit\n";
 	}
 
 	private String executeHistoryCommand() {
@@ -322,34 +405,44 @@ public class GSDControl {
 	}
 
 	private CommandDetails reverseAdd() {
-		CommandDetails addToDelete;
-		return addToDelete = new CommandDetails(CommandDetails.COMMANDS.DELETE, tasks.size() - 1);
+		CommandDetails addToDelete = new CommandDetails(CommandDetails.COMMANDS.DELETE, tasks.size() - 1);
+		return addToDelete;
 	}
 
 	private CommandDetails reverseDelete(int ID) {
-		// this.commandDetails.setCommand(CommandDetails.COMMANDS.ADD);
-		// return this.commandDetails;
 		CommandDetails taskDelete = new CommandDetails(CommandDetails.COMMANDS.ADD,
 				this.commandDetails.getDescription(), this.commandDetails.getStartDate(),
 				this.commandDetails.getDeadline(), this.commandDetails.getID());
 		return taskDelete;
 	}
 
-	private CommandDetails reverseUpdate(int ID) {
-		Task taskToUpdate = tasks.get(ID);
-		CommandDetails unUpdate;
-		return unUpdate = new CommandDetails(CommandDetails.COMMANDS.UPDATE, taskToUpdate.getDescription(),
-				taskToUpdate.getStartDate(), taskToUpdate.getDeadline(), ID);
-	}
-
 	private CommandDetails reverseComplete(int ID) {
-		CommandDetails completeToIncomplete;
-		return completeToIncomplete = new CommandDetails(CommandDetails.COMMANDS.INCOMPLETE, tasks.size());
+		CommandDetails completeToIncomplete = new CommandDetails(CommandDetails.COMMANDS.INCOMPLETE, tasks.size());
+		return completeToIncomplete;
 	}
 
 	private CommandDetails reverseIncomplete(int ID) {
-		CommandDetails incompleteToComplete;
-		return incompleteToComplete = new CommandDetails(CommandDetails.COMMANDS.COMPLETE, tasks.size());
+		CommandDetails incompleteToComplete = new CommandDetails(CommandDetails.COMMANDS.COMPLETE, tasks.size());
+		return incompleteToComplete;
+	}
+
+	private Task determineTaskType(Task task) {
+		if (task.getStartDate() != null) {
+			task.setIsEvent(true);
+			task.setIsDeadline(false);
+			;
+			task.setIsFloating(false);
+			return task;
+		} else if (task.getDeadline() != null) {
+			task.setIsDeadline(true);
+			task.setIsEvent(false);
+			task.setIsFloating(false);
+			return task;
+		}
+		task.setIsFloating(true);
+		task.setIsEvent(false);
+		task.setIsDeadline(false);
+		return task;
 	}
 
 }

@@ -6,13 +6,12 @@ public class CommandDetails {
 	private String description;
 	private COMMANDS command;
 	private int ID;
-	
+
 	public enum COMMANDS {
-		ADD, DELETE, SEARCH, UPDATE, COMPLETE, INCOMPLETE, UNDO, REDO, HELP, ALL, FLOATING, EVENTS, DEADLINES,
-		EXIT, INVALID, SET,
+		ADD, DELETE, SEARCH, UPDATE, COMPLETE, INCOMPLETE, UNDO, REDO, HELP, ALL, FLOATING, EVENTS, DEADLINES, EXIT, INVALID, SET,
 	}
 
-	//constructor
+	// constructor
 	public CommandDetails(COMMANDS command, String description, Date startDate, Date deadline, int ID) {
 		this.deadline = deadline;
 		this.startDate = startDate;
@@ -20,17 +19,17 @@ public class CommandDetails {
 		this.command = command;
 		this.ID = ID;
 	}
-	
-	public CommandDetails(COMMANDS command, int ID)	{
+
+	public CommandDetails(COMMANDS command, int ID) {
 		this.deadline = null;
 		this.startDate = null;
 		this.description = null;
 		this.command = command;
 		this.ID = ID;
 	}
-	
-	//Accessors
-	public COMMANDS getCommand()	{
+
+	// Accessors
+	public COMMANDS getCommand() {
 		return this.command;
 	}
 
@@ -45,17 +44,17 @@ public class CommandDetails {
 	public String getDescription() {
 		return this.description;
 	}
-	
+
 	public int getID() {
 		return this.ID;
 	}
-	
-	//Mutators
-	
-	public void setCommand(COMMANDS command)	{
+
+	// Mutators
+
+	public void setCommand(COMMANDS command) {
 		this.command = command;
 	}
-	
+
 	public Date setDeadline(Date deadline) {
 		return this.deadline = deadline;
 	}
@@ -63,24 +62,20 @@ public class CommandDetails {
 	public Date setStartDate(Date startDate) {
 		return this.startDate = startDate;
 	}
-	
-	public void setID(int ID)	{
+
+	public void setID(int ID) {
 		this.ID = ID;
 	}
-	
-	public void setDescription(String description)	{
+
+	public void setDescription(String description) {
 		this.description = description;
 	}
-	
-	
-	//Overriding methods
-	public String toString(){
+
+	// Overriding methods
+	public String toString() {
 		String result = "";
-		result= "command = " + command + "\n" + 
-				"ID = " + ID + "\n" +
-				"description = " + description + "\n" +
-				"startDate = " + startDate + "\n" +
-				"deadline = " + deadline + "\n";
+		result = "command = " + command + "\n" + "ID = " + ID + "\n" + "description = " + description + "\n"
+				+ "startDate = " + startDate + "\n" + "deadline = " + deadline + "\n";
 		return result;
 	}
 }

@@ -104,7 +104,7 @@ public class Parser {
 			"hh.mma dd-MMMM", "hh:mma dd-MMMM", "dd-MMMM",
 
 			"HHmm dd-MM", "HH.mm dd-MM", "HH:mm dd-MM", "hhmma dd-MM", "hha dd-MM", "hmma dd-MM", "hh.mma dd-MM",
-			"hh:mma dd-MM", "dd-MM",  "hhmma", "hha", "hmma", "hh.mma", "hh:mma","HH.mm", "HH:mm", "HHmm",
+			"hh:mma dd-MM", "dd-MM", "hhmma", "hha", "hmma", "hh.mma", "hh:mma", "HH.mm", "HH:mm", "HHmm",
 
 	};
 

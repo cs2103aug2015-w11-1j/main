@@ -15,7 +15,7 @@ public class Storage {
 
 	// Indicate that an attribute of a Task is null
 	private static final String NULL_FIELD = "\\";
-	
+
 	private static final String DATE_FORMAT = "dd MMMM yy HH:mm:ss";
 
 	// Indicate the number of lines required to store a task
@@ -35,8 +35,8 @@ public class Storage {
 	 *            is the ArrayList of Task(s)
 	 */
 	public void save(ArrayList<Task> tasks) {
-		
-		if (tasks == null){
+
+		if (tasks == null) {
 			return;
 		}
 
@@ -49,7 +49,7 @@ public class Storage {
 				writeDate(writer, task.getStartDate());
 				writeDate(writer, task.getDeadline());
 			}
-			
+
 			writer.close();
 
 		} catch (FileNotFoundException e) {
@@ -101,7 +101,7 @@ public class Storage {
 			writer.println(string);
 		}
 	}
-	
+
 	private void writeDate(PrintWriter writer, Date date) {
 
 		if (date == null) {

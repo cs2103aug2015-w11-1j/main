@@ -10,7 +10,7 @@ import java.util.Date;
  */
 
 public class Task {
-	
+
 	private String description;
 	private Date startDate;
 	private Date deadline;
@@ -18,12 +18,12 @@ public class Task {
 	private boolean isEvent;
 	private boolean isDeadline;
 	private boolean isFloating;
-	//private boolean isRecurring;
-	
-	//Constructors
-	
-	//Default
-	public Task()	{
+	// private boolean isRecurring;
+
+	// Constructors
+
+	// Default
+	public Task() {
 		description = null;
 		startDate = null;
 		deadline = null;
@@ -32,148 +32,139 @@ public class Task {
 		isDeadline = false;
 		isFloating = false;
 	}
-	
-	public Task(CommandDetails details)	{
+
+	public Task(CommandDetails details) {
 		this.description = details.getDescription();
 		this.startDate = details.getStartDate();
 		this.deadline = details.getDeadline();
 		this.isComplete = false;
 	}
-	
-	
-	//Mutators
-	
-	public void setDescription(String description)	{
+
+	// Mutators
+
+	public void setDescription(String description) {
 		this.description = description;
 	}
-	
-	public void setStartDate(Date startDate)	{
+
+	public void setStartDate(Date startDate) {
 		this.startDate = startDate;
 	}
-	
-	public void setDeadline(Date deadline)	{
+
+	public void setDeadline(Date deadline) {
 		this.deadline = deadline;
 	}
-	
-	public void setIsComplete(boolean isComplete)	{
+
+	public void setIsComplete(boolean isComplete) {
 		this.isComplete = isComplete;
 	}
-	
-	public void setIsEvent(boolean isEvent)	{
+
+	public void setIsEvent(boolean isEvent) {
 		this.isEvent = isEvent;
 	}
-	
-	public void setIsDeadline(boolean isDeadline)	{
+
+	public void setIsDeadline(boolean isDeadline) {
 		this.isDeadline = isDeadline;
 	}
-	
-	public void setIsFloating(boolean isFloating)	{
+
+	public void setIsFloating(boolean isFloating) {
 		this.isFloating = isFloating;
 	}
-	
-	//Accessors
-	
-	public String getDescription()	{
+
+	// Accessors
+
+	public String getDescription() {
 		return this.description;
 	}
-	
-	public Date getStartDate()	{
+
+	public Date getStartDate() {
 		return this.startDate;
 	}
-	
-	public Date getDeadline()	{
+
+	public Date getDeadline() {
 		return this.deadline;
 	}
-	
-	public boolean getIsComplete()	{
+
+	public boolean getIsComplete() {
 		return this.isComplete;
 	}
-	
-	public boolean getIsEvent()	{
+
+	public boolean getIsEvent() {
 		return this.isEvent;
 	}
-	
-	public boolean getIsDeadline()	{
+
+	public boolean getIsDeadline() {
 		return this.isDeadline;
 	}
-	
-	public boolean getIsFloating()	{
+
+	public boolean getIsFloating() {
 		return this.isFloating;
 	}
-	
-	//Behavioural methods
-	
-	public void updateDetails(CommandDetails details)	{
-		
-		if(details.getDescription() != null)	{
-			this.description = details.getDescription();
-		}
-		
-		if(details.getStartDate() != null)	{
-			this.startDate = details.getStartDate();
-		}
-		
-		if(details.getDeadline() != null)	{
-			this.deadline = details.getDeadline();
-		}
-		
+
+	// Behavioural methods
+
+	public void updateDetails(CommandDetails details) {
+
+		this.description = details.getDescription();
+		this.startDate = details.getStartDate();
+		this.deadline = details.getDeadline();
+
 	}
-	
-	public void markAsComplete()	{
+
+	public void markAsComplete() {
 		isComplete = true;
 	}
-	
-	public void markAsIncomplete()	{
+
+	public void markAsIncomplete() {
 		isComplete = false;
 	}
-	//Overriding methods
-	
-	public boolean contains(CommandDetails details)	{
-		
+	// Overriding methods
+
+	public boolean contains(CommandDetails details) {
+
 		Calendar startDateCal = Calendar.getInstance();
 		startDateCal.setTime(this.startDate);
-		
+
 		Calendar deadlineCal = Calendar.getInstance();
 		deadlineCal.setTime(this.deadline);
-		
+
 		Calendar taskStartDateCal = Calendar.getInstance();
 		taskStartDateCal.setTime(details.getStartDate());
-		
+
 		Calendar taskDeadlineCal = Calendar.getInstance();
 		taskDeadlineCal.setTime(details.getDeadline());
-				
-		if(details.getDescription().contains(this.description))	{
+
+		if (details.getDescription().contains(this.description)) {
 			return true;
 		}
-		
-		if(details.getStartDate() != null)	{
-			if(taskStartDateCal.get(Calendar.DAY_OF_YEAR) == (startDateCal.get(Calendar.DAY_OF_YEAR)))	{
+
+		if (details.getStartDate() != null) {
+			if (taskStartDateCal.get(Calendar.DAY_OF_YEAR) == (startDateCal.get(Calendar.DAY_OF_YEAR))) {
 				return true;
 			}
 		}
-		
-		if(details.getDeadline() != null)	{
-			if(taskDeadlineCal.get(Calendar.DAY_OF_YEAR) == (deadlineCal.get(Calendar.DAY_OF_YEAR)))	{
+
+		if (details.getDeadline() != null) {
+			if (taskDeadlineCal.get(Calendar.DAY_OF_YEAR) == (deadlineCal.get(Calendar.DAY_OF_YEAR))) {
 				return true;
 			}
 		}
 		return false;
 	}
-	
-	public String toString()	{
+
+	public String toString() {
 		DateFormat df = new SimpleDateFormat("hh:mma dd/MMM/yyyy ");
-		
+
 		String start, end;
-		
-		if(startDate == null){
+
+		if (startDate == null) {
 			start = "";
-		}else {
+		} else {
 			start = df.format(startDate);
 		}
-		
-		if(deadline == null){
+
+		if (deadline == null) {
 			end = "";
-		}else{
+		} else {
 			end = df.format(deadline);
 		}
 		return (description + "\nStart Date: " + start + "\nDeadline: " + end + "\n");

@@ -19,7 +19,7 @@ public class UI {
 
 	private static final int DISPLAY_BOX_WIDTH = 400;
 	private static final int DISPLAY_BOX_HEIGHT = 400;
-	private static final int FEEDBACK_BOX_WIDTH = 200;	
+	private static final int FEEDBACK_BOX_WIDTH = 200;
 	private static final int FEEDBACK_BOX_HEIGHT = 300;
 	private static final int INFO_BOX_WIDTH = 200;
 	private static final int INFO_BOX_HEIGHT = 100;
@@ -63,15 +63,15 @@ public class UI {
 			@Override
 			public void actionPerformed(ActionEvent event) {
 
-				 String input = commandBar.getText();
-				 commandBar.setText("");
-				 
-				 showInFeedbackBox(input + "\n", TextView.STYLE_NORMAL);
-				
-				 Feedback feedback = gsd.processInput(input);
-				 
-				 showInFeedbackBox(feedback.getFeedbackString(), TextView.STYLE_BOLD);
-				 showInDisplayBox(feedback.getDisplayString(), TextView.STYLE_NORMAL);
+				String input = commandBar.getText();
+				commandBar.setText("");
+
+				showInFeedbackBox(input + "\n", TextView.STYLE_NORMAL);
+
+				Feedback feedback = gsd.processInput(input);
+
+				showInFeedbackBox(feedback.getFeedbackString(), TextView.STYLE_BOLD);
+				showInDisplayBox(feedback.getDisplayString(), TextView.STYLE_NORMAL);
 			}
 		});
 
@@ -99,10 +99,10 @@ public class UI {
 			displayBox.display(string, style);
 		}
 	}
-	
-	private void showInInfoBox(String string){
-		
-		if(isValidString(string)) {
+
+	private void showInInfoBox(String string) {
+
+		if (isValidString(string)) {
 			infoBox.setText(string);
 		}
 	}
