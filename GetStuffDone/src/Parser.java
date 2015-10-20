@@ -399,6 +399,9 @@ public class Parser {
 		if (input.toUpperCase().contains("MONDAY")) {
 			if (weekday != Calendar.MONDAY) {
 				int days = (Calendar.MONDAY - weekday) % 7;
+				if(days<0){
+					days = days +7;
+				}
 				cal.add(Calendar.DAY_OF_YEAR, days);
 			} else if (HOUR_OF_DAY < NOW_HOUR_OF_DAY || (HOUR_OF_DAY == NOW_HOUR_OF_DAY && MINUTE < NOW_MINUTE)) {
 				cal.add(Calendar.DAY_OF_YEAR, 7);
@@ -409,6 +412,9 @@ public class Parser {
 			weekday = cal.get(Calendar.DAY_OF_WEEK);
 			if (weekday != Calendar.TUESDAY) {
 				int days = (Calendar.TUESDAY - weekday) % 7;
+				if(days<0){
+					days = days +7;
+				}
 				cal.add(Calendar.DAY_OF_YEAR, days);
 			} else if (HOUR_OF_DAY < NOW_HOUR_OF_DAY || (HOUR_OF_DAY == NOW_HOUR_OF_DAY && MINUTE < NOW_MINUTE)) {
 				cal.add(Calendar.DAY_OF_YEAR, 7);
@@ -419,6 +425,9 @@ public class Parser {
 			weekday = cal.get(Calendar.DAY_OF_WEEK);
 			if (weekday != Calendar.WEDNESDAY) {
 				int days = (Calendar.WEDNESDAY - weekday) % 7;
+				if(days<0){
+					days = days +7;
+				}
 				cal.add(Calendar.DAY_OF_YEAR, days);
 			} else if (HOUR_OF_DAY < NOW_HOUR_OF_DAY || (HOUR_OF_DAY == NOW_HOUR_OF_DAY && MINUTE < NOW_MINUTE)) {
 				cal.add(Calendar.DAY_OF_YEAR, 7);
@@ -429,6 +438,9 @@ public class Parser {
 			weekday = cal.get(Calendar.DAY_OF_WEEK);
 			if (weekday != Calendar.THURSDAY) {
 				int days = (Calendar.THURSDAY - weekday) % 7;
+				if(days<0){
+					days = days +7;
+				}
 				cal.add(Calendar.DAY_OF_YEAR, days);
 			} else if (HOUR_OF_DAY < NOW_HOUR_OF_DAY || (HOUR_OF_DAY == NOW_HOUR_OF_DAY && MINUTE < NOW_MINUTE)) {
 				cal.add(Calendar.DAY_OF_YEAR, 7);
@@ -439,6 +451,9 @@ public class Parser {
 			weekday = cal.get(Calendar.DAY_OF_WEEK);
 			if (weekday != Calendar.FRIDAY) {
 				int days = (Calendar.FRIDAY - weekday) % 7;
+				if(days<0){
+					days = days +7;
+				}
 				cal.add(Calendar.DAY_OF_YEAR, days);
 			} else if (HOUR_OF_DAY < NOW_HOUR_OF_DAY || (HOUR_OF_DAY == NOW_HOUR_OF_DAY && MINUTE < NOW_MINUTE)) {
 				cal.add(Calendar.DAY_OF_YEAR, 7);
@@ -449,6 +464,9 @@ public class Parser {
 			weekday = cal.get(Calendar.DAY_OF_WEEK);
 			if (weekday != Calendar.SATURDAY) {
 				int days = (Calendar.SATURDAY - weekday) % 7;
+				if(days<0){
+					days = days +7;
+				}
 				cal.add(Calendar.DAY_OF_YEAR, days);
 			} else if (HOUR_OF_DAY < NOW_HOUR_OF_DAY || (HOUR_OF_DAY == NOW_HOUR_OF_DAY && MINUTE < NOW_MINUTE)) {
 				cal.add(Calendar.DAY_OF_YEAR, 7);
@@ -459,7 +477,10 @@ public class Parser {
 			weekday = cal.get(Calendar.DAY_OF_WEEK);
 			if (weekday != Calendar.SUNDAY) {
 				int days = (Calendar.SUNDAY - weekday) % 7;
-				cal.add(Calendar.DAY_OF_YEAR, days + 7);
+				if(days<0){
+					days = days +7;
+				}
+				cal.add(Calendar.DAY_OF_YEAR, days);
 			} else if (HOUR_OF_DAY < NOW_HOUR_OF_DAY || (HOUR_OF_DAY == NOW_HOUR_OF_DAY && MINUTE < NOW_MINUTE)) {
 				cal.add(Calendar.DAY_OF_YEAR, 7);
 			}
