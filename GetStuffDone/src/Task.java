@@ -15,6 +15,10 @@ public class Task {
 	private Date startDate;
 	private Date deadline;
 	private boolean isComplete;
+	private boolean isEvent;
+	private boolean isDeadline;
+	private boolean isFloating;
+	//private boolean isRecurring;
 	
 	//Constructors
 	
@@ -24,6 +28,9 @@ public class Task {
 		startDate = null;
 		deadline = null;
 		isComplete = false;
+		isEvent = false;
+		isDeadline = false;
+		isFloating = false;
 	}
 	
 	public Task(CommandDetails details)	{
@@ -52,6 +59,18 @@ public class Task {
 		this.isComplete = isComplete;
 	}
 	
+	public void setIsEvent(boolean isEvent)	{
+		this.isEvent = isEvent;
+	}
+	
+	public void setIsDeadline(boolean isDeadline)	{
+		this.isDeadline = isDeadline;
+	}
+	
+	public void setIsFloating(boolean isFloating)	{
+		this.isFloating = isFloating;
+	}
+	
 	//Accessors
 	
 	public String getDescription()	{
@@ -70,6 +89,18 @@ public class Task {
 		return this.isComplete;
 	}
 	
+	public boolean getIsEvent()	{
+		return this.isEvent;
+	}
+	
+	public boolean getIsDeadline()	{
+		return this.isDeadline;
+	}
+	
+	public boolean getIsFloating()	{
+		return this.isFloating;
+	}
+	
 	//Behavioural methods
 	
 	public void updateDetails(CommandDetails details)	{
@@ -85,6 +116,7 @@ public class Task {
 		if(details.getDeadline() != null)	{
 			this.deadline = details.getDeadline();
 		}
+		
 	}
 	
 	public void markAsComplete()	{
@@ -103,19 +135,25 @@ public class Task {
 		
 		Calendar deadlineCal = Calendar.getInstance();
 		deadlineCal.setTime(this.deadline);
+		
+		Calendar taskStartDateCal = Calendar.getInstance();
+		taskStartDateCal.setTime(details.getStartDate());
+		
+		Calendar taskDeadlineCal = Calendar.getInstance();
+		taskDeadlineCal.setTime(details.getDeadline());
 				
 		if(details.getDescription().contains(this.description))	{
 			return true;
 		}
 		
 		if(details.getStartDate() != null)	{
-			if(details.getStartDate().equals(startDateCal.DATE))	{
+			if(taskStartDateCal.get(Calendar.DAY_OF_YEAR) == (startDateCal.get(Calendar.DAY_OF_YEAR)))	{
 				return true;
 			}
 		}
 		
 		if(details.getDeadline() != null)	{
-			if(details.getDeadline().equals(deadlineCal.DATE))	{
+			if(taskDeadlineCal.get(Calendar.DAY_OF_YEAR) == (deadlineCal.get(Calendar.DAY_OF_YEAR)))	{
 				return true;
 			}
 		}

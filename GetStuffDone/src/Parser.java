@@ -117,7 +117,7 @@ public class Parser {
 	private final static int NO_KEYWORD = -1;
 	private final static int NO_YEAR_INPUT = 1970;
 
-	static Date parseStartDate(ArrayList<String> input) throws ParseException, invalidDateFormat {
+	static Date parseStartDate(ArrayList<String> input) throws ParseException, invalidTimeDateInput {
 		String result = "";
 		int indexOfNextKeyWord = NO_NEXT_KEYWORD;
 		int indexOfKeyWordFROM = input.lastIndexOf("FROM");
@@ -149,7 +149,7 @@ public class Parser {
 		return indexOfNextKeyWord;
 	}
 
-	static Date parseEndDate(ArrayList<String> input) throws ParseException, invalidDateFormat {
+	static Date parseEndDate(ArrayList<String> input) throws ParseException, invalidTimeDateInput {
 		String result = "";
 		int indexOfNextKeyWord = NO_NEXT_KEYWORD;
 		int indexOfKeyWordTO = input.lastIndexOf("TO");
@@ -307,7 +307,7 @@ public class Parser {
 		}
 	}
 
-	static Date createStartDate(String input) throws ParseException, invalidDateFormat {
+	static Date createStartDate(String input) throws ParseException, invalidTimeDateInput {
 		for (String temp : DATE_FORMAT) {
 			try {
 				SimpleDateFormat possibleFormats = new SimpleDateFormat(temp);
@@ -341,7 +341,7 @@ public class Parser {
 
 				for (int i = 0; i < TimekeyWord.length; i++) {
 					if (input.toUpperCase().contains(TimekeyWord[i])) {
-						throw new invalidDateFormat(input);
+						throw new invalidTimeDateInput(input);
 					}
 				}
 
@@ -466,7 +466,7 @@ public class Parser {
 		}
 	}
 
-	static Date createEndDate(String input) throws ParseException, invalidDateFormat {
+	static Date createEndDate(String input) throws ParseException, invalidTimeDateInput {
 
 		for (String temp : DATE_FORMAT) {
 			try {
@@ -499,7 +499,7 @@ public class Parser {
 
 				for (int i = 0; i < TimekeyWord.length; i++) {
 					if (input.toUpperCase().contains(TimekeyWord[i])) {
-						throw new invalidDateFormat(input);
+						throw new invalidTimeDateInput(input);
 					}
 				}
 
@@ -549,7 +549,7 @@ public class Parser {
 	}
 
 	public static CommandDetails parse(String input)
-			throws ParseException, NumberFormatException, invalidDateFormat, invalidCommand {
+			throws ParseException, NumberFormatException, invalidTimeDateInput, invalidCommand {
 		String description;
 		Date start;
 		Date end;
@@ -610,13 +610,13 @@ public class Parser {
 	}
 }
 
-class invalidDateFormat extends Exception {
+class invalidTimeDateInput extends Exception {
 	// Parameterless Constructor
-	public invalidDateFormat() {
+	public invalidTimeDateInput() {
 	}
 
 	// Constructor that accepts a message
-	public invalidDateFormat(String message) {
+	public invalidTimeDateInput(String message) {
 		super(message);
 	}
 }

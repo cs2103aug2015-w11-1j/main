@@ -42,17 +42,17 @@ public class History {
 		if (undoStack.isEmpty()) {
 			return null;
 		} else {
-			CommandDetails temp = undoStack.pop();
-			switch (temp.getCommand()) {
+			CommandDetails latest = undoStack.pop();
+			switch (latest.getCommand()) {
 			case UPDATE:
-				CommandDetails temp2 = undoStack.pop();
-				redoStack.push(temp);
-				redoStack.push(temp2);
-				return temp;
+				CommandDetails old = undoStack.pop();
+				redoStack.push(latest);
+				redoStack.push(old);
+				return old;
 
 			default: 
-				redoStack.push(temp);
-				return temp;
+				redoStack.push(latest);
+				return latest;
 
 			}
 		}
@@ -85,23 +85,23 @@ public class History {
 		if (redoStack.isEmpty()) {
 			return null;
 		} else {
-			CommandDetails temp = redoStack.pop();
+			CommandDetails old = redoStack.pop();
 			if (!redoStack.isEmpty()) {
 				switch (redoStack.peek().getCommand()) {
 				case UPDATE:
-					CommandDetails temp2 = redoStack.pop();
-					undoStack.push(temp);
-					undoStack.push(temp2);
-					return temp;
+					CommandDetails latest = redoStack.pop();
+					undoStack.push(old);
+					undoStack.push(latest);
+					return latest;
 
 				default: 
-					undoStack.push(temp);
-					return temp;
+					undoStack.push(old);
+					return old;
 				}
 			}
 			else {
-				undoStack.push(temp);
-				return temp;
+				undoStack.push(old);
+				return old;
 			}
 		}
 	}

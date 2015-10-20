@@ -25,13 +25,13 @@ public class GSDControl {
 	private static final String FEEDBACK_DEADLINES = ">> Deadlines displayed";
 	private static final String FEEDBACK_HELP = ">> Called for help!";
 	private static final String FEEDBACK_SET = ">> File path set to ";
-	private static final String FEEDBACK_INVALID_COMMAND = ">> Invalid Command";
-	private static final String FEEDBACK_INVALID_TASK_NUMBER = ">> Invalid Task Number";
-	private static final String FEEDBACK_UNDO_ERROR = ">> Nothing to undo";
-	private static final String FEEDBACK_REDO_ERROR = ">> Nothing to redo";
-	private ArrayList<Task> floating = new ArrayList<Task>();
-	private ArrayList<Task> events = new ArrayList<Task>();
-	private ArrayList<Task> deadlines = new ArrayList<Task>();
+	private static final String FEEDBACK_INVALID_COMMAND = ">> ERROR : INVALID COMMAND";
+	private static final String FEEDBACK_INVALID_TASK_NUMBER = ">> ERROR : INVALID TASK NUMBER";
+	private static final String FEEDBACK_UNDO_ERROR = ">> ERROR : NOTHING TO UNDO";
+	private static final String FEEDBACK_REDO_ERROR = ">> ERROR: NOTHING TO REDO";
+	private static final String FEEDBACK_INVALID_DATE_FORMAT = ">> ERROR : INVALID DATE/TIME FORMAT";
+	private static final String FEEDBACK_INVALID_TIME_DATE_INPUT = ">> ERROR : INVALID DATE/TIME INPUT";
+	private ArrayList<Task> tasks = new ArrayList<Task>();
 	private Scanner sc = new Scanner(System.in);
 	private CommandDetails commandDetails;
 	private Parser parser = new Parser();
@@ -40,18 +40,19 @@ public class GSDControl {
 	private boolean isValidTaskNo = true;
 
 	public Feedback processInput(String input) throws IndexOutOfBoundsException {
+		Feedback feedback;
 		try {
 			this.commandDetails = parser.parse(input);
-		} catch (ParseException e) {
-			//Wrong date
+			
+		} catch (ParseException e) {	//Invalid Date Format
+			return feedback = new Feedback(null, FEEDBACK_INVALID_DATE_FORMAT);
 		} catch (NumberFormatException f) {
-			//id not int
-		} catch(invalidDateFormat g){
-			//illogical date format
+			return feedback = new Feedback(null, FEEDBACK_INVALID_TASK_NUMBER);
+		} catch(invalidTimeDateInput g){	//Not in the form [Time] [Date]
+			return feedback = new Feedback(null, FEEDBACK_INVALID_TIME_DATE_INPUT);
 		}catch (invalidCommand h){
-			//invalid command
+			return feedback = new Feedback(null, FEEDBACK_INVALID_COMMAND);
 		}
-		Feedback feedback;
 		switch (this.commandDetails.getCommand()) {
 		case ADD:
 			this.commandDetails.setID(tasks.size());
@@ -81,12 +82,12 @@ public class GSDControl {
 			return feedback = new Feedback(searchTask(), FEEDBACK_SEARCH + commandDetails.getDescription());
 		case UPDATE:
 			try {
-				Task taskToUpdate = tasks.get(this.commandDetails.getID() - 1);
-				CommandDetails updatedDetails = new CommandDetails(CommandDetails.COMMANDS.UPDATE,
-						taskToUpdate.getDescription(), taskToUpdate.getStartDate(), taskToUpdate.getDeadline(),
+				Task oldTask = tasks.get(this.commandDetails.getID() - 1);
+				CommandDetails oldDetails = new CommandDetails(CommandDetails.COMMANDS.UPDATE,
+						oldTask.getDescription(), oldTask.getStartDate(), oldTask.getDeadline(),
 						this.commandDetails.getID() - 1);
-				System.out.println(updatedDetails.getDescription());
-				history.insert(updatedDetails);
+				System.out.println(oldDetails.getDescription());
+				history.insert(oldDetails);
 				// history.insert(reverseCommandDetails(this.commandDetails.getID()-1));
 				return feedback = new Feedback(updateTask(commandDetails.getID() - 1),
 						FEEDBACK_UPDATE + commandDetails.getDescription());
@@ -142,11 +143,11 @@ public class GSDControl {
 		case ALL:
 			return feedback = new Feedback(displayAllTasks(), FEEDBACK_ALL);
 		case FLOATING:
-			return feedback = new Feedback(displayFloatingTasks(), FEEDBACK_FLOATING);
+			//return feedback = new Feedback(displayFloatingTasks(), FEEDBACK_FLOATING);
 		case EVENTS:
-			return feedback = new Feedback(displayEvents(), FEEDBACK_EVENTS);
+			//return feedback = new Feedback(displayEvents(), FEEDBACK_EVENTS);
 		case DEADLINES:
-			return feedback = new Feedback(displayDeadlines(), FEEDBACK_DEADLINES);
+			//return feedback = new Feedback(displayDeadlines(), FEEDBACK_DEADLINES);
 		case HELP:
 			return feedback = new Feedback(help(), FEEDBACK_HELP);
 		case EXIT:
@@ -194,9 +195,13 @@ public class GSDControl {
 
 	private String updateTask(int ID) {
 		tasks.get(ID).updateDetails(commandDetails);
+		Task updatedTask = tasks.get(ID);
+		CommandDetails updatedDetails = new CommandDetails(CommandDetails.COMMANDS.UPDATE,
+				updatedTask.getDescription(), updatedTask.getStartDate(), updatedTask.getDeadline(),
+				ID);
+		history.insert(updatedDetails);
 		storage.save(tasks);
 		return displayAllTasks();
-		// return ID+1 + " " + tasks.get(ID).toString();
 	}
 
 	private String deleteTask(int ID) {
@@ -232,8 +237,9 @@ public class GSDControl {
 
 	/*
 	 * private String setFilePath() {
-	 * storage.setFilePath(this.commandDetails.getDescription()); return
-	 * displayAllTasks(); }
+	 * storage.setFilePath(this.commandDetails.getDescription()); 
+	 * return null;
+	 *  }
 	 */
 
 	private String undoRedoCreateTask() {
@@ -246,6 +252,12 @@ public class GSDControl {
 
 	private String undoRedoDeleteTask() {
 		tasks.remove(this.commandDetails.getID());
+		storage.save(tasks);
+		return displayAllTasks();
+	}
+	
+	private String undoRedoUpdateTask(int ID) {
+		tasks.get(ID).updateDetails(commandDetails);
 		storage.save(tasks);
 		return displayAllTasks();
 	}
@@ -281,7 +293,7 @@ public class GSDControl {
 		case DELETE:
 			return undoRedoDeleteTask();
 		case UPDATE:
-			return updateTask(commandDetails.getID());
+			return undoRedoUpdateTask(commandDetails.getID());
 		case COMPLETE:
 			return completeTask(commandDetails.getID() - 1);
 		case INCOMPLETE:
