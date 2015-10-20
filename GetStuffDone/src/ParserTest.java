@@ -11,7 +11,6 @@ import org.junit.Test;
 public class ParserTest {
 	
 	
-	
 	@Test
 	public void test1() throws Exception {
 		String input = "add dinner FROM 1234 01 january 03";
@@ -240,6 +239,25 @@ public class ParserTest {
 		System.out.println(date);
 		
 		assertEquals(date ,Parser.parseEndDate(strTokens));
+	}
+	
+	
+	
+	@Test
+	public void testParse() throws Exception {
+		String input = "Add dinner with mom FROM 2359 19/03/1993 TO 22/04/1994";
+		CommandDetails.COMMANDS commandAdd = CommandDetails.COMMANDS.ADD;
+		String description = "dinner with mom";
+		SimpleDateFormat sdf = new SimpleDateFormat("HHmm dd/MM/yyyy");
+		SimpleDateFormat sdf2 = new SimpleDateFormat("dd/MM/yyyy");
+		Date start = sdf.parse("2359 19/03/1993");
+		Date end = sdf2.parse("22/04/1994");
+		CommandDetails cmdDetTemp = Parser.parse(input);
+		assertEquals(commandAdd, cmdDetTemp.getCommand());
+		assertEquals(description, cmdDetTemp.getDescription());
+		assertEquals(start, cmdDetTemp.getStartDate());
+		assertEquals(end, cmdDetTemp.getDeadline());
+		assertEquals(-10, cmdDetTemp.getID());
 	}
 	
 }
