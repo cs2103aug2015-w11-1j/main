@@ -149,7 +149,7 @@ public class Storage {
 			return false;
 		}
 
-		preferences.put(KEY_PATH, DEFAULT_PATH);
+		preferences.put(KEY_PATH, string);
 
 		return true;
 	}
