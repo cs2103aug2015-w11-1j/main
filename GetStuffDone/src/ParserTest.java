@@ -260,4 +260,35 @@ public class ParserTest {
 		assertEquals(-10, cmdDetTemp.getID());
 	}
 	
+	@Test
+	public void testParse2() throws Exception {
+		String input = "Add commit some stuff to github BY tomorrow";
+		CommandDetails.COMMANDS commandAdd = CommandDetails.COMMANDS.ADD;
+		String description = "commit some stuff to github";
+		SimpleDateFormat sdf = new SimpleDateFormat("HHmm dd/MM/yyyy");
+		Date start = null;
+		Date end = sdf.parse("2359 22/10/2015");
+		CommandDetails cmdDetTemp = Parser.parse(input);
+		assertEquals(commandAdd, cmdDetTemp.getCommand());
+		assertEquals(description, cmdDetTemp.getDescription());
+		assertEquals(start, cmdDetTemp.getStartDate());
+		assertEquals(end, cmdDetTemp.getDeadline());
+		assertEquals(-10, cmdDetTemp.getID());
+	}
+	
+	@Test
+	public void testParse3() throws Exception {
+		String input = "Add go to USS horror night AT friday";
+		CommandDetails.COMMANDS commandAdd = CommandDetails.COMMANDS.ADD;
+		String description = "go to USS horror night";
+		SimpleDateFormat sdf = new SimpleDateFormat("HHmm dd/MM/yyyy");
+		Date start = sdf.parse("0000 23/10/2015");
+		Date end = sdf.parse("0000 23/10/2015");
+		CommandDetails cmdDetTemp = Parser.parse(input);
+		assertEquals(commandAdd, cmdDetTemp.getCommand());
+		assertEquals(description, cmdDetTemp.getDescription());
+		assertEquals(start, cmdDetTemp.getStartDate());
+		assertEquals(end, cmdDetTemp.getDeadline());
+		assertEquals(-10, cmdDetTemp.getID());
+	}
 }
