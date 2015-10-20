@@ -72,6 +72,7 @@ public class CommandDetails {
 	}
 
 	// Overriding methods
+	@Override
 	public String toString() {
 		String result = "";
 		result = "command = " + command + "\n" + "ID = " + ID + "\n" + "description = " + description + "\n"

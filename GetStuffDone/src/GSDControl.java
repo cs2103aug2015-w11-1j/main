@@ -36,7 +36,7 @@ public class GSDControl {
 	private static final String FEEDBACK_REDO_ERROR = ">> ERROR: NOTHING TO REDO";
 	private static final String FEEDBACK_INVALID_DATE_FORMAT = ">> ERROR : INVALID DATE/TIME FORMAT";
 	private static final String FEEDBACK_INVALID_TIME_DATE_INPUT = ">> ERROR : INVALID DATE/TIME INPUT";
-	
+
 	private ArrayList<Task> tasks = new ArrayList<Task>();
 	private CommandDetails commandDetails;
 	private Parser parser = new Parser();
@@ -85,7 +85,6 @@ public class GSDControl {
 		case UPDATE:
 			try {
 				CommandDetails oldDetails = generateDetails();
-				System.out.println(oldDetails.getDescription());
 				history.insert(oldDetails);
 				if (this.commandDetails.getDescription() == null) {
 					return feedback = new Feedback(updateTask(commandDetails.getID() - 1),
@@ -158,8 +157,8 @@ public class GSDControl {
 		case EXIT:
 
 		case SET:
-			// return feedback = new Feedback(setFilePath(), FEEDBACK_SET +
-			// this.commandDetails.getDescription());
+			return feedback = new Feedback(setFilePath(), FEEDBACK_SET + this.commandDetails.getDescription(),
+					generateInfoBox());
 		default:
 			return feedback = new Feedback(displayAllTasks(), FEEDBACK_INVALID_COMMAND, generateInfoBox());
 
@@ -228,21 +227,18 @@ public class GSDControl {
 	}
 
 	private String undoLastAction() {
-		System.out.println(commandDetails.toString());
 		this.commandDetails = reverseCommandDetails(this.commandDetails.getID());
-		System.out.println(commandDetails.toString());
 		return executeHistoryCommand();
 	}
 
 	private String redoLastAction() {
-		System.out.println(commandDetails.toString());
 		return executeHistoryCommand();
 	}
 
-	/*
-	 * private String setFilePath() {
-	 * storage.setFilePath(this.commandDetails.getDescription()); return null; }
-	 */
+	private String setFilePath() {
+		storage.setFilePath(this.commandDetails.getDescription());
+		return null;
+	}
 
 	private String undoRedoCreateTask() {
 		Task task = new Task(this.commandDetails);
