@@ -17,16 +17,16 @@ public class UI {
 
 	private static final String TITLE = "GetStuffDone";
 
-	private static final int DISPLAY_BOX_WIDTH = 400;
+	private static final int DISPLAY_BOX_WIDTH = 350;
 	private static final int DISPLAY_BOX_HEIGHT = 400;
-	private static final int FEEDBACK_BOX_WIDTH = 200;
+	private static final int FEEDBACK_BOX_WIDTH = 250;
 	private static final int FEEDBACK_BOX_HEIGHT = 300;
-	private static final int INFO_BOX_WIDTH = 200;
+	private static final int INFO_BOX_WIDTH = 250;
 	private static final int INFO_BOX_HEIGHT = 100;
 
 	private TextView displayBox = new TextView(DISPLAY_BOX_WIDTH, DISPLAY_BOX_HEIGHT);
 	private TextView feedbackBox = new TextView(FEEDBACK_BOX_WIDTH, FEEDBACK_BOX_HEIGHT);
-	private JLabel infoBox = new JLabel();
+	private TextView infoBox = new TextView(INFO_BOX_WIDTH, INFO_BOX_HEIGHT);
 	private JTextField commandBar = new JTextField();
 
 	public static void main(String[] args) {
@@ -48,10 +48,8 @@ public class UI {
 		JPanel panel = new JPanel();
 		panel.setLayout(new BoxLayout(panel, BoxLayout.PAGE_AXIS));
 
-		infoBox.setPreferredSize(new Dimension(INFO_BOX_WIDTH, INFO_BOX_HEIGHT));
-
 		panel.add(new JScrollPane(feedbackBox));
-		panel.add(infoBox);
+		panel.add(new JScrollPane(infoBox));
 
 		frame.add(new JScrollPane(displayBox), BorderLayout.LINE_START);
 		frame.add(panel, BorderLayout.LINE_END);
@@ -72,6 +70,7 @@ public class UI {
 
 				showInFeedbackBox(feedback.getFeedbackString(), TextView.STYLE_BOLD);
 				showInDisplayBox(feedback.getDisplayString(), TextView.STYLE_NORMAL);
+				showInInfoBox(feedback.getInfoString());
 			}
 		});
 
