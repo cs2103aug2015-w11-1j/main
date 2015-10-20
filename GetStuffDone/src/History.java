@@ -18,6 +18,9 @@ public class History {
 		and clears redo stack of obsolete commands
 		returns 1 if successful, 0 if unsuccessful **/
 	public int insert(CommandDetails cmdDetObj) {
+		if (cmdDetObj.getCommand() == null) {
+			return 0;			
+		}
 		try {
 			undoStack.push(cmdDetObj);
 			redoStack.clear();
@@ -48,7 +51,7 @@ public class History {
 				CommandDetails temp2 = undoStack.pop();
 				redoStack.push(temp);
 				redoStack.push(temp2);
-				return temp;
+				return temp2;
 
 			default: 
 				redoStack.push(temp);
@@ -59,55 +62,53 @@ public class History {
 	}
 
 	//this method returns the last action undid, returns null of redoStack is empty
-	//	public CommandDetails redo() {
-	//		if (redoStack.isEmpty()) {
-	//			return null;
-	//		} else {
-	//			CommandDetails temp = redoStack.pop();
-	//			switch (temp.getCommand()) {
-	//			case UPDATE:
-	//				CommandDetails temp2 = redoStack.pop();
-	//				undoStack.push(temp);
-	//				undoStack.push(temp2);
-	//				return temp;
-	//
-	//			default: 
-	//				undoStack.push(temp);
-	//				return temp;
-	//			}
-	//		}
-	//	}
-
-
-
-
-	public CommandDetails redo() {
-		if (redoStack.isEmpty()) {
-			return null;
-		} else {
-			CommandDetails temp = redoStack.pop();
-			if (!redoStack.isEmpty()) {
-				switch (redoStack.peek().getCommand()) {
+		public CommandDetails redo() {
+			if (redoStack.isEmpty()) {
+				return null;
+			} else {
+				CommandDetails temp = redoStack.pop();
+				switch (temp.getCommand()) {
 				case UPDATE:
 					CommandDetails temp2 = redoStack.pop();
 					undoStack.push(temp);
 					undoStack.push(temp2);
-					return temp;
-
+					return temp2;
+	
 				default: 
 					undoStack.push(temp);
 					return temp;
 				}
 			}
-			else {
-				undoStack.push(temp);
-				return temp;
-			}
 		}
-	}
 
 
 
+
+//	public CommandDetails redo() {
+//		if (redoStack.isEmpty()) {
+//			return null;
+//		} else {
+//			CommandDetails temp = redoStack.pop();
+//			if (!redoStack.isEmpty()) {
+//				switch (redoStack.peek().getCommand()) {
+//				case UPDATE:
+//					CommandDetails temp2 = redoStack.pop();
+//					undoStack.push(temp);
+//					undoStack.push(temp2);
+//					return temp;
+//
+//				default: 
+//					undoStack.push(temp);
+//					return temp;
+//				}
+//			}
+//			else {
+//				undoStack.push(temp);
+//				return temp;
+//			}
+//		}
+//	}
+	
 
 	public Stack<CommandDetails> getUndoStack() {
 		return this.undoStack;	
