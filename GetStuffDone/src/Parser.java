@@ -221,89 +221,70 @@ public class Parser {
 	}
 
 	static CommandDetails.COMMANDS parseCommandType(ArrayList<String> input) throws invalidCommand {
-
-		switch (input.get(0).toUpperCase()) {
+		
+		String command = input.remove(0);
+		
+		switch (command.toUpperCase()) {
 		case "ADD":
 			System.out.println("ADD command");
-			input.remove(0);
 			return CommandDetails.COMMANDS.ADD;
 		case "a":
 			System.out.println("ADD command");
-			input.remove(0);
 			return CommandDetails.COMMANDS.ADD;
 		case "DELETE":
 			System.out.println("DELETE command");
-			input.remove(0);
 			return CommandDetails.COMMANDS.DELETE;
 		case "d":
 			System.out.println("DELETE command");
-			input.remove(0);
 			return CommandDetails.COMMANDS.DELETE;
 		case "COMPLETE":
 			System.out.println("COMPLETE command");
-			input.remove(0);
 			return CommandDetails.COMMANDS.COMPLETE;
 		case "INCOMPLETE":
 			System.out.println("INCOMPLETE command");
-			input.remove(0);
 			return CommandDetails.COMMANDS.INCOMPLETE;
 		case "HELP":
 			System.out.println("HELP command");
-			input.remove(0);
 			return CommandDetails.COMMANDS.HELP;
 		case "REDO":
 			System.out.println("REDO command");
-			input.remove(0);
 			return CommandDetails.COMMANDS.REDO;
 		case "SEARCH":
 			System.out.println("SEARCH command");
-			input.remove(0);
 			return CommandDetails.COMMANDS.SEARCH;
 		case "s":
 			System.out.println("SEARCH command");
-			input.remove(0);
 			return CommandDetails.COMMANDS.SEARCH;
 		case "UNDO":
 			System.out.println("UNDO command");
-			input.remove(0);
 			return CommandDetails.COMMANDS.UNDO;
 		case "ALL":
-			System.out.println("ALL command");
-			input.remove(0);
 			return CommandDetails.COMMANDS.ALL;
 		case "UPDATE":
 			System.out.println("UPDATE command");
-			input.remove(0);
 			return CommandDetails.COMMANDS.UPDATE;
 		case "u":
 			System.out.println("UPDATE command");
-			input.remove(0);
 			return CommandDetails.COMMANDS.UPDATE;
 		case "SET":
 			System.out.println("SET command");
-			input.remove(0);
 			return CommandDetails.COMMANDS.SET;
 		case "FLOATING":
 			System.out.println("FLOATING command");
-			input.remove(0);
 			return CommandDetails.COMMANDS.FLOATING;
 		case "EVENTS":
 			System.out.println("EVENTS command");
-			input.remove(0);
 			return CommandDetails.COMMANDS.EVENTS;
 		case "DEADLINES":
 			System.out.println("DEADLINES command");
-			input.remove(0);
 			return CommandDetails.COMMANDS.DEADLINES;
 		case "EXIT":
 			System.out.println("EXIT command");
-			input.remove(0);
 			return CommandDetails.COMMANDS.EXIT;
 		default:
 			System.out.print("Invalid Command");
-			// input.remove(0);
-			throw new invalidCommand(input.remove(0));
-			// return CommandDetails.COMMANDS.INVALID;
+			//throw new invalidCommand(command);
+			return CommandDetails.COMMANDS.INVALID;
 		}
 	}
 
@@ -315,6 +296,7 @@ public class Parser {
 				Date mydate = possibleFormats.parse(input);
 				Calendar cal = Calendar.getInstance();
 				cal.setTime(mydate);
+				
 				/*
 				 * if (cal.get(Calendar.YEAR) == NO_YEAR_INPUT &&
 				 * cal.get(Calendar.MONTH) == 0 && cal.get(Calendar.DATE) == 1
