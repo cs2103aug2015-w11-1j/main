@@ -43,8 +43,8 @@ public class testHistory {
 	@Test
 	public void testUndo() {
 		CommandDetails.COMMANDS commandUpdate = CommandDetails.COMMANDS.UPDATE;
-		CommandDetails cmdDetAdd = new CommandDetails(command, testDescription, testDate, testDeadline, testID);
-		CommandDetails cmdDetUpdate = new CommandDetails(commandUpdate, testDescription, testDate, testDeadline, testID);
+		CommandDetails cmdDetUpdateNew = new CommandDetails(commandUpdate, "new test", testDate, testDeadline, testID);
+		CommandDetails cmdDetUpdateOld = new CommandDetails(commandUpdate, testDescription, testDate, testDeadline, testID);
 		//case 1: undoStack is empty
 		assertEquals(history.undo(), null);
 		
@@ -58,22 +58,22 @@ public class testHistory {
 		temp = null;
 		
 		//case 3: undoStack first element is update
-		history.insert(cmdDet);		
-		history.insert(cmdDetUpdate);
+		history.insert(cmdDetUpdateOld);		
+		history.insert(cmdDetUpdateNew);
 		temp = history.undo();
 		assertEquals(history.getUndoStack().empty(), true);
-		assertEquals(history.getRedoStack().peek(), cmdDet);
+		assertEquals(history.getRedoStack().peek(), cmdDetUpdateOld);
 		history.getRedoStack().pop();
-		assertEquals(history.getRedoStack().peek(), cmdDetUpdate);
-		assertEquals(temp, cmdDetUpdate);
+		assertEquals(history.getRedoStack().peek(), cmdDetUpdateNew);
+		assertEquals(temp, cmdDetUpdateOld);
 		history.clear();
 	}
 	
 	@Test
 	public void testRedo() {
 		CommandDetails.COMMANDS commandUpdate = CommandDetails.COMMANDS.UPDATE;
-		CommandDetails cmdDetAdd = new CommandDetails(command, testDescription, testDate, testDeadline, testID);
-		CommandDetails cmdDetUpdate = new CommandDetails(commandUpdate, testDescription, testDate, testDeadline, testID);
+		CommandDetails cmdDetUpdateNew = new CommandDetails(commandUpdate, "new test", testDate, testDeadline, testID);
+		CommandDetails cmdDetUpdateOld = new CommandDetails(commandUpdate, testDescription, testDate, testDeadline, testID);
 		//case 1: redoStack is empty
 		assertEquals(history.redo(), null);
 		
@@ -88,17 +88,16 @@ public class testHistory {
 		temp = null;
 		
 		//case 3: redoStack second element is update
-		history.insert(cmdDet);		
-		history.insert(cmdDetUpdate);
+		history.insert(cmdDetUpdateOld);		
+		history.insert(cmdDetUpdateNew);
 		history.undo();
 		temp = history.redo();
 		assertEquals(history.getRedoStack().empty(), true);
-		assertEquals(history.getUndoStack().peek(), cmdDetUpdate);
+		assertEquals(history.getUndoStack().peek(), cmdDetUpdateNew);
 		history.getUndoStack().pop();
-		assertEquals(history.getUndoStack().peek(), cmdDet);
-		assertEquals(temp, cmdDet);
+		assertEquals(history.getUndoStack().peek(), cmdDetUpdateOld);
+		assertEquals(temp, cmdDetUpdateNew);
 		history.clear();
 	}
 	
-
 }
