@@ -175,8 +175,7 @@ public class GSDControl {
 					generateInfoBox());
 				}
 				else	{
-					return feedback = new Feedback(null, FEEDBACK_SET_ERROR + this.commandDetails.getDescription() + "\n",
-					generateInfoBox());
+					return feedback = new Feedback(null, FEEDBACK_SET_ERROR, generateInfoBox());
 				}
 			} catch (InvalidPathException q)	{
 				return feedback = new Feedback(null, FEEDBACK_INVALID_FILE_PATH, generateInfoBox());
