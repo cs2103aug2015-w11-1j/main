@@ -1,4 +1,5 @@
 import java.io.IOException;
+import java.nio.file.InvalidPathException;
 import java.text.ParseException;
 import java.util.*;
 
@@ -10,7 +11,7 @@ import java.util.*;
  */
 
 public class GSDControl {
-	
+
 	private static final String DISPLAY_TASK_NOT_FOUND = ">> Task was not found";
 	private static final String DISPLAY_NO_TASKS = ">> No tasks recorded";
 	private static final String DISPLAY_NO_FLOATING_TASKS = ">> No Floating Tasks";
@@ -32,6 +33,8 @@ public class GSDControl {
 	private static final String FEEDBACK_DEADLINES = ">> Deadlines displayed\n";
 	private static final String FEEDBACK_HELP = ">> Called for help!\n";
 	private static final String FEEDBACK_SET = ">> File path set to ";
+	private static final String FEEDBACK_SET_ERROR = ">> ERROR : FILE PATH CAN'T BE SET";
+	private static final String FEEDBACK_INVALID_FILE_PATH = ">> ERROR : INVALID FILE PATH\n";
 	private static final String FEEDBACK_INVALID_COMMAND = ">> ERROR : INVALID COMMAND\n";
 	private static final String FEEDBACK_INVALID_COMMAND_FORMAT = ">> ERROR : INVALID COMMAND FORMAT\n";
 	private static final String FEEDBACK_INVALID_TASK_NUMBER = ">> ERROR : INVALID TASK NUMBER\n";
@@ -165,8 +168,19 @@ public class GSDControl {
 		case EXIT:
 
 		case SET:
-			return feedback = new Feedback(setFilePath(), FEEDBACK_SET + this.commandDetails.getDescription() + "\n",
+			try	{
+				boolean isValidFilePath = setFilePath();
+				if(isValidFilePath)	{
+					return feedback = new Feedback(null, FEEDBACK_SET + this.commandDetails.getDescription() + "\n",
 					generateInfoBox());
+				}
+				else	{
+					return feedback = new Feedback(null, FEEDBACK_SET_ERROR + this.commandDetails.getDescription() + "\n",
+					generateInfoBox());
+				}
+			} catch (InvalidPathException q)	{
+				return feedback = new Feedback(null, FEEDBACK_INVALID_FILE_PATH, generateInfoBox());
+			}
 		default:
 			return feedback = new Feedback(displayAllTasks(), FEEDBACK_INVALID_COMMAND, generateInfoBox());
 
@@ -176,7 +190,7 @@ public class GSDControl {
 	// Constructor
 
 	public GSDControl() {
-		
+
 		try {
 			tasks = storage.load();
 		} catch (IOException e) {
@@ -185,10 +199,10 @@ public class GSDControl {
 			f.printStackTrace();
 		}
 	}
-	
-	//For UI
-	
-	public Feedback loadFromFile()	{
+
+	// For UI
+
+	public Feedback loadFromFile() {
 		Feedback feedback;
 		return feedback = new Feedback(displayAllTasks(), FEEDBACK_WELCOME_MESSAGE, generateInfoBox());
 	}
@@ -257,9 +271,9 @@ public class GSDControl {
 		return executeHistoryCommand();
 	}
 
-	private String setFilePath() {
-		storage.setFilePath(this.commandDetails.getDescription());
-		return null;
+	private boolean setFilePath() {
+		boolean isSuccessfulPath;
+		return isSuccessfulPath = storage.setFilePath(this.commandDetails.getDescription());
 	}
 
 	private String undoRedoCreateTask() {
