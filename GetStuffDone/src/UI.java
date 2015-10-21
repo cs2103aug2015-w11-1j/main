@@ -71,11 +71,12 @@ public class UI {
 
 				Feedback feedback = gsd.processInput(input);
 
-				showInFeedbackBox(feedback.getFeedbackString(), TextView.STYLE_BOLD);
-				showInDisplayBox(feedback.getDisplayString(), TextView.STYLE_NORMAL);
-				showInInfoBox(feedback.getInfoString());
+				show(feedback);
 			}
 		});
+		
+		Feedback feedback = gsd.loadFromFile();
+		show(feedback);
 
 		frame.pack();
 
@@ -85,6 +86,12 @@ public class UI {
 		commandBar.requestFocusInWindow();
 
 		frame.setVisible(true);
+	}
+	
+	private void show(Feedback feedback) {
+		showInFeedbackBox(feedback.getFeedbackString(), TextView.STYLE_BOLD);
+		showInDisplayBox(feedback.getDisplayString(), TextView.STYLE_NORMAL);
+		showInInfoBox(feedback.getInfoString());
 	}
 
 	private void showInFeedbackBox(String string, String style) {
