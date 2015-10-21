@@ -1,3 +1,4 @@
+import java.io.IOException;
 import java.text.ParseException;
 import java.util.*;
 
@@ -9,13 +10,14 @@ import java.util.*;
  */
 
 public class GSDControl {
-
+	
 	private static final String DISPLAY_TASK_NOT_FOUND = ">> Task was not found";
 	private static final String DISPLAY_NO_TASKS = ">> No tasks recorded";
 	private static final String DISPLAY_NO_FLOATING_TASKS = ">> No Floating Tasks";
 	private static final String DISPLAY_NO_EVENTS = ">> No Events";
 	private static final String DISPLAY_NO_DEADLINES = ">> No Deadlines";
 
+	private static final String FEEDBACK_WELCOME_MESSAGE = "WELCOME TO GSD!\n";
 	private static final String FEEDBACK_ADD = ">> ADDED ";
 	private static final String FEEDBACK_SEARCH = ">> SEARCH for ";
 	private static final String FEEDBACK_UPDATE = ">> UPDATED ";
@@ -31,6 +33,7 @@ public class GSDControl {
 	private static final String FEEDBACK_HELP = ">> Called for help!\n";
 	private static final String FEEDBACK_SET = ">> File path set to ";
 	private static final String FEEDBACK_INVALID_COMMAND = ">> ERROR : INVALID COMMAND\n";
+	private static final String FEEDBACK_INVALID_COMMAND_FORMAT = ">> ERROR : INVALID COMMAND FORMAT\n";
 	private static final String FEEDBACK_INVALID_TASK_NUMBER = ">> ERROR : INVALID TASK NUMBER\n";
 	private static final String FEEDBACK_UNDO_ERROR = ">> ERROR : NOTHING TO UNDO\n";
 	private static final String FEEDBACK_REDO_ERROR = ">> ERROR: NOTHING TO REDO\n";
@@ -57,6 +60,7 @@ public class GSDControl {
 		} catch (invalidCommand h) {
 			return feedback = new Feedback(null, FEEDBACK_INVALID_COMMAND, generateInfoBox());
 		} catch (invalidParameters i) {
+			return feedback = new Feedback(null, FEEDBACK_INVALID_COMMAND_FORMAT, generateInfoBox());
 			// Invalid parameters
 			// eg delete 1 screw this up
 			// eg All banananaanananananaa
@@ -172,7 +176,21 @@ public class GSDControl {
 	// Constructor
 
 	public GSDControl() {
-
+		
+		try {
+			tasks = storage.load();
+		} catch (IOException e) {
+			e.printStackTrace();
+		} catch (ParseException f) {
+			f.printStackTrace();
+		}
+	}
+	
+	//For UI
+	
+	public Feedback loadFromFile()	{
+		Feedback feedback;
+		return feedback = new Feedback(displayAllTasks(), FEEDBACK_WELCOME_MESSAGE, generateInfoBox());
 	}
 
 	// Behavioural Methods
