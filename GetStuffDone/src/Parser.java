@@ -631,13 +631,7 @@ public class Parser {
 			}
 		}
 		
-		if (command == CommandDetails.COMMANDS.UPDATE){
-			if (description == null && start == null && end == null) {
-				throw new invalidParameters(input);
-			}
-		}
-		
-		if (command == CommandDetails.COMMANDS.ADD){
+		if (command == CommandDetails.COMMANDS.ADD || command == CommandDetails.COMMANDS.UPDATE){
 			if (description == null) {
 				throw new invalidParameters(input);
 			}
