@@ -22,20 +22,20 @@ public class GSDControl {
 	private static final String FEEDBACK_DELETE = ">> DELETED ";
 	private static final String FEEDBACK_COMPLETE = ">> COMPLETED ";
 	private static final String FEEDBACK_INCOMPLETE = ">> INCOMPLETE ";
-	private static final String FEEDBACK_UNDO = ">> Last action undone";
-	private static final String FEEDBACK_REDO = ">> Last action redone";
-	private static final String FEEDBACK_ALL = ">> All tasks displayed";
-	private static final String FEEDBACK_FLOATING = ">> Floating Tasks displayed";
-	private static final String FEEDBACK_EVENTS = ">> Events displayed";
-	private static final String FEEDBACK_DEADLINES = ">> Deadlines displayed";
-	private static final String FEEDBACK_HELP = ">> Called for help!";
+	private static final String FEEDBACK_UNDO = ">> Last action undone\n";
+	private static final String FEEDBACK_REDO = ">> Last action redone\n";
+	private static final String FEEDBACK_ALL = ">> All tasks displayed\n";
+	private static final String FEEDBACK_FLOATING = ">> Floating Tasks displayed\n";
+	private static final String FEEDBACK_EVENTS = ">> Events displayed\n";
+	private static final String FEEDBACK_DEADLINES = ">> Deadlines displayed\n";
+	private static final String FEEDBACK_HELP = ">> Called for help!\n";
 	private static final String FEEDBACK_SET = ">> File path set to ";
-	private static final String FEEDBACK_INVALID_COMMAND = ">> ERROR : INVALID COMMAND";
-	private static final String FEEDBACK_INVALID_TASK_NUMBER = ">> ERROR : INVALID TASK NUMBER";
-	private static final String FEEDBACK_UNDO_ERROR = ">> ERROR : NOTHING TO UNDO";
-	private static final String FEEDBACK_REDO_ERROR = ">> ERROR: NOTHING TO REDO";
-	private static final String FEEDBACK_INVALID_DATE_FORMAT = ">> ERROR : INVALID DATE/TIME FORMAT";
-	private static final String FEEDBACK_INVALID_TIME_DATE_INPUT = ">> ERROR : INVALID DATE/TIME INPUT";
+	private static final String FEEDBACK_INVALID_COMMAND = ">> ERROR : INVALID COMMAND\n";
+	private static final String FEEDBACK_INVALID_TASK_NUMBER = ">> ERROR : INVALID TASK NUMBER\n";
+	private static final String FEEDBACK_UNDO_ERROR = ">> ERROR : NOTHING TO UNDO\n";
+	private static final String FEEDBACK_REDO_ERROR = ">> ERROR: NOTHING TO REDO\n";
+	private static final String FEEDBACK_INVALID_DATE_FORMAT = ">> ERROR : INVALID DATE/TIME FORMAT\n";
+	private static final String FEEDBACK_INVALID_TIME_DATE_INPUT = ">> ERROR : INVALID DATE/TIME INPUT\n";
 
 	private ArrayList<Task> tasks = new ArrayList<Task>();
 	private CommandDetails commandDetails;
@@ -56,16 +56,16 @@ public class GSDControl {
 			return feedback = new Feedback(null, FEEDBACK_INVALID_TIME_DATE_INPUT, generateInfoBox());
 		} catch (invalidCommand h) {
 			return feedback = new Feedback(null, FEEDBACK_INVALID_COMMAND, generateInfoBox());
-		} catch (invalidParameters i){
-			//Invalid parameters 
-			//eg delete 1 screw this up 
-			//eg All banananaanananananaa
+		} catch (invalidParameters i) {
+			// Invalid parameters
+			// eg delete 1 screw this up
+			// eg All banananaanananananaa
 		}
 		switch (this.commandDetails.getCommand()) {
 		case ADD:
 			this.commandDetails.setID(tasks.size());
 			history.insert(this.commandDetails);
-			return feedback = new Feedback(createTask(), FEEDBACK_ADD + commandDetails.getDescription(),
+			return feedback = new Feedback(createTask(), FEEDBACK_ADD + commandDetails.getDescription() + "\n",
 					generateInfoBox());
 		case DELETE:
 			try {
@@ -73,7 +73,7 @@ public class GSDControl {
 				history.insert(deletedDetails);
 				String taskDescription = tasks.get(commandDetails.getID() - 1).getDescription();
 				return feedback = new Feedback(deleteTask(commandDetails.getID() - 1),
-						FEEDBACK_DELETE + taskDescription, generateInfoBox());
+						FEEDBACK_DELETE + taskDescription + "\n", generateInfoBox());
 			} catch (IndexOutOfBoundsException e) {
 				isValidTaskNo = false;
 				throw new IndexOutOfBoundsException();
@@ -84,7 +84,7 @@ public class GSDControl {
 				}
 			}
 		case SEARCH:
-			return feedback = new Feedback(searchTask(), FEEDBACK_SEARCH + commandDetails.getDescription(),
+			return feedback = new Feedback(searchTask(), FEEDBACK_SEARCH + commandDetails.getDescription() + "\n",
 					generateInfoBox());
 		case UPDATE:
 			try {
@@ -92,10 +92,10 @@ public class GSDControl {
 				history.insert(oldDetails);
 				if (this.commandDetails.getDescription() == null) {
 					return feedback = new Feedback(updateTask(commandDetails.getID() - 1),
-							FEEDBACK_UPDATE + oldDetails.getDescription(), generateInfoBox());
+							FEEDBACK_UPDATE + oldDetails.getDescription() + "\n", generateInfoBox());
 				}
-				return feedback = new Feedback(updateTask(commandDetails.getID() - 1),
-						FEEDBACK_UPDATE + oldDetails.getDescription() + " to " + this.commandDetails.getDescription(),
+				return feedback = new Feedback(updateTask(commandDetails.getID() - 1), FEEDBACK_UPDATE
+						+ oldDetails.getDescription() + " to " + this.commandDetails.getDescription() + "\n",
 						generateInfoBox());
 			} catch (IndexOutOfBoundsException e) {
 				isValidTaskNo = false;
@@ -110,7 +110,7 @@ public class GSDControl {
 			try {
 				history.insert(this.commandDetails);
 				return feedback = new Feedback(completeTask(commandDetails.getID() - 1),
-						FEEDBACK_COMPLETE + tasks.get(this.commandDetails.getID() - 1).getDescription(),
+						FEEDBACK_COMPLETE + tasks.get(this.commandDetails.getID() - 1).getDescription() + "\n",
 						generateInfoBox());
 			} catch (IndexOutOfBoundsException e) {
 				isValidTaskNo = false;
@@ -125,7 +125,7 @@ public class GSDControl {
 			try {
 				history.insert(this.commandDetails);
 				return feedback = new Feedback(incompleteTask(commandDetails.getID() - 1),
-						FEEDBACK_INCOMPLETE + tasks.get(this.commandDetails.getID() - 1).getDescription(),
+						FEEDBACK_INCOMPLETE + tasks.get(this.commandDetails.getID() - 1).getDescription() + "\n",
 						generateInfoBox());
 			} catch (IndexOutOfBoundsException e) {
 				isValidTaskNo = false;
@@ -161,7 +161,7 @@ public class GSDControl {
 		case EXIT:
 
 		case SET:
-			return feedback = new Feedback(setFilePath(), FEEDBACK_SET + this.commandDetails.getDescription(),
+			return feedback = new Feedback(setFilePath(), FEEDBACK_SET + this.commandDetails.getDescription() + "\n",
 					generateInfoBox());
 		default:
 			return feedback = new Feedback(displayAllTasks(), FEEDBACK_INVALID_COMMAND, generateInfoBox());
