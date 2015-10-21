@@ -399,8 +399,8 @@ public class Parser {
 		if (input.toUpperCase().contains("MONDAY")) {
 			if (weekday != Calendar.MONDAY) {
 				int days = (Calendar.MONDAY - weekday) % 7;
-				if(days<0){
-					days = days +7;
+				if (days < 0) {
+					days = days + 7;
 				}
 				cal.add(Calendar.DAY_OF_YEAR, days);
 			} else if (HOUR_OF_DAY < NOW_HOUR_OF_DAY || (HOUR_OF_DAY == NOW_HOUR_OF_DAY && MINUTE < NOW_MINUTE)) {
@@ -412,8 +412,8 @@ public class Parser {
 			weekday = cal.get(Calendar.DAY_OF_WEEK);
 			if (weekday != Calendar.TUESDAY) {
 				int days = (Calendar.TUESDAY - weekday) % 7;
-				if(days<0){
-					days = days +7;
+				if (days < 0) {
+					days = days + 7;
 				}
 				cal.add(Calendar.DAY_OF_YEAR, days);
 			} else if (HOUR_OF_DAY < NOW_HOUR_OF_DAY || (HOUR_OF_DAY == NOW_HOUR_OF_DAY && MINUTE < NOW_MINUTE)) {
@@ -425,8 +425,8 @@ public class Parser {
 			weekday = cal.get(Calendar.DAY_OF_WEEK);
 			if (weekday != Calendar.WEDNESDAY) {
 				int days = (Calendar.WEDNESDAY - weekday) % 7;
-				if(days<0){
-					days = days +7;
+				if (days < 0) {
+					days = days + 7;
 				}
 				cal.add(Calendar.DAY_OF_YEAR, days);
 			} else if (HOUR_OF_DAY < NOW_HOUR_OF_DAY || (HOUR_OF_DAY == NOW_HOUR_OF_DAY && MINUTE < NOW_MINUTE)) {
@@ -438,8 +438,8 @@ public class Parser {
 			weekday = cal.get(Calendar.DAY_OF_WEEK);
 			if (weekday != Calendar.THURSDAY) {
 				int days = (Calendar.THURSDAY - weekday) % 7;
-				if(days<0){
-					days = days +7;
+				if (days < 0) {
+					days = days + 7;
 				}
 				cal.add(Calendar.DAY_OF_YEAR, days);
 			} else if (HOUR_OF_DAY < NOW_HOUR_OF_DAY || (HOUR_OF_DAY == NOW_HOUR_OF_DAY && MINUTE < NOW_MINUTE)) {
@@ -451,8 +451,8 @@ public class Parser {
 			weekday = cal.get(Calendar.DAY_OF_WEEK);
 			if (weekday != Calendar.FRIDAY) {
 				int days = (Calendar.FRIDAY - weekday) % 7;
-				if(days<0){
-					days = days +7;
+				if (days < 0) {
+					days = days + 7;
 				}
 				cal.add(Calendar.DAY_OF_YEAR, days);
 			} else if (HOUR_OF_DAY < NOW_HOUR_OF_DAY || (HOUR_OF_DAY == NOW_HOUR_OF_DAY && MINUTE < NOW_MINUTE)) {
@@ -464,8 +464,8 @@ public class Parser {
 			weekday = cal.get(Calendar.DAY_OF_WEEK);
 			if (weekday != Calendar.SATURDAY) {
 				int days = (Calendar.SATURDAY - weekday) % 7;
-				if(days<0){
-					days = days +7;
+				if (days < 0) {
+					days = days + 7;
 				}
 				cal.add(Calendar.DAY_OF_YEAR, days);
 			} else if (HOUR_OF_DAY < NOW_HOUR_OF_DAY || (HOUR_OF_DAY == NOW_HOUR_OF_DAY && MINUTE < NOW_MINUTE)) {
@@ -477,8 +477,8 @@ public class Parser {
 			weekday = cal.get(Calendar.DAY_OF_WEEK);
 			if (weekday != Calendar.SUNDAY) {
 				int days = (Calendar.SUNDAY - weekday) % 7;
-				if(days<0){
-					days = days +7;
+				if (days < 0) {
+					days = days + 7;
 				}
 				cal.add(Calendar.DAY_OF_YEAR, days);
 			} else if (HOUR_OF_DAY < NOW_HOUR_OF_DAY || (HOUR_OF_DAY == NOW_HOUR_OF_DAY && MINUTE < NOW_MINUTE)) {
@@ -563,14 +563,18 @@ public class Parser {
 		throw new ParseException(input, 0);
 	}
 
-	static int parseID(ArrayList<String> input) {
-		int ID;
+	static int parseID(ArrayList<String> input) throws invalidParameters {
+		int ID=-10;
+		try{
 		ID = Integer.parseInt(input.remove(0));
+		}catch(IndexOutOfBoundsException e){
+			throw new invalidParameters();
+		}
 		return ID;
 	}
 
 	public static CommandDetails parse(String input)
-			throws ParseException, NumberFormatException, invalidTimeDateInput, invalidCommand {
+			throws ParseException, NumberFormatException, invalidTimeDateInput, invalidCommand, invalidParameters {
 		String description;
 		Date start;
 		Date end;
@@ -602,10 +606,55 @@ public class Parser {
 		// to check if details correct
 
 		CommandDetails details = new CommandDetails(command, description, start, end, ID);
-
+		validateCommandDetails(command, ID, description, start, end, input);
 		System.out.println(details);
 
 		return new CommandDetails(command, description, start, end, ID);
+	}
+
+	private static void validateCommandDetails(CommandDetails.COMMANDS command, int ID, String description, Date start,
+			Date end, String input) throws invalidParameters {
+		// TODO Auto-generated method stub
+		if (command == CommandDetails.COMMANDS.HELP || command == CommandDetails.COMMANDS.REDO
+				|| command == CommandDetails.COMMANDS.UNDO || command == CommandDetails.COMMANDS.ALL
+				|| command == CommandDetails.COMMANDS.FLOATING || command == CommandDetails.COMMANDS.EVENTS
+				|| command == CommandDetails.COMMANDS.DEADLINES || command == CommandDetails.COMMANDS.EXIT) {
+			if (description != null || start != null || end != null || ID != -10) {
+				throw new invalidParameters(input);
+			}
+		}
+
+		if (command == CommandDetails.COMMANDS.DELETE || command == CommandDetails.COMMANDS.COMPLETE
+				|| command == CommandDetails.COMMANDS.INCOMPLETE) {
+			if (description != null || start != null || end != null) {
+				throw new invalidParameters(input);
+			}
+		}
+		
+		if (command == CommandDetails.COMMANDS.UPDATE){
+			if (description == null && start == null && end == null) {
+				throw new invalidParameters(input);
+			}
+		}
+		
+		if (command == CommandDetails.COMMANDS.ADD){
+			if (description == null) {
+				throw new invalidParameters(input);
+			}
+		}
+		
+		if (command == CommandDetails.COMMANDS.SET){
+			if (description == null || start!=null || end != null) {
+				throw new invalidParameters(input);
+			}
+		}
+		
+		if (command == CommandDetails.COMMANDS.SEARCH){
+			if (description == null && (start==null && end == null)) {
+				throw new invalidParameters(input);
+			}
+		}
+
 	}
 
 	private static void validateInput(ArrayList<String> strTokens) throws ParseException {
@@ -650,4 +699,16 @@ class invalidCommand extends Exception {
 	public invalidCommand(String message) {
 		super(message);
 	}
+
+}
+
+class invalidParameters extends Exception {
+
+	public invalidParameters() {
+	}
+
+	public invalidParameters(String message) {
+		super(message);
+	}
+
 }

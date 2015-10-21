@@ -56,6 +56,10 @@ public class GSDControl {
 			return feedback = new Feedback(null, FEEDBACK_INVALID_TIME_DATE_INPUT, generateInfoBox());
 		} catch (invalidCommand h) {
 			return feedback = new Feedback(null, FEEDBACK_INVALID_COMMAND, generateInfoBox());
+		} catch (invalidParameters i){
+			//Invalid parameters 
+			//eg delete 1 screw this up 
+			//eg All banananaanananananaa
 		}
 		switch (this.commandDetails.getCommand()) {
 		case ADD:
