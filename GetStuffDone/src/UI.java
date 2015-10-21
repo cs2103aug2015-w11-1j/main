@@ -1,14 +1,13 @@
 import java.awt.BorderLayout;
-import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 import javax.swing.BoxLayout;
 import javax.swing.JFrame;
-import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
+import javax.swing.text.DefaultCaret;
 
 /**
  * User interface for GetStuffDone. Only interacts with the Logic component.
@@ -54,6 +53,10 @@ public class UI {
 		frame.add(new JScrollPane(displayBox), BorderLayout.LINE_START);
 		frame.add(panel, BorderLayout.LINE_END);
 		frame.add(commandBar, BorderLayout.PAGE_END);
+		
+		// Auto scrolling for Feedback Box
+		DefaultCaret caret = (DefaultCaret) feedbackBox.getCaret();
+		caret.setUpdatePolicy(DefaultCaret.ALWAYS_UPDATE);
 
 		// Process the input when Enter is pressed
 		commandBar.addActionListener(new ActionListener() {
