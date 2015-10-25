@@ -120,7 +120,7 @@ public class Storage {
 	 *            is the string indicating the complete path
 	 * @return true if the path is valid and successfully set, else false
 	 */
-	public boolean setFilePath(String string)  throws InvalidPathException	{
+	public boolean setFilePath(String string) {
 
 		if (string == null || string.isEmpty()) {
 			return false;
@@ -140,6 +140,12 @@ public class Storage {
 		}
 
 		if (!(new File(folderName)).exists()) {
+			return false;
+		}
+		
+		try {
+			Paths.get(string);
+		} catch(InvalidPathException e) {
 			return false;
 		}
 
