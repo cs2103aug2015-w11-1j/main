@@ -204,7 +204,6 @@ public class GSDControl {
 
 	private String createTask() {
 		Task task = new Task(this.commandDetails);
-		determineTaskType(task);
 		tasks.add(task);
 		storage.save(tasks);
 		return displayAllTasks();
@@ -227,7 +226,6 @@ public class GSDControl {
 
 	private String updateTask(int ID) {
 		tasks.get(ID).updateDetails(commandDetails);
-		determineTaskType(tasks.get(ID));
 		Task updatedTask = tasks.get(ID);
 		CommandDetails updatedDetails = new CommandDetails(CommandDetails.COMMANDS.UPDATE, updatedTask.getDescription(),
 				updatedTask.getStartDate(), updatedTask.getDeadline(), ID);
@@ -251,7 +249,6 @@ public class GSDControl {
 	private String incompleteTask(int ID) {
 		tasks.get(ID).markAsIncomplete();
 		storage.save(tasks);
-		;
 		return displayAllTasks();
 	}
 
@@ -270,7 +267,6 @@ public class GSDControl {
 
 	private String undoRedoCreateTask() {
 		Task task = new Task(this.commandDetails);
-		determineTaskType(task);
 		tasks.add(this.commandDetails.getID(), task);
 		storage.save(tasks);
 		return displayAllTasks();
@@ -284,7 +280,6 @@ public class GSDControl {
 
 	private String undoRedoUpdateTask(int ID) {
 		tasks.get(ID).updateDetails(commandDetails);
-		determineTaskType(tasks.get(ID));
 		storage.save(tasks);
 		return displayAllTasks();
 	}
@@ -367,6 +362,7 @@ public class GSDControl {
 		int floating = 0, events = 0, deadlines = 0, totalTasks = tasks.size();
 
 		for (int i = 0; i < tasks.size(); i++) {
+			determineTaskType(tasks.get(i));
 			if (tasks.get(i).getIsDeadline()) {
 				deadlines++;
 			}
