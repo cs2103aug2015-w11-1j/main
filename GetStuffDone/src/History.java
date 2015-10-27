@@ -61,27 +61,6 @@ public class History {
 		}
 	}
 
-	// this method returns the last action undid, returns null of redoStack is
-	// empty
-	// public CommandDetails redo() {
-	// if (redoStack.isEmpty()) {
-	// return null;
-	// } else {
-	// CommandDetails temp = redoStack.pop();
-	// switch (temp.getCommand()) {
-	// case UPDATE:
-	// CommandDetails temp2 = redoStack.pop();
-	// undoStack.push(temp);
-	// undoStack.push(temp2);
-	// return temp;
-	//
-	// default:
-	// undoStack.push(temp);
-	// return temp;
-	// }
-	// }
-	// }
-
 	public CommandDetails redo() {
 		if (redoStack.isEmpty()) {
 			return null;
