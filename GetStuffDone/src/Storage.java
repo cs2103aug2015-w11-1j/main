@@ -142,10 +142,10 @@ public class Storage {
 		if (!(new File(folderName)).exists()) {
 			return false;
 		}
-		
+
 		try {
 			Paths.get(string);
-		} catch(InvalidPathException e) {
+		} catch (InvalidPathException e) {
 			return false;
 		}
 

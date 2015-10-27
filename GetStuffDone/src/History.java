@@ -45,6 +45,7 @@ public class History {
 			return null;
 		} else {
 			CommandDetails latest = undoStack.pop();
+			System.out.println(latest.toString());
 			switch (latest.getCommand()) {
 			case UPDATE:
 				CommandDetails old = undoStack.pop();
@@ -87,7 +88,8 @@ public class History {
 		} else {
 			CommandDetails old = redoStack.pop();
 			if (!redoStack.isEmpty()) {
-				switch (redoStack.peek().getCommand()) {
+				System.out.println(old.toString());
+				switch (old.getCommand()) {
 				case UPDATE:
 					CommandDetails latest = redoStack.pop();
 					undoStack.push(old);

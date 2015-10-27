@@ -564,10 +564,10 @@ public class Parser {
 	}
 
 	static int parseID(ArrayList<String> input) throws invalidParameters {
-		int ID=-10;
-		try{
-		ID = Integer.parseInt(input.remove(0));
-		}catch(IndexOutOfBoundsException e){
+		int ID = -10;
+		try {
+			ID = Integer.parseInt(input.remove(0));
+		} catch (IndexOutOfBoundsException e) {
 			throw new invalidParameters();
 		}
 		return ID;
@@ -630,21 +630,21 @@ public class Parser {
 				throw new invalidParameters(input);
 			}
 		}
-		
-		if (command == CommandDetails.COMMANDS.ADD || command == CommandDetails.COMMANDS.UPDATE){
+
+		if (command == CommandDetails.COMMANDS.ADD || command == CommandDetails.COMMANDS.UPDATE) {
 			if (description == null) {
 				throw new invalidParameters(input);
 			}
 		}
-		
-		if (command == CommandDetails.COMMANDS.SET){
-			if (description == null || start!=null || end != null) {
+
+		if (command == CommandDetails.COMMANDS.SET) {
+			if (description == null || start != null || end != null) {
 				throw new invalidParameters(input);
 			}
 		}
-		
-		if (command == CommandDetails.COMMANDS.SEARCH){
-			if (description == null && (start==null && end == null)) {
+
+		if (command == CommandDetails.COMMANDS.SEARCH) {
+			if (description == null && (start == null && end == null)) {
 				throw new invalidParameters(input);
 			}
 		}

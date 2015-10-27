@@ -105,17 +105,10 @@ public class Task {
 	
 	public void updateDetails(CommandDetails details)	{
 		
-		if(details.getDescription() != null)	{
 			this.description = details.getDescription();
-		}
-		
-		if(details.getStartDate() != null)	{
 			this.startDate = details.getStartDate();
-		}
-		
-		if(details.getDeadline() != null)	{
 			this.deadline = details.getDeadline();
-		}
+
 		
 	}
 	
@@ -130,19 +123,31 @@ public class Task {
 	
 	public boolean contains(CommandDetails details)	{
 		
+		
 		Calendar startDateCal = Calendar.getInstance();
+		if(this.startDate != null)	{
 		startDateCal.setTime(this.startDate);
+		}
+		
 		
 		Calendar deadlineCal = Calendar.getInstance();
+		if(this.deadline != null){
 		deadlineCal.setTime(this.deadline);
+		}
+		
 		
 		Calendar taskStartDateCal = Calendar.getInstance();
+		if(details.getStartDate() != null)	{
 		taskStartDateCal.setTime(details.getStartDate());
+		}
+		
 		
 		Calendar taskDeadlineCal = Calendar.getInstance();
+		if(details.getDeadline() != null){
 		taskDeadlineCal.setTime(details.getDeadline());
+		}
 				
-		if(details.getDescription().contains(this.description))	{
+		if(details.getDescription() != null && details.getDescription().contains(this.description))	{
 			return true;
 		}
 		

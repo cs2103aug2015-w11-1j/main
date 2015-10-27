@@ -45,23 +45,25 @@ public class GSDControl {
 
 	private ArrayList<Task> tasks = new ArrayList<Task>();
 	private CommandDetails commandDetails;
+	private Parser parser = new Parser();
 	private Storage storage = new Storage();
 	private History history = new History();
 	private boolean isValidTaskNo = true;
 
 	public Feedback processInput(String input) throws IndexOutOfBoundsException {
+		Feedback feedback;
 		try {
-			this.commandDetails = Parser.parse(input);
+			this.commandDetails = parser.parse(input);
 		} catch (ParseException e) { // Invalid Date Format
-			return new Feedback(null, FEEDBACK_INVALID_DATE_FORMAT, generateInfoBox());
+			return feedback = new Feedback(null, FEEDBACK_INVALID_DATE_FORMAT, generateInfoBox());
 		} catch (NumberFormatException f) {
-			return new Feedback(null, FEEDBACK_INVALID_TASK_NUMBER, generateInfoBox());
+			return feedback = new Feedback(null, FEEDBACK_INVALID_TASK_NUMBER, generateInfoBox());
 		} catch (invalidTimeDateInput g) { // Not in the form [Time] [Date]
-			return new Feedback(null, FEEDBACK_INVALID_TIME_DATE_INPUT, generateInfoBox());
+			return feedback = new Feedback(null, FEEDBACK_INVALID_TIME_DATE_INPUT, generateInfoBox());
 		} catch (invalidCommand h) {
-			return new Feedback(null, FEEDBACK_INVALID_COMMAND, generateInfoBox());
+			return feedback = new Feedback(null, FEEDBACK_INVALID_COMMAND, generateInfoBox());
 		} catch (invalidParameters i) {
-			return new Feedback(null, FEEDBACK_INVALID_COMMAND_FORMAT, generateInfoBox());
+			return feedback = new Feedback(null, FEEDBACK_INVALID_COMMAND_FORMAT, generateInfoBox());
 			// Invalid parameters
 			// eg delete 1 screw this up
 			// eg All banananaanananananaa
@@ -70,35 +72,40 @@ public class GSDControl {
 		case ADD:
 			this.commandDetails.setID(tasks.size());
 			history.insert(this.commandDetails);
-			return new Feedback(createTask(), FEEDBACK_ADD + commandDetails.getDescription() + "\n", generateInfoBox());
+			return feedback = new Feedback(createTask(), FEEDBACK_ADD + commandDetails.getDescription() + "\n",
+					generateInfoBox());
 		case DELETE:
 			try {
 				CommandDetails deletedDetails = generateDetails();
 				history.insert(deletedDetails);
 				String taskDescription = tasks.get(commandDetails.getID() - 1).getDescription();
-				return new Feedback(deleteTask(commandDetails.getID() - 1), FEEDBACK_DELETE + taskDescription + "\n",
-						generateInfoBox());
+				return feedback = new Feedback(deleteTask(commandDetails.getID() - 1),
+						FEEDBACK_DELETE + taskDescription + "\n", generateInfoBox());
 			} catch (IndexOutOfBoundsException e) {
 				isValidTaskNo = false;
 				throw new IndexOutOfBoundsException();
 			} finally {
 				if (!isValidTaskNo) {
 					isValidTaskNo = true;
-					return new Feedback(displayAllTasks(), FEEDBACK_INVALID_TASK_NUMBER, generateInfoBox());
+					return feedback = new Feedback(displayAllTasks(), FEEDBACK_INVALID_TASK_NUMBER, generateInfoBox());
 				}
 			}
 		case SEARCH:
-			return new Feedback(searchTask(), FEEDBACK_SEARCH + commandDetails.getDescription() + "\n",
-					generateInfoBox());
+			String[] temp = input.split(" ");
+			String feedbackString = "";
+			for (int i = 1; i < temp.length; i++) {
+				feedbackString += temp[i] + " ";
+			}
+			return feedback = new Feedback(searchTask(), FEEDBACK_SEARCH + feedbackString + "\n", generateInfoBox());
 		case UPDATE:
 			try {
 				CommandDetails oldDetails = generateDetails();
 				history.insert(oldDetails);
 				if (this.commandDetails.getDescription() == null) {
-					return new Feedback(updateTask(commandDetails.getID() - 1),
+					return feedback = new Feedback(updateTask(commandDetails.getID() - 1),
 							FEEDBACK_UPDATE + oldDetails.getDescription() + "\n", generateInfoBox());
 				}
-				return new Feedback(updateTask(commandDetails.getID() - 1), FEEDBACK_UPDATE
+				return feedback = new Feedback(updateTask(commandDetails.getID() - 1), FEEDBACK_UPDATE
 						+ oldDetails.getDescription() + " to " + this.commandDetails.getDescription() + "\n",
 						generateInfoBox());
 			} catch (IndexOutOfBoundsException e) {
@@ -107,13 +114,13 @@ public class GSDControl {
 			} finally {
 				if (!isValidTaskNo) {
 					isValidTaskNo = true;
-					return new Feedback(displayAllTasks(), FEEDBACK_INVALID_TASK_NUMBER, generateInfoBox());
+					return feedback = new Feedback(displayAllTasks(), FEEDBACK_INVALID_TASK_NUMBER, generateInfoBox());
 				}
 			}
 		case COMPLETE:
 			try {
 				history.insert(this.commandDetails);
-				return new Feedback(completeTask(commandDetails.getID() - 1),
+				return feedback = new Feedback(completeTask(commandDetails.getID() - 1),
 						FEEDBACK_COMPLETE + tasks.get(this.commandDetails.getID() - 1).getDescription() + "\n",
 						generateInfoBox());
 			} catch (IndexOutOfBoundsException e) {
@@ -122,13 +129,13 @@ public class GSDControl {
 			} finally {
 				if (!isValidTaskNo) {
 					isValidTaskNo = true;
-					return new Feedback(displayAllTasks(), FEEDBACK_INVALID_TASK_NUMBER, generateInfoBox());
+					return feedback = new Feedback(displayAllTasks(), FEEDBACK_INVALID_TASK_NUMBER, generateInfoBox());
 				}
 			}
 		case INCOMPLETE:
 			try {
 				history.insert(this.commandDetails);
-				return new Feedback(incompleteTask(commandDetails.getID() - 1),
+				return feedback = new Feedback(incompleteTask(commandDetails.getID() - 1),
 						FEEDBACK_INCOMPLETE + tasks.get(this.commandDetails.getID() - 1).getDescription() + "\n",
 						generateInfoBox());
 			} catch (IndexOutOfBoundsException e) {
@@ -137,47 +144,48 @@ public class GSDControl {
 			} finally {
 				if (!isValidTaskNo) {
 					isValidTaskNo = true;
-					return new Feedback(displayAllTasks(), FEEDBACK_INVALID_TASK_NUMBER, generateInfoBox());
+					return feedback = new Feedback(displayAllTasks(), FEEDBACK_INVALID_TASK_NUMBER, generateInfoBox());
 				}
 			}
 		case REDO:
 			this.commandDetails = history.redo();
 			if (this.commandDetails == null) {
-				return new Feedback(displayAllTasks(), FEEDBACK_REDO_ERROR, generateInfoBox());
+				return feedback = new Feedback(displayAllTasks(), FEEDBACK_REDO_ERROR, generateInfoBox());
 			}
-			return new Feedback(redoLastAction(), FEEDBACK_REDO, generateInfoBox());
+			return feedback = new Feedback(redoLastAction(), FEEDBACK_REDO, generateInfoBox());
 		case UNDO:
 			this.commandDetails = history.undo();
 			if (this.commandDetails == null) {
-				return new Feedback(displayAllTasks(), FEEDBACK_UNDO_ERROR, generateInfoBox());
+				return feedback = new Feedback(displayAllTasks(), FEEDBACK_UNDO_ERROR, generateInfoBox());
 			}
-			return new Feedback(undoLastAction(), FEEDBACK_UNDO, generateInfoBox());
+			return feedback = new Feedback(undoLastAction(), FEEDBACK_UNDO, generateInfoBox());
 		case ALL:
-			return new Feedback(displayAllTasks(), FEEDBACK_ALL, generateInfoBox());
+			return feedback = new Feedback(displayAllTasks(), FEEDBACK_ALL, generateInfoBox());
 		case FLOATING:
-			return new Feedback(displayFloatingTasks(), FEEDBACK_FLOATING, generateInfoBox());
+			return feedback = new Feedback(displayFloatingTasks(), FEEDBACK_FLOATING, generateInfoBox());
 		case EVENTS:
-			return new Feedback(displayEvents(), FEEDBACK_EVENTS, generateInfoBox());
+			return feedback = new Feedback(displayEvents(), FEEDBACK_EVENTS, generateInfoBox());
 		case DEADLINES:
-			return new Feedback(displayDeadlines(), FEEDBACK_DEADLINES, generateInfoBox());
+			return feedback = new Feedback(displayDeadlines(), FEEDBACK_DEADLINES, generateInfoBox());
 		case HELP:
-			return new Feedback(help(), FEEDBACK_HELP, generateInfoBox());
+			return feedback = new Feedback(help(), FEEDBACK_HELP, generateInfoBox());
 		case EXIT:
-
+			System.exit(0);
 		case SET:
 			try {
 				boolean isValidFilePath = setFilePath();
 				if (isValidFilePath) {
-					return new Feedback(null, FEEDBACK_SET + this.commandDetails.getDescription() + "\n",
+					return feedback = new Feedback(null, FEEDBACK_SET + this.commandDetails.getDescription() + "\n",
 							generateInfoBox());
 				} else {
-					return new Feedback(null, FEEDBACK_SET_ERROR, generateInfoBox());
+					return feedback = new Feedback(null, FEEDBACK_SET_ERROR, generateInfoBox());
 				}
 			} catch (InvalidPathException q) {
-				return new Feedback(null, FEEDBACK_INVALID_FILE_PATH, generateInfoBox());
+				return feedback = new Feedback(null, FEEDBACK_INVALID_FILE_PATH, generateInfoBox());
 			}
 		default:
-			return new Feedback(displayAllTasks(), FEEDBACK_INVALID_COMMAND, generateInfoBox());
+			return feedback = new Feedback(displayAllTasks(), FEEDBACK_INVALID_COMMAND, generateInfoBox());
+
 		}
 	}
 
@@ -197,7 +205,8 @@ public class GSDControl {
 	// For UI
 
 	public Feedback loadFromFile() {
-		return new Feedback(displayAllTasks(), FEEDBACK_WELCOME_MESSAGE, generateInfoBox());
+		Feedback feedback;
+		return feedback = new Feedback(displayAllTasks(), FEEDBACK_WELCOME_MESSAGE, generateInfoBox());
 	}
 
 	// Behavioural Methods
@@ -213,7 +222,7 @@ public class GSDControl {
 		String search = "";
 
 		for (int i = 0; i < tasks.size(); i++) {
-			if (tasks.get(i).getDescription().contains(commandDetails.getDescription())) {
+			if (tasks.get(i).contains(commandDetails)) {
 				search += i + 1 + ". " + tasks.get(i).toString();
 			}
 		}
@@ -262,7 +271,8 @@ public class GSDControl {
 	}
 
 	private boolean setFilePath() {
-		return storage.setFilePath(this.commandDetails.getDescription());
+		boolean isSuccessfulPath;
+		return isSuccessfulPath = storage.setFilePath(this.commandDetails.getDescription());
 	}
 
 	private String undoRedoCreateTask() {
@@ -463,4 +473,5 @@ public class GSDControl {
 		task.setIsDeadline(false);
 		return task;
 	}
+
 }
