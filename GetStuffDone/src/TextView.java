@@ -19,10 +19,10 @@ public class TextView extends JTextPane {
 	// Auto-generated code
 	private static final long serialVersionUID = 1L;
 
-	private static final int FONT_SIZE_NORMAL = 14;
+	private static final int FONT_SIZE_NORMAL = 12;
 	private static final int FONT_SIZE_TITLE = 16;
 	
-	private static final String DEFAULT_FONT = "calibri";
+	private static final String DEFAULT_FONT = "verdana";
 
 	private StyledDocument document = getStyledDocument();
 

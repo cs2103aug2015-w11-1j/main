@@ -43,7 +43,7 @@ public class UI {
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.setResizable(false);
 
-		// Attach the UI componenets
+		// Attach the UI components
 		JPanel panel = new JPanel();
 		panel.setLayout(new BoxLayout(panel, BoxLayout.PAGE_AXIS));
 
@@ -91,7 +91,7 @@ public class UI {
 	private void show(Feedback feedback) {
 		showInFeedbackBox(feedback.getFeedbackString(), TextView.STYLE_BOLD);
 		showInDisplayBox(feedback.getDisplayString(), TextView.STYLE_NORMAL);
-		showInInfoBox(feedback.getInfoString());
+		showInInfoBox(feedback.getInfoString(), TextView.STYLE_NORMAL);
 	}
 
 	private void showInFeedbackBox(String string, String style) {
@@ -109,10 +109,11 @@ public class UI {
 		}
 	}
 
-	private void showInInfoBox(String string) {
+	private void showInInfoBox(String string, String style) {
 
 		if (isValidString(string)) {
-			infoBox.setText(string);
+			infoBox.clear();
+			infoBox.display(string, style);
 		}
 	}
 
