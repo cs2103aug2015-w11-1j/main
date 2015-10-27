@@ -32,7 +32,7 @@ public class GSDControl {
 	private static final String FEEDBACK_FLOATING = ">> Floating Tasks displayed\n";
 	private static final String FEEDBACK_EVENTS = ">> Events displayed\n";
 	private static final String FEEDBACK_DEADLINES = ">> Deadlines displayed\n";
-	private static final String FEEDBACK_RECURRING = ">> Recurring Tasks displayed\n";	
+	private static final String FEEDBACK_RECURRING = ">> Recurring Tasks displayed\n";
 	private static final String FEEDBACK_HELP = ">> Called for help!\n";
 	private static final String FEEDBACK_SET = ">> File path set to ";
 	private static final String FEEDBACK_SET_ERROR = ">> ERROR : FILE PATH CAN'T BE SET";
@@ -52,7 +52,7 @@ public class GSDControl {
 	private History history = new History();
 	private boolean isValidTaskNo = true;
 
-	public Feedback processInput(String input){
+	public Feedback processInput(String input) {
 		Feedback feedback;
 		try {
 			this.commandDetails = parser.parse(input);
@@ -274,32 +274,49 @@ public class GSDControl {
 	private String redoLastAction() {
 		return executeHistoryCommand();
 	}
-	
-	private void recurringTaskUpdate()	{
-		
+
+	private void recurringTaskUpdate() {
+
 		Calendar currentDateCal = Calendar.getInstance();
 		// set the currentdate to the current date
-		
+
+		Calendar deadlineCal = Calendar.getInstance();
 		Calendar endingDateCal = Calendar.getInstance();
-		
+
 		for (int i = 0; i < tasks.size(); i++) {
 			if (tasks.get(i).getIsRecurring()) {
 				endingDateCal.setTime(tasks.get(i).getEndingDate());
-				if(date passed || tasks.get(i).getIsComplete())	{
-					if( havent passed ending date)	{
-						//change to the next stated date according to the RECURRING string
+				deadlineCal.setTime(tasks.get(i).getDeadline());
+				if (currentDateCal.get(Calendar.DAY_OF_YEAR) > deadlineCal.get(Calendar.DAY_OF_YEAR)
+						|| currentDateCal.get(Calendar.YEAR) > deadlineCal.get(Calendar.YEAR) || tasks.get(i).getIsComplete()); {
+					if (currentDateCal.get(Calendar.DAY_OF_YEAR) <= endingDateCal.get(Calendar.DAY_OF_YEAR)
+							|| currentDateCal.get(Calendar.YEAR) <= endingDateCal.get(Calendar.YEAR)) {
+						switch (tasks.get(i).getRecurring())	{
+							case "DAILY":
+								tasks.get(i).setStartDate(//newStartDate);
+								tasks.get(i).setDeadline(//newDeadline);
+							case "WEEKLY":
+								tasks.get(i).setStartDate(//newStartDate);
+								tasks.get(i).setDeadline(//newDeadline);
+							case "MONTHLY":
+								tasks.get(i).setStartDate(//newStartDate);
+								tasks.get(i).setDeadline(//newDeadline);
+							case "YEARLY":
+								tasks.get(i).setStartDate(//newStartDate);
+								tasks.get(i).setDeadline(//newDeadline);
+						}
+						// change to the next stated date according to the
+						// RECURRING string
+					} else if (currentDateCal.get(Calendar.DAY_OF_YEAR) > endingDateCal.get(Calendar.DAY_OF_YEAR)
+							|| currentDateCal.get(Calendar.YEAR) > endingDateCal.get(Calendar.YEAR)) {
+						// if recurring task expired
+						tasks.get(i).setRecurringCount(0); // reset the
+															// recurringcount
 					}
-					if (passed ending date)	{
-						//do nothing
-					}
-				}
-				else	{ //haven't passed date
-					//do nothing
-				}
-				
+				} 
 			}
 		}
-		
+
 	}
 
 	private boolean setFilePath() {
@@ -410,7 +427,7 @@ public class GSDControl {
 				recurring += i + 1 + ". " + tasks.get(i).toString();
 			}
 		}
-		if (recurring.isEmpty())	{
+		if (recurring.isEmpty()) {
 			recurring = DISPLAY_NO_RECURRING;
 		}
 		return recurring;

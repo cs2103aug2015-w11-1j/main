@@ -16,6 +16,7 @@ public class Task {
 	private Date deadline;
 	private String recurring;
 	private Date endingDate;
+	private int recurringCount;
 	private boolean isComplete;
 	private boolean isEvent;
 	private boolean isDeadline;
@@ -31,6 +32,7 @@ public class Task {
 		deadline = null;
 		recurring = null;
 		endingDate = null;
+		recurringCount = 0;
 		isComplete = false;
 		isEvent = false;
 		isDeadline = false;
@@ -67,6 +69,10 @@ public class Task {
 
 	public void setEndingDate(Date endingDate) {
 		this.endingDate = endingDate;
+	}
+	
+	public void setRecurringCount(int recurringCount)	{
+		this.recurringCount = recurringCount;
 	}
 
 	public void setIsComplete(boolean isComplete) {
@@ -109,6 +115,10 @@ public class Task {
 
 	public Date getEndingDate() {
 		return this.endingDate;
+	}
+	
+	public int getRecurringCount()	{
+		return this.recurringCount;
 	}
 
 	public boolean getIsComplete() {
