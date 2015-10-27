@@ -18,11 +18,11 @@ public class UI {
 	private static final String TITLE_HELP = "GetStuffDone Help";
 
 	private static final int DISPLAY_BOX_WIDTH = 350;
-	private static final int DISPLAY_BOX_HEIGHT = 400;
+	private static final int DISPLAY_BOX_HEIGHT = 420;
 	private static final int FEEDBACK_BOX_WIDTH = 250;
 	private static final int FEEDBACK_BOX_HEIGHT = 300;
 	private static final int INFO_BOX_WIDTH = 250;
-	private static final int INFO_BOX_HEIGHT = 100;
+	private static final int INFO_BOX_HEIGHT = 120;
 	private static final int SYNTAX_BOX_WIDTH = 600;
 	private static final int SYNTAX_BOX_HEIGHT = 300;
 	private static final int COMMAND_BOX_WIDTH = 200;
@@ -133,7 +133,7 @@ public class UI {
 			JFrame frame = new JFrame(TITLE_HELP);
 
 			frame.setLayout(new BorderLayout());
-			frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+			frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 			frame.setResizable(false);
 
 			TextView commandBox = new TextView(COMMAND_BOX_WIDTH, COMMAND_BOX_HEIGHT);
