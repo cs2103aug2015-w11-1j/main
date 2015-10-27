@@ -52,7 +52,7 @@ public class GSDControl {
 	private History history = new History();
 	private boolean isValidTaskNo = true;
 
-	public Feedback processInput(String input) throws Exception {
+	public Feedback processInput(String input){
 		Feedback feedback;
 		try {
 			this.commandDetails = parser.parse(input);

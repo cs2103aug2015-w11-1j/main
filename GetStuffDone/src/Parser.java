@@ -574,7 +574,7 @@ public class Parser {
 		return ID;
 	}
 
-	public static CommandDetails parse(String input) throws Exception {
+	public static CommandDetails parse(String input) throws ParseException, invalidCommand, invalidParameters, invalidTimeDateInput {
 		String description;
 		Date start;
 		Date end;
@@ -658,7 +658,7 @@ public class Parser {
 	}
 
 	private static void validateCommandDetails(CommandDetails.COMMANDS command, int ID, String description, Date start,
-			Date end, String input, String recurring, Date endingDate) throws Exception {
+			Date end, String input, String recurring, Date endingDate) throws invalidParameters, invalidTimeDateInput {
 		if (command == CommandDetails.COMMANDS.HELP || command == CommandDetails.COMMANDS.REDO
 				|| command == CommandDetails.COMMANDS.UNDO || command == CommandDetails.COMMANDS.ALL
 				|| command == CommandDetails.COMMANDS.FLOATING || command == CommandDetails.COMMANDS.EVENTS
