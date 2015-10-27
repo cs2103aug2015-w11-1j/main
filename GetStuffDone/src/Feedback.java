@@ -47,4 +47,12 @@ public class Feedback {
 	public String getInfoString() {
 		return infoString;
 	}
+	
+	public String getHelpCommandString() {
+		return helpCommandString;
+	}
+	
+	public String getHelpSyntaxString() {
+		return helpSyntaxString;
+	}
 }

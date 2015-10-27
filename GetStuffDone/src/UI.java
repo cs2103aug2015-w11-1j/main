@@ -14,7 +14,8 @@ import javax.swing.text.DefaultCaret;
  */
 public class UI {
 
-	private static final String TITLE = "GetStuffDone";
+	private static final String TITLE_MAIN = "GetStuffDone";
+	private static final String TITLE_HELP = "GetStuffDone Help";
 
 	private static final int DISPLAY_BOX_WIDTH = 350;
 	private static final int DISPLAY_BOX_HEIGHT = 400;
@@ -22,6 +23,10 @@ public class UI {
 	private static final int FEEDBACK_BOX_HEIGHT = 300;
 	private static final int INFO_BOX_WIDTH = 250;
 	private static final int INFO_BOX_HEIGHT = 100;
+	private static final int SYNTAX_BOX_WIDTH = 600;
+	private static final int SYNTAX_BOX_HEIGHT = 300;
+	private static final int COMMAND_BOX_WIDTH = 200;
+	private static final int COMMAND_BOX_HEIGHT = 300;
 
 	private TextView displayBox = new TextView(DISPLAY_BOX_WIDTH, DISPLAY_BOX_HEIGHT);
 	private TextView feedbackBox = new TextView(FEEDBACK_BOX_WIDTH, FEEDBACK_BOX_HEIGHT);
@@ -37,7 +42,7 @@ public class UI {
 		GSDControl gsd = new GSDControl();
 
 		// Initialize the main window
-		JFrame frame = new JFrame(TITLE);
+		JFrame frame = new JFrame(TITLE_MAIN);
 
 		frame.setLayout(new BorderLayout());
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -53,7 +58,7 @@ public class UI {
 		frame.add(new JScrollPane(displayBox), BorderLayout.LINE_START);
 		frame.add(panel, BorderLayout.LINE_END);
 		frame.add(commandBar, BorderLayout.PAGE_END);
-		
+
 		// Auto scrolling for Feedback Box
 		DefaultCaret caret = (DefaultCaret) feedbackBox.getCaret();
 		caret.setUpdatePolicy(DefaultCaret.ALWAYS_UPDATE);
@@ -74,7 +79,7 @@ public class UI {
 				show(feedback);
 			}
 		});
-		
+
 		Feedback feedback = gsd.loadFromFile();
 		show(feedback);
 
@@ -87,11 +92,14 @@ public class UI {
 
 		frame.setVisible(true);
 	}
-	
+
 	private void show(Feedback feedback) {
+
 		showInFeedbackBox(feedback.getFeedbackString(), TextView.STYLE_BOLD);
 		showInDisplayBox(feedback.getDisplayString(), TextView.STYLE_NORMAL);
 		showInInfoBox(feedback.getInfoString(), TextView.STYLE_NORMAL);
+
+		showHelpBox(feedback.getHelpCommandString(), feedback.getHelpSyntaxString());
 	}
 
 	private void showInFeedbackBox(String string, String style) {
@@ -114,6 +122,31 @@ public class UI {
 		if (isValidString(string)) {
 			infoBox.clear();
 			infoBox.display(string, style);
+		}
+	}
+
+	private void showHelpBox(String commands, String syntax) {
+
+		if (isValidString(commands) && isValidString(syntax)) {
+
+			JFrame frame = new JFrame(TITLE_HELP);
+
+			frame.setLayout(new BorderLayout());
+			frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+			frame.setResizable(false);
+
+			TextView commandBox = new TextView(COMMAND_BOX_WIDTH, COMMAND_BOX_HEIGHT);
+			TextView syntaxBox = new TextView(SYNTAX_BOX_WIDTH, SYNTAX_BOX_HEIGHT);
+			
+			commandBox.display(commands, TextView.STYLE_NORMAL);
+			syntaxBox.display(syntax, TextView.STYLE_NORMAL);
+
+			frame.add(syntaxBox, BorderLayout.LINE_END);
+			frame.add(commandBox, BorderLayout.LINE_START);
+			
+			frame.pack();
+			frame.setLocationRelativeTo(null);
+			frame.setVisible(true);
 		}
 	}
 
