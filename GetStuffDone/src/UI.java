@@ -101,7 +101,7 @@ public class UI {
 		showInDisplayBox(feedback.getDisplayString(), TextView.STYLE_NORMAL);
 		showInInfoBox(feedback.getInfoString(), TextView.STYLE_NORMAL);
 
-		showHelpBox(feedback.getHelpCommandString(), feedback.getHelpSyntaxString());
+		showHelpBox(feedback.getHelpCommandString(), feedback.getHelpCommandString());
 	}
 
 	private void showInFeedbackBox(String string, String style) {

@@ -218,6 +218,7 @@ public class GSDControl {
 	private String createTask() {
 		Task task = new Task(this.commandDetails);
 		tasks.add(task);
+		determineTaskType(task);
 		storage.save(tasks);
 		return displayAllTasks();
 	}
@@ -239,6 +240,7 @@ public class GSDControl {
 
 	private String updateTask(int ID) {
 		tasks.get(ID).updateDetails(commandDetails);
+		determineTaskType(tasks.get(ID));
 		Task updatedTask = tasks.get(ID);
 		CommandDetails updatedDetails = new CommandDetails(CommandDetails.COMMANDS.UPDATE, updatedTask.getDescription(),
 				updatedTask.getStartDate(), updatedTask.getDeadline(), ID, updatedTask.getRecurring(),
@@ -278,42 +280,59 @@ public class GSDControl {
 	private void recurringTaskUpdate() {
 
 		Calendar currentDateCal = Calendar.getInstance();
-		// set the currentdate to the current date
-
+		Calendar startDateCal = Calendar.getInstance();
 		Calendar deadlineCal = Calendar.getInstance();
 		Calendar endingDateCal = Calendar.getInstance();
 
 		for (int i = 0; i < tasks.size(); i++) {
 			if (tasks.get(i).getIsRecurring()) {
 				endingDateCal.setTime(tasks.get(i).getEndingDate());
+				startDateCal.setTime(tasks.get(i).getStartDate());
 				deadlineCal.setTime(tasks.get(i).getDeadline());
-				if (currentDateCal.get(Calendar.DAY_OF_YEAR) > deadlineCal.get(Calendar.DAY_OF_YEAR)
-						|| currentDateCal.get(Calendar.YEAR) > deadlineCal.get(Calendar.YEAR) || tasks.get(i).getIsComplete()); {
-					if (currentDateCal.get(Calendar.DAY_OF_YEAR) <= endingDateCal.get(Calendar.DAY_OF_YEAR)
-							|| currentDateCal.get(Calendar.YEAR) <= endingDateCal.get(Calendar.YEAR)) {
-						switch (tasks.get(i).getRecurring())	{
+				if (currentDateCal.after(deadlineCal) || tasks.get(i).getIsComplete()) {
+					System.out.println("PAST DEADLINE\n");
+					{
+						if (currentDateCal.before(endingDateCal)) {
+							System.out.println("BEFORE END DATE\n");
+							switch (tasks.get(i).getRecurring()) {
 							case "DAILY":
-								tasks.get(i).setStartDate(//newStartDate);
-								tasks.get(i).setDeadline(//newDeadline);
+								startDateCal.add(Calendar.DAY_OF_YEAR, 1);
+								deadlineCal.add(Calendar.DAY_OF_YEAR, 1);
+								tasks.get(i).setStartDate(startDateCal.getTime());
+								tasks.get(i).setDeadline(deadlineCal.getTime());
+								break;
 							case "WEEKLY":
-								tasks.get(i).setStartDate(//newStartDate);
-								tasks.get(i).setDeadline(//newDeadline);
+								startDateCal.add(Calendar.DAY_OF_YEAR, 7);
+								deadlineCal.add(Calendar.DAY_OF_YEAR, 7);
+								tasks.get(i).setStartDate(startDateCal.getTime());
+								tasks.get(i).setDeadline(deadlineCal.getTime());
+								break;
 							case "MONTHLY":
-								tasks.get(i).setStartDate(//newStartDate);
-								tasks.get(i).setDeadline(//newDeadline);
+								startDateCal.add(Calendar.MONTH, 1);
+								deadlineCal.add(Calendar.MONTH, 1);
+								tasks.get(i).setStartDate(startDateCal.getTime());
+								tasks.get(i).setDeadline(deadlineCal.getTime());
+								break;
 							case "YEARLY":
-								tasks.get(i).setStartDate(//newStartDate);
-								tasks.get(i).setDeadline(//newDeadline);
+								startDateCal.add(Calendar.YEAR, 1);
+								deadlineCal.add(Calendar.YEAR, 1);
+								tasks.get(i).setStartDate(startDateCal.getTime());
+								tasks.get(i).setDeadline(deadlineCal.getTime());
+								break;
+							}
+							// change to the next stated date according to the
+							// RECURRING string
+						} else {
+							// if recurring task expired
+							System.out.println("EXPIRED\n");
+							tasks.get(i).setRecurringCount(0); // reset the
+																// recurringcount
+																// (still dunno
+																// wat this is
+																// for)
 						}
-						// change to the next stated date according to the
-						// RECURRING string
-					} else if (currentDateCal.get(Calendar.DAY_OF_YEAR) > endingDateCal.get(Calendar.DAY_OF_YEAR)
-							|| currentDateCal.get(Calendar.YEAR) > endingDateCal.get(Calendar.YEAR)) {
-						// if recurring task expired
-						tasks.get(i).setRecurringCount(0); // reset the
-															// recurringcount
 					}
-				} 
+				}
 			}
 		}
 
@@ -327,6 +346,7 @@ public class GSDControl {
 	private String undoRedoCreateTask() {
 		Task task = new Task(this.commandDetails);
 		tasks.add(this.commandDetails.getID(), task);
+		determineTaskType(tasks.get(commandDetails.getID()));
 		storage.save(tasks);
 		return displayAllTasks();
 	}
@@ -339,6 +359,7 @@ public class GSDControl {
 
 	private String undoRedoUpdateTask(int ID) {
 		tasks.get(ID).updateDetails(commandDetails);
+		determineTaskType(tasks.get(ID));
 		storage.save(tasks);
 		return displayAllTasks();
 	}
@@ -362,6 +383,7 @@ public class GSDControl {
 	}
 
 	private String displayAllTasks() {
+		recurringTaskUpdate();
 		String displayAll = "";
 
 		for (int i = 0; i < tasks.size(); i++) {
@@ -375,6 +397,7 @@ public class GSDControl {
 	}
 
 	private String displayFloatingTasks() {
+		recurringTaskUpdate();
 		String floating = "";
 
 		for (int i = 0; i < tasks.size(); i++) {
@@ -390,6 +413,7 @@ public class GSDControl {
 	}
 
 	private String displayEvents() {
+		recurringTaskUpdate();
 		String events = "";
 
 		for (int i = 0; i < tasks.size(); i++) {
@@ -405,6 +429,7 @@ public class GSDControl {
 	}
 
 	private String displayDeadlines() {
+		recurringTaskUpdate();
 		String deadlines = "";
 
 		for (int i = 0; i < tasks.size(); i++) {
@@ -420,6 +445,7 @@ public class GSDControl {
 	}
 
 	private String displayRecurring() {
+		recurringTaskUpdate();
 		String recurring = "";
 
 		for (int i = 0; i < tasks.size(); i++) {
@@ -452,7 +478,7 @@ public class GSDControl {
 			}
 		}
 		return "Floating Tasks = " + floating + "\nEvents = " + events + "\nDeadlines = " + deadlines
-				+ "Recurring Tasks = " + recurring + "\nTotal No. of Tasks = " + totalTasks + "\n";
+				+ "\nRecurring Tasks = " + recurring + "\nTotal No. of Tasks = " + totalTasks + "\n";
 	}
 
 	private String helpCommands() {
@@ -531,7 +557,13 @@ public class GSDControl {
 	}
 
 	private Task determineTaskType(Task task) {
-		if (task.getStartDate() != null) {
+		if (task.getEndingDate() != null) {
+			task.setIsRecurring(true);
+			task.setIsDeadline(false);
+			task.setIsEvent(false);
+			task.setIsFloating(false);
+			return task;
+		} else if (task.getStartDate() != null) {
 			task.setIsEvent(true);
 			task.setIsDeadline(false);
 			task.setIsFloating(false);
@@ -543,11 +575,6 @@ public class GSDControl {
 			task.setIsFloating(false);
 			task.setIsRecurring(false);
 			return task;
-		} else if (task.getEndingDate() != null) {
-			task.setIsRecurring(true);
-			task.setIsDeadline(false);
-			task.setIsEvent(false);
-			task.setIsFloating(false);
 		}
 		task.setIsFloating(true);
 		task.setIsEvent(false);

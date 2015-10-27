@@ -48,11 +48,11 @@ public class Feedback {
 		return infoString;
 	}
 	
-	public String getHelpCommandString() {
-		return helpCommandString;
-	}
-	
 	public String getHelpSyntaxString() {
 		return helpSyntaxString;
+	}
+
+	public String getHelpCommandString() {
+		return helpCommandString;
 	}
 }

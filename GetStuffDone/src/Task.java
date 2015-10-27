@@ -70,8 +70,8 @@ public class Task {
 	public void setEndingDate(Date endingDate) {
 		this.endingDate = endingDate;
 	}
-	
-	public void setRecurringCount(int recurringCount)	{
+
+	public void setRecurringCount(int recurringCount) {
 		this.recurringCount = recurringCount;
 	}
 
@@ -116,8 +116,8 @@ public class Task {
 	public Date getEndingDate() {
 		return this.endingDate;
 	}
-	
-	public int getRecurringCount()	{
+
+	public int getRecurringCount() {
 		return this.recurringCount;
 	}
 
@@ -206,7 +206,7 @@ public class Task {
 	public String toString() {
 		DateFormat df = new SimpleDateFormat("hh:mma dd/MMM/yyyy ");
 
-		String start, end;
+		String start, end, ending;
 
 		if (startDate == null) {
 			start = "";
@@ -219,10 +219,16 @@ public class Task {
 		} else {
 			end = df.format(deadline);
 		}
+		if (endingDate == null) {
+			ending = "";
+		} else {
+			ending = df.format(endingDate);
+		}
 		if (!isRecurring) {
 			return (description + "\nStart Date: " + start + "\nDeadline: " + end + "\n");
+		} else {
+			return (description + "\nStart Date: " + start + "\nDeadline: " + end + "\n" + "Recurring " + recurring
+					+ "\nEnding Date: " + ending + "\n");
 		}
-		return (description + "\nStart Date: " + start + "\nDeadline: " + end + "\n" + "Recurring " + recurring
-				+ "\nEnding Date: " + endingDate);
 	}
 }
