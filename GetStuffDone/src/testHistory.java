@@ -11,12 +11,15 @@ public class testHistory {
 	History history = new History();
 	long sampleDate = 999;
 	long sampleDeadline = 9999;
+	long sampleEndingDate = 9999;
 	Date testDate = new Date(sampleDate);
 	Date testDeadline = new Date(sampleDeadline);
+	Date testEndingDate = new Date(sampleEndingDate);
+	String testRecurring = "DAILY";
 	String testDescription = "test";
 	int testID = 99;
 	CommandDetails.COMMANDS command = CommandDetails.COMMANDS.ADD;	
-	CommandDetails cmdDet = new CommandDetails(command, testDescription, testDate, testDeadline, testID);
+	CommandDetails cmdDet = new CommandDetails(command, testDescription, testDate, testDeadline, testID, testRecurring, testEndingDate);
 
 
 	@Test
@@ -43,8 +46,8 @@ public class testHistory {
 	@Test
 	public void testUndo() {
 		CommandDetails.COMMANDS commandUpdate = CommandDetails.COMMANDS.UPDATE;
-		CommandDetails cmdDetUpdateNew = new CommandDetails(commandUpdate, "new test", testDate, testDeadline, testID);
-		CommandDetails cmdDetUpdateOld = new CommandDetails(commandUpdate, testDescription, testDate, testDeadline, testID);
+		CommandDetails cmdDetUpdateNew = new CommandDetails(commandUpdate, "new test", testDate, testDeadline, testID, testRecurring, testEndingDate);
+		CommandDetails cmdDetUpdateOld = new CommandDetails(commandUpdate, testDescription, testDate, testDeadline, testID, testRecurring, testEndingDate);
 		//case 1: undoStack is empty
 		assertEquals(history.undo(), null);
 		
@@ -72,8 +75,8 @@ public class testHistory {
 	@Test
 	public void testRedo() {
 		CommandDetails.COMMANDS commandUpdate = CommandDetails.COMMANDS.UPDATE;
-		CommandDetails cmdDetUpdateNew = new CommandDetails(commandUpdate, "new test", testDate, testDeadline, testID);
-		CommandDetails cmdDetUpdateOld = new CommandDetails(commandUpdate, testDescription, testDate, testDeadline, testID);
+		CommandDetails cmdDetUpdateNew = new CommandDetails(commandUpdate, "new test", testDate, testDeadline, testID, testRecurring, testEndingDate);
+		CommandDetails cmdDetUpdateOld = new CommandDetails(commandUpdate, testDescription, testDate, testDeadline, testID, testRecurring, testEndingDate);
 		//case 1: redoStack is empty
 		assertEquals(history.redo(), null);
 		

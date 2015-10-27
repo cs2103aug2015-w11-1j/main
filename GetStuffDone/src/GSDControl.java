@@ -17,6 +17,7 @@ public class GSDControl {
 	private static final String DISPLAY_NO_FLOATING_TASKS = ">> No Floating Tasks";
 	private static final String DISPLAY_NO_EVENTS = ">> No Events";
 	private static final String DISPLAY_NO_DEADLINES = ">> No Deadlines";
+	private static final String DISPLAY_NO_RECURRING = ">> No Recurring Tasks";
 
 	private static final String FEEDBACK_WELCOME_MESSAGE = "WELCOME TO GSD!\n";
 	private static final String FEEDBACK_ADD = ">> ADDED ";
@@ -31,6 +32,7 @@ public class GSDControl {
 	private static final String FEEDBACK_FLOATING = ">> Floating Tasks displayed\n";
 	private static final String FEEDBACK_EVENTS = ">> Events displayed\n";
 	private static final String FEEDBACK_DEADLINES = ">> Deadlines displayed\n";
+	private static final String FEEDBACK_RECURRING = ">> Recurring Tasks displayed\n";	
 	private static final String FEEDBACK_HELP = ">> Called for help!\n";
 	private static final String FEEDBACK_SET = ">> File path set to ";
 	private static final String FEEDBACK_SET_ERROR = ">> ERROR : FILE PATH CAN'T BE SET";
@@ -50,7 +52,7 @@ public class GSDControl {
 	private History history = new History();
 	private boolean isValidTaskNo = true;
 
-	public Feedback processInput(String input) throws IndexOutOfBoundsException {
+	public Feedback processInput(String input) throws Exception {
 		Feedback feedback;
 		try {
 			this.commandDetails = parser.parse(input);
@@ -167,6 +169,8 @@ public class GSDControl {
 			return feedback = new Feedback(displayEvents(), FEEDBACK_EVENTS, generateInfoBox());
 		case DEADLINES:
 			return feedback = new Feedback(displayDeadlines(), FEEDBACK_DEADLINES, generateInfoBox());
+		case RECURRING:
+			return feedback = new Feedback(displayRecurring(), FEEDBACK_RECURRING, generateInfoBox());
 		case HELP:
 			return feedback = new Feedback(null, FEEDBACK_HELP, generateInfoBox(), helpCommands(), helpSyntax());
 		case EXIT:
@@ -237,7 +241,8 @@ public class GSDControl {
 		tasks.get(ID).updateDetails(commandDetails);
 		Task updatedTask = tasks.get(ID);
 		CommandDetails updatedDetails = new CommandDetails(CommandDetails.COMMANDS.UPDATE, updatedTask.getDescription(),
-				updatedTask.getStartDate(), updatedTask.getDeadline(), ID);
+				updatedTask.getStartDate(), updatedTask.getDeadline(), ID, updatedTask.getRecurring(),
+				updatedTask.getEndingDate());
 		history.insert(updatedDetails);
 		storage.save(tasks);
 		return displayAllTasks();
@@ -299,11 +304,13 @@ public class GSDControl {
 		switch (this.commandDetails.getCommand()) {
 		case DELETE:
 			CommandDetails deletedDetails = new CommandDetails(CommandDetails.COMMANDS.DELETE, task.getDescription(),
-					task.getStartDate(), task.getDeadline(), this.commandDetails.getID() - 1);
+					task.getStartDate(), task.getDeadline(), this.commandDetails.getID() - 1, task.getRecurring(),
+					task.getEndingDate());
 			return deletedDetails;
 		case UPDATE:
 			CommandDetails oldDetails = new CommandDetails(CommandDetails.COMMANDS.UPDATE, task.getDescription(),
-					task.getStartDate(), task.getDeadline(), this.commandDetails.getID() - 1);
+					task.getStartDate(), task.getDeadline(), this.commandDetails.getID() - 1, task.getRecurring(),
+					task.getEndingDate());
 			return oldDetails;
 		default:
 			return null;
@@ -368,8 +375,22 @@ public class GSDControl {
 		return deadlines;
 	}
 
+	private String displayRecurring() {
+		String recurring = "";
+
+		for (int i = 0; i < tasks.size(); i++) {
+			if (tasks.get(i).getIsRecurring()) {
+				recurring += i + 1 + ". " + tasks.get(i).toString();
+			}
+		}
+		if (recurring.isEmpty())	{
+			recurring = DISPLAY_NO_RECURRING;
+		}
+		return recurring;
+	}
+
 	private String generateInfoBox() {
-		int floating = 0, events = 0, deadlines = 0, totalTasks = tasks.size();
+		int floating = 0, events = 0, deadlines = 0, recurring = 0, totalTasks = tasks.size();
 
 		for (int i = 0; i < tasks.size(); i++) {
 			determineTaskType(tasks.get(i));
@@ -382,46 +403,28 @@ public class GSDControl {
 			if (tasks.get(i).getIsFloating()) {
 				floating++;
 			}
+			if (tasks.get(i).getIsRecurring()) {
+				recurring++;
+			}
 		}
 		return "Floating Tasks = " + floating + "\nEvents = " + events + "\nDeadlines = " + deadlines
-				+ "\nTotal No. of Tasks = " + totalTasks + "\n";
+				+ "Recurring Tasks = " + recurring + "\nTotal No. of Tasks = " + totalTasks + "\n";
 	}
 
 	private String helpCommands() {
-		return "Add a floating task\n"
-				+ "Add a deadline task\n"
-				+ "Add an event\n"
-				+ "Search for task\n"
-				+ "Update a task\n"
-				+ "Delete a task\n"
-				+ "Mark a task as complete\n"
-				+ "Mark a task as incomplete\n"
-				+ "Undo last action\n"
-				+ "Redo last action\n"
-				+ "Display all tasks\n"
-				+ "Display floating tasks\n"
-				+ "Display events\n"
-				+ "Display deadlines\n"
-				+ "Set file path\n"
+		return "Add a floating task\n" + "Add a deadline task\n" + "Add an event\n" + "Add a recurring task\n"
+				+ "Search for task\n" + "Update a task\n" + "Delete a task\n" + "Mark a task as complete\n"
+				+ "Mark a task as incomplete\n" + "Undo last action\n" + "Redo last action\n" + "Display all tasks\n"
+				+ "Display floating tasks\n" + "Display events\n" + "Display deadlines\n" + "Set file path\n"
 				+ "Exit GSD\n";
 	}
-	
+
 	private String helpSyntax() {
-		return "add <description>\n"
-				+ "add <description> BY <time> <date>\n"
+		return "add <description>\n" + "add <description> BY <time> <date>\n"
 				+ "add <description> FROM <start time> <start date> TO <end time> <end date>\n"
-				+ "search <keyword/day/date>\n"
-				+ "update <ID> <description> FROM <start time> <start date> TO <end time> <end date>\n"
-				+ "delete <ID>\n"
-				+ "complete <ID>\n"
-				+ "incomplete <ID>\n" 
-				+ "undo\n"
-				+ "redo\n"
-				+ "all\n"
-				+ "floating\n"
-				+ "events\n"
-				+ "deadlines\n"
-				+ "set <file path>\n"
+				+ "add [event/deadline] <end date> <recurrence> ENDING <ending date>\n" + "search <keyword/day/date>\n"
+				+ "update <ID> [floating/event/deadline]\n" + "delete <ID>\n" + "complete <ID>\n" + "incomplete <ID>\n"
+				+ "undo\n" + "redo\n" + "all\n" + "floating\n" + "events\n" + "deadlines\n" + "set <file path>\n"
 				+ "exit\n";
 	}
 
@@ -468,7 +471,8 @@ public class GSDControl {
 	private CommandDetails reverseDelete(int ID) {
 		CommandDetails taskDelete = new CommandDetails(CommandDetails.COMMANDS.ADD,
 				this.commandDetails.getDescription(), this.commandDetails.getStartDate(),
-				this.commandDetails.getDeadline(), this.commandDetails.getID());
+				this.commandDetails.getDeadline(), this.commandDetails.getID(), this.commandDetails.getRecurring(),
+				this.commandDetails.getEndingDate());
 		return taskDelete;
 	}
 
@@ -487,16 +491,24 @@ public class GSDControl {
 			task.setIsEvent(true);
 			task.setIsDeadline(false);
 			task.setIsFloating(false);
+			task.setIsRecurring(false);
 			return task;
 		} else if (task.getDeadline() != null) {
 			task.setIsDeadline(true);
 			task.setIsEvent(false);
 			task.setIsFloating(false);
+			task.setIsRecurring(false);
 			return task;
+		} else if (task.getEndingDate() != null) {
+			task.setIsRecurring(true);
+			task.setIsDeadline(false);
+			task.setIsEvent(false);
+			task.setIsFloating(false);
 		}
 		task.setIsFloating(true);
 		task.setIsEvent(false);
 		task.setIsDeadline(false);
+		task.setIsRecurring(false);
 		return task;
 	}
 

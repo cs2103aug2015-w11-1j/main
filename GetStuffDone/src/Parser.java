@@ -299,6 +299,10 @@ public class Parser {
 			System.out.println("DEADLINES command");
 			input.remove(0);
 			return CommandDetails.COMMANDS.DEADLINES;
+		case "RECURRING":
+			System.out.println("RECURRING command");
+			input.remove(0);
+			return CommandDetails.COMMANDS.RECURRING;
 		case "EXIT":
 			System.out.println("EXIT command");
 			input.remove(0);

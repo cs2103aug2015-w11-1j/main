@@ -14,11 +14,13 @@ public class Task {
 	private String description;
 	private Date startDate;
 	private Date deadline;
+	private String recurring;
+	private Date endingDate;
 	private boolean isComplete;
 	private boolean isEvent;
 	private boolean isDeadline;
 	private boolean isFloating;
-	// private boolean isRecurring;
+	private boolean isRecurring;
 
 	// Constructors
 
@@ -27,16 +29,21 @@ public class Task {
 		description = null;
 		startDate = null;
 		deadline = null;
+		recurring = null;
+		endingDate = null;
 		isComplete = false;
 		isEvent = false;
 		isDeadline = false;
 		isFloating = false;
+		isRecurring = false;
 	}
 
 	public Task(CommandDetails details) {
 		this.description = details.getDescription();
 		this.startDate = details.getStartDate();
 		this.deadline = details.getDeadline();
+		this.recurring = details.getRecurring();
+		this.endingDate = details.getEndingDate();
 		this.isComplete = false;
 	}
 
@@ -52,6 +59,14 @@ public class Task {
 
 	public void setDeadline(Date deadline) {
 		this.deadline = deadline;
+	}
+
+	public void setRecurring(String recurring) {
+		this.recurring = recurring;
+	}
+
+	public void setEndingDate(Date endingDate) {
+		this.endingDate = endingDate;
 	}
 
 	public void setIsComplete(boolean isComplete) {
@@ -70,6 +85,10 @@ public class Task {
 		this.isFloating = isFloating;
 	}
 
+	public void setIsRecurring(boolean isRecurring) {
+		this.isRecurring = isRecurring;
+	}
+
 	// Accessors
 
 	public String getDescription() {
@@ -82,6 +101,14 @@ public class Task {
 
 	public Date getDeadline() {
 		return this.deadline;
+	}
+
+	public String getRecurring() {
+		return this.recurring;
+	}
+
+	public Date getEndingDate() {
+		return this.endingDate;
 	}
 
 	public boolean getIsComplete() {
@@ -100,6 +127,10 @@ public class Task {
 		return this.isFloating;
 	}
 
+	public boolean getIsRecurring() {
+		return this.isRecurring;
+	}
+
 	// Behavioural methods
 
 	public void updateDetails(CommandDetails details) {
@@ -107,6 +138,8 @@ public class Task {
 		this.description = details.getDescription();
 		this.startDate = details.getStartDate();
 		this.deadline = details.getDeadline();
+		this.recurring = details.getRecurring();
+		this.endingDate = details.getEndingDate();
 
 	}
 
@@ -176,6 +209,10 @@ public class Task {
 		} else {
 			end = df.format(deadline);
 		}
-		return (description + "\nStart Date: " + start + "\nDeadline: " + end + "\n");
+		if (!isRecurring) {
+			return (description + "\nStart Date: " + start + "\nDeadline: " + end + "\n");
+		}
+		return (description + "\nStart Date: " + start + "\nDeadline: " + end + "\n" + "Recurring " + recurring
+				+ "\nEnding Date: " + endingDate);
 	}
 }

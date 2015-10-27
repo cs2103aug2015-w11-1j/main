@@ -10,10 +10,11 @@ public class CommandDetails {
 	private Date endingDate;
 
 	public enum COMMANDS {
-		ADD, DELETE, SEARCH, UPDATE, COMPLETE, INCOMPLETE, UNDO, REDO, HELP, ALL, FLOATING, EVENTS, DEADLINES, EXIT, INVALID, SET,
+		ADD, DELETE, SEARCH, UPDATE, COMPLETE, INCOMPLETE, UNDO, REDO, HELP, ALL, FLOATING, EVENTS, DEADLINES, RECURRING, EXIT, INVALID, SET,
 	}
 
 	// constructor
+	
 	public CommandDetails(COMMANDS command, String description, Date startDate, Date deadline, int ID, String recurring, Date endingDate) {
 		this.deadline = deadline;
 		this.startDate = startDate;
