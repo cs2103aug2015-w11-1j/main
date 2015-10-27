@@ -16,7 +16,6 @@ public class Task {
 	private Date deadline;
 	private String recurring;
 	private Date endingDate;
-	private int recurringCount;
 	private boolean isComplete;
 	private boolean isEvent;
 	private boolean isDeadline;
@@ -32,7 +31,6 @@ public class Task {
 		deadline = null;
 		recurring = null;
 		endingDate = null;
-		recurringCount = 0;
 		isComplete = false;
 		isEvent = false;
 		isDeadline = false;
@@ -71,29 +69,10 @@ public class Task {
 		this.endingDate = endingDate;
 	}
 
-	public void setRecurringCount(int recurringCount) {
-		this.recurringCount = recurringCount;
-	}
-
 	public void setIsComplete(boolean isComplete) {
 		this.isComplete = isComplete;
 	}
 
-	public void setIsEvent(boolean isEvent) {
-		this.isEvent = isEvent;
-	}
-
-	public void setIsDeadline(boolean isDeadline) {
-		this.isDeadline = isDeadline;
-	}
-
-	public void setIsFloating(boolean isFloating) {
-		this.isFloating = isFloating;
-	}
-
-	public void setIsRecurring(boolean isRecurring) {
-		this.isRecurring = isRecurring;
-	}
 
 	// Accessors
 
@@ -117,28 +96,24 @@ public class Task {
 		return this.endingDate;
 	}
 
-	public int getRecurringCount() {
-		return this.recurringCount;
-	}
-
-	public boolean getIsComplete() {
+	public boolean isComplete() {
 		return this.isComplete;
 	}
 
-	public boolean getIsEvent() {
-		return this.isEvent;
+	public boolean isEvent() {
+		return (startDate != null && deadline != null);
 	}
 
-	public boolean getIsDeadline() {
-		return this.isDeadline;
+	public boolean isDeadline() {
+		return (startDate == null && deadline != null);
 	}
 
-	public boolean getIsFloating() {
-		return this.isFloating;
+	public boolean isFloating() {
+		return (startDate == null && deadline == null);
 	}
 
-	public boolean getIsRecurring() {
-		return this.isRecurring;
+	public boolean isRecurring() {
+		return (recurring != null && endingDate != null);
 	}
 
 	// Behavioural methods

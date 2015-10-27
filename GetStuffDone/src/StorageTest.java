@@ -141,7 +141,7 @@ public class StorageTest {
 		assertTrue(isSame(task1.getDeadline(), task2.getDeadline()));
 		assertTrue(isSame(task1.getEndingDate(), task2.getEndingDate()));
 		assertTrue(isSame(task1.getRecurring(), task2.getRecurring()));
-		assertEquals(task1.getIsComplete(), task2.getIsComplete());
+		assertEquals(task1.isComplete(), task2.isComplete());
 	}
 
 	private static boolean isSame(String string1, String string2) {

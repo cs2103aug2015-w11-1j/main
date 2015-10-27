@@ -42,6 +42,7 @@ public class GSDControl {
 	private static final String FEEDBACK_INVALID_TASK_NUMBER = ">> ERROR : INVALID TASK NUMBER\n";
 	private static final String FEEDBACK_UNDO_ERROR = ">> ERROR : NOTHING TO UNDO\n";
 	private static final String FEEDBACK_REDO_ERROR = ">> ERROR: NOTHING TO REDO\n";
+	private static final String FEEDBACK_LOAD_ERROR = ">> ERROR: FAILED TO LOAD FROM FILE\n";
 	private static final String FEEDBACK_INVALID_DATE_FORMAT = ">> ERROR : INVALID DATE/TIME FORMAT\n";
 	private static final String FEEDBACK_INVALID_TIME_DATE_INPUT = ">> ERROR : INVALID DATE/TIME INPUT\n";
 
@@ -53,19 +54,18 @@ public class GSDControl {
 	private boolean isValidTaskNo = true;
 
 	public Feedback processInput(String input) {
-		Feedback feedback;
 		try {
 			this.commandDetails = parser.parse(input);
 		} catch (ParseException e) { // Invalid Date Format
-			return feedback = new Feedback(null, FEEDBACK_INVALID_DATE_FORMAT, generateInfoBox());
+			return new Feedback(null, FEEDBACK_INVALID_DATE_FORMAT, generateInfoBox());
 		} catch (NumberFormatException f) {
-			return feedback = new Feedback(null, FEEDBACK_INVALID_TASK_NUMBER, generateInfoBox());
+			return new Feedback(null, FEEDBACK_INVALID_TASK_NUMBER, generateInfoBox());
 		} catch (invalidTimeDateInput g) { // Not in the form [Time] [Date]
-			return feedback = new Feedback(null, FEEDBACK_INVALID_TIME_DATE_INPUT, generateInfoBox());
+			return new Feedback(null, FEEDBACK_INVALID_TIME_DATE_INPUT, generateInfoBox());
 		} catch (invalidCommand h) {
-			return feedback = new Feedback(null, FEEDBACK_INVALID_COMMAND, generateInfoBox());
+			return new Feedback(null, FEEDBACK_INVALID_COMMAND, generateInfoBox());
 		} catch (invalidParameters i) {
-			return feedback = new Feedback(null, FEEDBACK_INVALID_COMMAND_FORMAT, generateInfoBox());
+			return new Feedback(null, FEEDBACK_INVALID_COMMAND_FORMAT, generateInfoBox());
 			// Invalid parameters
 			// eg delete 1 screw this up
 			// eg All banananaanananananaa
@@ -74,14 +74,14 @@ public class GSDControl {
 		case ADD:
 			this.commandDetails.setID(tasks.size());
 			history.insert(this.commandDetails);
-			return feedback = new Feedback(createTask(), FEEDBACK_ADD + commandDetails.getDescription() + "\n",
+			return new Feedback(createTask(), FEEDBACK_ADD + commandDetails.getDescription() + "\n",
 					generateInfoBox());
 		case DELETE:
 			try {
 				CommandDetails deletedDetails = generateDetails();
 				history.insert(deletedDetails);
 				String taskDescription = tasks.get(commandDetails.getID() - 1).getDescription();
-				return feedback = new Feedback(deleteTask(commandDetails.getID() - 1),
+				return new Feedback(deleteTask(commandDetails.getID() - 1),
 						FEEDBACK_DELETE + taskDescription + "\n", generateInfoBox());
 			} catch (IndexOutOfBoundsException e) {
 				isValidTaskNo = false;
@@ -89,7 +89,7 @@ public class GSDControl {
 			} finally {
 				if (!isValidTaskNo) {
 					isValidTaskNo = true;
-					return feedback = new Feedback(displayAllTasks(), FEEDBACK_INVALID_TASK_NUMBER, generateInfoBox());
+					return new Feedback(displayAllTasks(), FEEDBACK_INVALID_TASK_NUMBER, generateInfoBox());
 				}
 			}
 		case SEARCH:
@@ -98,16 +98,16 @@ public class GSDControl {
 			for (int i = 1; i < temp.length; i++) {
 				feedbackString += temp[i] + " ";
 			}
-			return feedback = new Feedback(searchTask(), FEEDBACK_SEARCH + feedbackString + "\n", generateInfoBox());
+			return new Feedback(searchTask(), FEEDBACK_SEARCH + feedbackString + "\n", generateInfoBox());
 		case UPDATE:
 			try {
 				CommandDetails oldDetails = generateDetails();
 				history.insert(oldDetails);
 				if (this.commandDetails.getDescription() == null) {
-					return feedback = new Feedback(updateTask(commandDetails.getID() - 1),
+					return new Feedback(updateTask(commandDetails.getID() - 1),
 							FEEDBACK_UPDATE + oldDetails.getDescription() + "\n", generateInfoBox());
 				}
-				return feedback = new Feedback(updateTask(commandDetails.getID() - 1), FEEDBACK_UPDATE
+				return new Feedback(updateTask(commandDetails.getID() - 1), FEEDBACK_UPDATE
 						+ oldDetails.getDescription() + " to " + this.commandDetails.getDescription() + "\n",
 						generateInfoBox());
 			} catch (IndexOutOfBoundsException e) {
@@ -116,13 +116,13 @@ public class GSDControl {
 			} finally {
 				if (!isValidTaskNo) {
 					isValidTaskNo = true;
-					return feedback = new Feedback(displayAllTasks(), FEEDBACK_INVALID_TASK_NUMBER, generateInfoBox());
+					return new Feedback(displayAllTasks(), FEEDBACK_INVALID_TASK_NUMBER, generateInfoBox());
 				}
 			}
 		case COMPLETE:
 			try {
 				history.insert(this.commandDetails);
-				return feedback = new Feedback(completeTask(commandDetails.getID() - 1),
+				return new Feedback(completeTask(commandDetails.getID() - 1),
 						FEEDBACK_COMPLETE + tasks.get(this.commandDetails.getID() - 1).getDescription() + "\n",
 						generateInfoBox());
 			} catch (IndexOutOfBoundsException e) {
@@ -131,13 +131,13 @@ public class GSDControl {
 			} finally {
 				if (!isValidTaskNo) {
 					isValidTaskNo = true;
-					return feedback = new Feedback(displayAllTasks(), FEEDBACK_INVALID_TASK_NUMBER, generateInfoBox());
+					return new Feedback(displayAllTasks(), FEEDBACK_INVALID_TASK_NUMBER, generateInfoBox());
 				}
 			}
 		case INCOMPLETE:
 			try {
 				history.insert(this.commandDetails);
-				return feedback = new Feedback(incompleteTask(commandDetails.getID() - 1),
+				return new Feedback(incompleteTask(commandDetails.getID() - 1),
 						FEEDBACK_INCOMPLETE + tasks.get(this.commandDetails.getID() - 1).getDescription() + "\n",
 						generateInfoBox());
 			} catch (IndexOutOfBoundsException e) {
@@ -146,49 +146,49 @@ public class GSDControl {
 			} finally {
 				if (!isValidTaskNo) {
 					isValidTaskNo = true;
-					return feedback = new Feedback(displayAllTasks(), FEEDBACK_INVALID_TASK_NUMBER, generateInfoBox());
+					return new Feedback(displayAllTasks(), FEEDBACK_INVALID_TASK_NUMBER, generateInfoBox());
 				}
 			}
 		case REDO:
 			this.commandDetails = history.redo();
 			if (this.commandDetails == null) {
-				return feedback = new Feedback(displayAllTasks(), FEEDBACK_REDO_ERROR, generateInfoBox());
+				return new Feedback(displayAllTasks(), FEEDBACK_REDO_ERROR, generateInfoBox());
 			}
-			return feedback = new Feedback(redoLastAction(), FEEDBACK_REDO, generateInfoBox());
+			return new Feedback(redoLastAction(), FEEDBACK_REDO, generateInfoBox());
 		case UNDO:
 			this.commandDetails = history.undo();
 			if (this.commandDetails == null) {
-				return feedback = new Feedback(displayAllTasks(), FEEDBACK_UNDO_ERROR, generateInfoBox());
+				return new Feedback(displayAllTasks(), FEEDBACK_UNDO_ERROR, generateInfoBox());
 			}
-			return feedback = new Feedback(undoLastAction(), FEEDBACK_UNDO, generateInfoBox());
+			return new Feedback(undoLastAction(), FEEDBACK_UNDO, generateInfoBox());
 		case ALL:
-			return feedback = new Feedback(displayAllTasks(), FEEDBACK_ALL, generateInfoBox());
+			return new Feedback(displayAllTasks(), FEEDBACK_ALL, generateInfoBox());
 		case FLOATING:
-			return feedback = new Feedback(displayFloatingTasks(), FEEDBACK_FLOATING, generateInfoBox());
+			return new Feedback(displayFloatingTasks(), FEEDBACK_FLOATING, generateInfoBox());
 		case EVENTS:
-			return feedback = new Feedback(displayEvents(), FEEDBACK_EVENTS, generateInfoBox());
+			return new Feedback(displayEvents(), FEEDBACK_EVENTS, generateInfoBox());
 		case DEADLINES:
-			return feedback = new Feedback(displayDeadlines(), FEEDBACK_DEADLINES, generateInfoBox());
+			return new Feedback(displayDeadlines(), FEEDBACK_DEADLINES, generateInfoBox());
 		case RECURRING:
-			return feedback = new Feedback(displayRecurring(), FEEDBACK_RECURRING, generateInfoBox());
+			return new Feedback(displayRecurring(), FEEDBACK_RECURRING, generateInfoBox());
 		case HELP:
-			return feedback = new Feedback(null, FEEDBACK_HELP, generateInfoBox(), helpCommands(), helpSyntax());
+			return new Feedback(null, FEEDBACK_HELP, generateInfoBox(), helpCommands(), helpSyntax());
 		case EXIT:
 			System.exit(0);
 		case SET:
 			try {
 				boolean isValidFilePath = setFilePath();
 				if (isValidFilePath) {
-					return feedback = new Feedback(null, FEEDBACK_SET + this.commandDetails.getDescription() + "\n",
+					return new Feedback(null, FEEDBACK_SET + this.commandDetails.getDescription() + "\n",
 							generateInfoBox());
 				} else {
-					return feedback = new Feedback(null, FEEDBACK_SET_ERROR, generateInfoBox());
+					return new Feedback(null, FEEDBACK_SET_ERROR, generateInfoBox());
 				}
 			} catch (InvalidPathException q) {
-				return feedback = new Feedback(null, FEEDBACK_INVALID_FILE_PATH, generateInfoBox());
+				return new Feedback(null, FEEDBACK_INVALID_FILE_PATH, generateInfoBox());
 			}
 		default:
-			return feedback = new Feedback(displayAllTasks(), FEEDBACK_INVALID_COMMAND, generateInfoBox());
+			return new Feedback(displayAllTasks(), FEEDBACK_INVALID_COMMAND, generateInfoBox());
 
 		}
 	}
@@ -196,21 +196,20 @@ public class GSDControl {
 	// Constructor
 
 	public GSDControl() {
-
-		try {
-			tasks = storage.load();
-		} catch (IOException e) {
-			e.printStackTrace();
-		} catch (ParseException f) {
-			f.printStackTrace();
-		}
 	}
 
 	// For UI
-
+	
 	public Feedback loadFromFile() {
-		Feedback feedback;
-		return feedback = new Feedback(displayAllTasks(), FEEDBACK_WELCOME_MESSAGE, generateInfoBox());
+		try {
+			tasks = storage.load();
+		} catch (IOException e) {
+			return new Feedback(displayAllTasks(), FEEDBACK_LOAD_ERROR, generateInfoBox());
+		} catch (ParseException f) {
+			return new Feedback(displayAllTasks(), FEEDBACK_LOAD_ERROR, generateInfoBox());
+		}
+		
+		return new Feedback(displayAllTasks(), FEEDBACK_WELCOME_MESSAGE, generateInfoBox());
 	}
 
 	// Behavioural Methods
@@ -218,7 +217,6 @@ public class GSDControl {
 	private String createTask() {
 		Task task = new Task(this.commandDetails);
 		tasks.add(task);
-		determineTaskType(task);
 		storage.save(tasks);
 		return displayAllTasks();
 	}
@@ -240,7 +238,6 @@ public class GSDControl {
 
 	private String updateTask(int ID) {
 		tasks.get(ID).updateDetails(commandDetails);
-		determineTaskType(tasks.get(ID));
 		Task updatedTask = tasks.get(ID);
 		CommandDetails updatedDetails = new CommandDetails(CommandDetails.COMMANDS.UPDATE, updatedTask.getDescription(),
 				updatedTask.getStartDate(), updatedTask.getDeadline(), ID, updatedTask.getRecurring(),
@@ -285,11 +282,11 @@ public class GSDControl {
 		Calendar endingDateCal = Calendar.getInstance();
 
 		for (int i = 0; i < tasks.size(); i++) {
-			if (tasks.get(i).getIsRecurring()) {
+			if (tasks.get(i).isRecurring()) {
 				endingDateCal.setTime(tasks.get(i).getEndingDate());
 				startDateCal.setTime(tasks.get(i).getStartDate());
 				deadlineCal.setTime(tasks.get(i).getDeadline());
-				if (currentDateCal.after(deadlineCal) || tasks.get(i).getIsComplete()) {
+				if (currentDateCal.after(deadlineCal) || tasks.get(i).isComplete()) {
 					System.out.println("PAST DEADLINE\n");
 					{
 						if (currentDateCal.before(endingDateCal)) {
@@ -325,11 +322,6 @@ public class GSDControl {
 						} else {
 							// if recurring task expired
 							System.out.println("EXPIRED\n");
-							tasks.get(i).setRecurringCount(0); // reset the
-																// recurringcount
-																// (still dunno
-																// wat this is
-																// for)
 						}
 					}
 				}
@@ -346,7 +338,6 @@ public class GSDControl {
 	private String undoRedoCreateTask() {
 		Task task = new Task(this.commandDetails);
 		tasks.add(this.commandDetails.getID(), task);
-		determineTaskType(tasks.get(commandDetails.getID()));
 		storage.save(tasks);
 		return displayAllTasks();
 	}
@@ -359,7 +350,6 @@ public class GSDControl {
 
 	private String undoRedoUpdateTask(int ID) {
 		tasks.get(ID).updateDetails(commandDetails);
-		determineTaskType(tasks.get(ID));
 		storage.save(tasks);
 		return displayAllTasks();
 	}
@@ -401,7 +391,7 @@ public class GSDControl {
 		String floating = "";
 
 		for (int i = 0; i < tasks.size(); i++) {
-			if (tasks.get(i).getIsFloating()) {
+			if (tasks.get(i).isFloating()) {
 				floating += i + 1 + ". " + tasks.get(i).toString();
 			}
 		}
@@ -417,7 +407,7 @@ public class GSDControl {
 		String events = "";
 
 		for (int i = 0; i < tasks.size(); i++) {
-			if (tasks.get(i).getIsEvent()) {
+			if (tasks.get(i).isEvent()) {
 				events += i + 1 + ". " + tasks.get(i).toString();
 			}
 		}
@@ -433,7 +423,7 @@ public class GSDControl {
 		String deadlines = "";
 
 		for (int i = 0; i < tasks.size(); i++) {
-			if (tasks.get(i).getIsDeadline()) {
+			if (tasks.get(i).isDeadline()) {
 				deadlines += i + 1 + ". " + tasks.get(i).toString();
 			}
 		}
@@ -449,7 +439,7 @@ public class GSDControl {
 		String recurring = "";
 
 		for (int i = 0; i < tasks.size(); i++) {
-			if (tasks.get(i).getIsRecurring()) {
+			if (tasks.get(i).isRecurring()) {
 				recurring += i + 1 + ". " + tasks.get(i).toString();
 			}
 		}
@@ -463,17 +453,16 @@ public class GSDControl {
 		int floating = 0, events = 0, deadlines = 0, recurring = 0, totalTasks = tasks.size();
 
 		for (int i = 0; i < tasks.size(); i++) {
-			determineTaskType(tasks.get(i));
-			if (tasks.get(i).getIsDeadline()) {
+			if (tasks.get(i).isDeadline()) {
 				deadlines++;
 			}
-			if (tasks.get(i).getIsEvent()) {
+			if (tasks.get(i).isEvent()) {
 				events++;
 			}
-			if (tasks.get(i).getIsFloating()) {
+			if (tasks.get(i).isFloating()) {
 				floating++;
 			}
-			if (tasks.get(i).getIsRecurring()) {
+			if (tasks.get(i).isRecurring()) {
 				recurring++;
 			}
 		}
@@ -554,33 +543,6 @@ public class GSDControl {
 	private CommandDetails reverseIncomplete(int ID) {
 		CommandDetails incompleteToComplete = new CommandDetails(CommandDetails.COMMANDS.COMPLETE, tasks.size());
 		return incompleteToComplete;
-	}
-
-	private Task determineTaskType(Task task) {
-		if (task.getEndingDate() != null) {
-			task.setIsRecurring(true);
-			task.setIsDeadline(false);
-			task.setIsEvent(false);
-			task.setIsFloating(false);
-			return task;
-		} else if (task.getStartDate() != null) {
-			task.setIsEvent(true);
-			task.setIsDeadline(false);
-			task.setIsFloating(false);
-			task.setIsRecurring(false);
-			return task;
-		} else if (task.getDeadline() != null) {
-			task.setIsDeadline(true);
-			task.setIsEvent(false);
-			task.setIsFloating(false);
-			task.setIsRecurring(false);
-			return task;
-		}
-		task.setIsFloating(true);
-		task.setIsEvent(false);
-		task.setIsDeadline(false);
-		task.setIsRecurring(false);
-		return task;
 	}
 
 }

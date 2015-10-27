@@ -63,7 +63,7 @@ public class Storage {
 
 			for (Task task : tasks) {
 				writeString(writer, task.getDescription());
-				writeStatus(writer, task.getIsComplete());
+				writeStatus(writer, task.isComplete());
 				writeDate(writer, task.getStartDate());
 				writeDate(writer, task.getDeadline());
 				writeDate(writer, task.getEndingDate());
