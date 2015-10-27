@@ -168,7 +168,7 @@ public class GSDControl {
 		case DEADLINES:
 			return feedback = new Feedback(displayDeadlines(), FEEDBACK_DEADLINES, generateInfoBox());
 		case HELP:
-			return feedback = new Feedback(help(), FEEDBACK_HELP, generateInfoBox());
+			return feedback = new Feedback(null, FEEDBACK_HELP, generateInfoBox(), helpCommands(), helpSyntax());
 		case EXIT:
 			System.exit(0);
 		case SET:
@@ -387,16 +387,42 @@ public class GSDControl {
 				+ "\nTotal No. of Tasks = " + totalTasks + "\n";
 	}
 
-	private String help() {
-		return "Add a floating task - add <description> \n"
-				+ "Add a deadline task - add <description> BY <time> <date>\n"
-				+ "Add an event - add <description> FROM <start time> <start date> TO <end time> <end date>\n"
-				+ "Search for task - search <keyword/day/date>\n"
-				+ "Update a task - update <ID> <description> FROM <start time> <start date> TO <end time> <end date>\n"
-				+ "Delete a task - delete <ID>\n" + "Mark a task as complete - complete <ID>\n"
-				+ "Mark a task as incomplete - incomplete <ID>\n" + "Undo last action - undo\n"
-				+ "Display all tasks - all\n" + "Display floating tasks - floating\n" + "Display events - events\n"
-				+ "Display deadlines - deadlines\n" + "Set file path - set <file path>\n" + "Exit GSD - exit\n";
+	private String helpCommands() {
+		return "Add a floating task\n"
+				+ "Add a deadline task\n"
+				+ "Add an event\n"
+				+ "Search for task\n"
+				+ "Update a task\n"
+				+ "Delete a task\n"
+				+ "Mark a task as complete\n"
+				+ "Mark a task as incomplete\n"
+				+ "Undo last action\n"
+				+ "Redo last action\n"
+				+ "Display all tasks\n"
+				+ "Display floating tasks\n"
+				+ "Display events\n"
+				+ "Display deadlines\n"
+				+ "Set file path\n"
+				+ "Exit GSD\n";
+	}
+	
+	private String helpSyntax() {
+		return "add <description>\n"
+				+ "add <description> BY <time> <date>\n"
+				+ "add <description> FROM <start time> <start date> TO <end time> <end date>\n"
+				+ "search <keyword/day/date>\n"
+				+ "update <ID> <description> FROM <start time> <start date> TO <end time> <end date>\n"
+				+ "delete <ID>\n"
+				+ "complete <ID>\n"
+				+ "incomplete <ID>\n" 
+				+ "undo\n"
+				+ "redo\n"
+				+ "all\n"
+				+ "floating\n"
+				+ "events\n"
+				+ "deadlines\n"
+				+ "set <file path>\n"
+				+ "exit\n";
 	}
 
 	private String executeHistoryCommand() {
