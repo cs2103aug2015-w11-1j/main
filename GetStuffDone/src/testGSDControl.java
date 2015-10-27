@@ -70,14 +70,14 @@ public class testGSDControl {
 	GSDControl gsd = new GSDControl();
 
 	@Before
-	public void setUp() throws Exception {
+	public void setUp() {
 		input = "set " + PATH_CURRENT + FILENAME;
 		gsd.processInput(input);
 
 	}
 
 	@Test
-	public void testCreateTask() throws Exception {
+	public void testCreateTask() {
 		input = "add TASK";
 		check = new Feedback(DEFAULT_TASK, FEEDBACK_ADD + "TASK\n", INFO_BOX);
 		feedback = gsd.processInput(input);
@@ -87,7 +87,7 @@ public class testGSDControl {
 	}
 
 	@Test
-	public void testSearchTask() throws Exception {
+	public void testSearchTask() {
 		input = "add TASK";
 		gsd.processInput(input);
 		input = "search TASK";
@@ -99,7 +99,7 @@ public class testGSDControl {
 	}
 
 	@Test
-	public void testSearchNothing() throws Exception {
+	public void testSearchNothing() {
 		input = "search TASK";
 		check = new Feedback(DISPLAY_TASK_NOT_FOUND, FEEDBACK_SEARCH + "TASK\n", INFO_BOX);
 		feedback = gsd.processInput(input);
@@ -109,7 +109,7 @@ public class testGSDControl {
 	}
 
 	@Test
-	public void testUpdateTask() throws Exception {
+	public void testUpdateTask() {
 		input = "add TASK";
 		gsd.processInput(input);
 		input = "update 1 NOTHING";
@@ -121,7 +121,7 @@ public class testGSDControl {
 	}
 
 	@Test
-	public void testUpdateNothing() throws Exception {
+	public void testUpdateNothing() {
 		input = "update 1 NOTHING";
 		gsd.processInput(input);
 		input = "search TASK";
@@ -133,7 +133,7 @@ public class testGSDControl {
 	}
 
 	@Test
-	public void testDeleteTask() throws Exception {
+	public void testDeleteTask() {
 		input = "add TASK";
 		gsd.processInput(input);
 		input = "delete 1";
@@ -145,7 +145,7 @@ public class testGSDControl {
 	}
 
 	@Test
-	public void testDeleteNothing() throws Exception {
+	public void testDeleteNothing() {
 		input = "delete 1";
 		check = new Feedback(DISPLAY_NO_TASKS, FEEDBACK_INVALID_TASK_NUMBER, INFO_BOX);
 		feedback = gsd.processInput(input);
@@ -155,7 +155,7 @@ public class testGSDControl {
 	}
 
 	@Test
-	public void testComplete() throws Exception {
+	public void testComplete() {
 		input = "add TASK";
 		gsd.processInput(input);
 		input = "complete 1";
@@ -167,7 +167,7 @@ public class testGSDControl {
 	}
 
 	@Test
-	public void testCompleteNothing() throws Exception {
+	public void testCompleteNothing() {
 		input = "complete 1";
 		check = new Feedback(DISPLAY_NO_TASKS, FEEDBACK_INVALID_TASK_NUMBER, INFO_BOX);
 		feedback = gsd.processInput(input);
@@ -177,7 +177,7 @@ public class testGSDControl {
 	}
 
 	@Test
-	public void testIncomplete() throws Exception {
+	public void testIncomplete() {
 		input = "add TASK";
 		gsd.processInput(input);
 		input = "incomplete 1";
@@ -189,7 +189,7 @@ public class testGSDControl {
 	}
 
 	@Test
-	public void testIncompleteNothing() throws Exception {
+	public void testIncompleteNothing() {
 		input = "incomplete 1";
 		check = new Feedback(DISPLAY_NO_TASKS, FEEDBACK_INVALID_TASK_NUMBER, INFO_BOX);
 		feedback = gsd.processInput(input);
@@ -199,7 +199,7 @@ public class testGSDControl {
 	}
 
 	@Test
-	public void testUndo() throws Exception {
+	public void testUndo() {
 		input = "add TASK";
 		gsd.processInput(input);
 		input = "undo";
@@ -211,7 +211,7 @@ public class testGSDControl {
 	}
 
 	@Test
-	public void testUndoNothing() throws Exception {
+	public void testUndoNothing() {
 		input = "undo";
 		check = new Feedback(DISPLAY_NO_TASKS, FEEDBACK_UNDO_ERROR, INFO_BOX);
 		feedback = gsd.processInput(input);
@@ -221,7 +221,7 @@ public class testGSDControl {
 	}
 
 	@Test
-	public void testRedo() throws Exception {
+	public void testRedo() {
 		input = "add TASK";
 		gsd.processInput(input);
 		input = "undo";
@@ -235,7 +235,7 @@ public class testGSDControl {
 	}
 
 	@Test
-	public void testRedoNothing() throws Exception {
+	public void testRedoNothing() {
 		input = "redo";
 		check = new Feedback(DISPLAY_NO_TASKS, FEEDBACK_REDO_ERROR, INFO_BOX);
 		feedback = gsd.processInput(input);
@@ -245,7 +245,7 @@ public class testGSDControl {
 	}
 
 	@Test
-	public void testAll() throws Exception {
+	public void testAll() {
 		input = "add TASK";
 		gsd.processInput(input);
 		input = "all";
@@ -255,9 +255,9 @@ public class testGSDControl {
 		assertEquals(feedback.getFeedbackString(), check.getFeedbackString());
 		assertEquals(feedback.getInfoString(), check.getInfoString());
 	}
-	
+
 	@Test
-	public void testNoAll() throws Exception {
+	public void testNoAll() {
 		input = "all";
 		check = new Feedback(DISPLAY_NO_TASKS, FEEDBACK_ALL, INFO_BOX);
 		feedback = gsd.processInput(input);
@@ -265,9 +265,9 @@ public class testGSDControl {
 		assertEquals(feedback.getFeedbackString(), check.getFeedbackString());
 		assertNotEquals(feedback.getInfoString(), check.getInfoString());
 	}
-	
+
 	@Test
-	public void testNoFloating() throws Exception {
+	public void testNoFloating() {
 		input = "floating";
 		check = new Feedback(DISPLAY_NO_FLOATING_TASKS, FEEDBACK_FLOATING, INFO_BOX);
 		feedback = gsd.processInput(input);
@@ -275,9 +275,9 @@ public class testGSDControl {
 		assertEquals(feedback.getFeedbackString(), check.getFeedbackString());
 		assertNotEquals(feedback.getInfoString(), check.getInfoString());
 	}
-	
+
 	@Test
-	public void testFloating() throws Exception {
+	public void testFloating() {
 		input = "add TASK";
 		gsd.processInput(input);
 		input = "floating";
@@ -289,7 +289,7 @@ public class testGSDControl {
 	}
 
 	@Test
-	public void testNoEvents() throws Exception {
+	public void testNoEvents() {
 		input = "events";
 		check = new Feedback(DISPLAY_NO_EVENTS, FEEDBACK_EVENTS, INFO_BOX);
 		feedback = gsd.processInput(input);
@@ -297,9 +297,9 @@ public class testGSDControl {
 		assertEquals(feedback.getFeedbackString(), check.getFeedbackString());
 		assertNotEquals(feedback.getInfoString(), check.getInfoString());
 	}
-	
+
 	@Test
-	public void testEvents() throws Exception {
+	public void testEvents() {
 		input = "add TASK FROM today TO tomorrow";
 		gsd.processInput(input);
 		input = "events";
@@ -309,9 +309,9 @@ public class testGSDControl {
 		assertEquals(feedback.getFeedbackString(), check.getFeedbackString());
 		assertEquals(feedback.getInfoString(), check.getInfoString());
 	}
-	
+
 	@Test
-	public void testDeadlines() throws Exception {
+	public void testDeadlines() {
 		input = "add TASK BY tomorrow";
 		gsd.processInput(input);
 		input = "deadlines";
@@ -321,9 +321,9 @@ public class testGSDControl {
 		assertEquals(feedback.getFeedbackString(), check.getFeedbackString());
 		assertEquals(feedback.getInfoString(), check.getInfoString());
 	}
-	
+
 	@Test
-	public void testNoDeadlines() throws Exception {
+	public void testNoDeadlines() {
 		input = "deadlines";
 		check = new Feedback(DISPLAY_NO_DEADLINES, FEEDBACK_DEADLINES, INFO_BOX);
 		feedback = gsd.processInput(input);
@@ -333,7 +333,7 @@ public class testGSDControl {
 	}
 
 	@Test
-	public void testHelp() throws Exception {
+	public void testHelp() {
 		input = "help";
 		check = new Feedback(HELP, FEEDBACK_HELP, INFO_BOX);
 		feedback = gsd.processInput(input);
@@ -342,19 +342,18 @@ public class testGSDControl {
 		assertNotEquals(feedback.getInfoString(), check.getInfoString());
 	}
 
-	
 	@Test
-	public void testSet() throws Exception {
+	public void testSet() {
 		input = "set " + PATH_CURRENT + FILENAME;
-		check = new Feedback(null, FEEDBACK_SET + PATH_CURRENT + FILENAME +  "\n", INFO_BOX);
+		check = new Feedback(null, FEEDBACK_SET + PATH_CURRENT + FILENAME + "\n", INFO_BOX);
 		feedback = gsd.processInput(input);
 		assertEquals(feedback.getDisplayString(), check.getDisplayString());
 		assertEquals(feedback.getFeedbackString(), check.getFeedbackString());
 		assertNotEquals(feedback.getInfoString(), check.getInfoString());
 	}
-	
+
 	@Test
-	public void testSetFail() throws Exception {
+	public void testSetFail() {
 		input = "set LOLKAPPAPRIDE";
 		check = new Feedback(null, FEEDBACK_SET_ERROR, INFO_BOX);
 		feedback = gsd.processInput(input);
@@ -364,7 +363,7 @@ public class testGSDControl {
 	}
 
 	@Test
-	public void testInvalid() throws Exception {
+	public void testInvalid() {
 		input = "LOLKAPPAPRIDE";
 		check = new Feedback(null, FEEDBACK_INVALID_COMMAND, INFO_BOX);
 		feedback = gsd.processInput(input);
@@ -372,7 +371,7 @@ public class testGSDControl {
 		assertEquals(feedback.getFeedbackString(), check.getFeedbackString());
 		assertNotEquals(feedback.getInfoString(), check.getInfoString());
 	}
-	
+
 	@Test
 	public void testLoadFromFile() {
 		check = new Feedback(DISPLAY_NO_TASKS, FEEDBACK_WELCOME_MESSAGE, INFO_BOX);
@@ -381,9 +380,9 @@ public class testGSDControl {
 		assertEquals(feedback.getFeedbackString(), check.getFeedbackString());
 		assertNotEquals(feedback.getInfoString(), check.getInfoString());
 	}
-	
+
 	@Test
-	public void testInvalidCommandFormat() throws Exception {
+	public void testInvalidCommandFormat() {
 		check = new Feedback(null, FEEDBACK_INVALID_COMMAND_FORMAT, INFO_BOX);
 		input = "add";
 		feedback = gsd.processInput(input);
@@ -456,7 +455,6 @@ public class testGSDControl {
 		assertEquals(feedback.getFeedbackString(), check.getFeedbackString());
 		assertNotEquals(feedback.getInfoString(), check.getInfoString());
 	}
-	
 
 	@After
 	public void tearDown() {

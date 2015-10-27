@@ -274,6 +274,33 @@ public class GSDControl {
 	private String redoLastAction() {
 		return executeHistoryCommand();
 	}
+	
+	private void recurringTaskUpdate()	{
+		
+		Calendar currentDateCal = Calendar.getInstance();
+		// set the currentdate to the current date
+		
+		Calendar endingDateCal = Calendar.getInstance();
+		
+		for (int i = 0; i < tasks.size(); i++) {
+			if (tasks.get(i).getIsRecurring()) {
+				endingDateCal.setTime(tasks.get(i).getEndingDate());
+				if(date passed || tasks.get(i).getIsComplete())	{
+					if( havent passed ending date)	{
+						//change to the next stated date according to the RECURRING string
+					}
+					if (passed ending date)	{
+						//do nothing
+					}
+				}
+				else	{ //haven't passed date
+					//do nothing
+				}
+				
+			}
+		}
+		
+	}
 
 	private boolean setFilePath() {
 		boolean isSuccessfulPath;

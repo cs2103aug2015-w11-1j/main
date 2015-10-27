@@ -75,12 +75,8 @@ public class UI {
 				showInFeedbackBox(input + "\n", TextView.STYLE_NORMAL);
 
 				Feedback feedback = null;
-				try {
+				
 					feedback = gsd.processInput(input);
-				} catch (Exception e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
 
 				show(feedback);
 			}
