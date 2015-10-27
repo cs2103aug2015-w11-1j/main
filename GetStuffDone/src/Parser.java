@@ -108,7 +108,7 @@ public class Parser {
 
 	};
 
-	private final static String[] keyWord = { "BY", "FROM", "TO", "AT", "DAILY" , "MONTHLY" , "YEARLY", "WEEKLY"};
+	private final static String[] keyWord = { "BY", "FROM", "TO", "AT", "DAILY", "MONTHLY", "YEARLY", "WEEKLY" };
 	private final static String[] TimekeyWord = { "MONDAY", "TUESDAY", "WEDNESDAY", "THURSDAY", "FRIDAY", "SATURDAY",
 			"SUNDAY", "TODAY", "TOMORROW" };
 
@@ -117,7 +117,7 @@ public class Parser {
 	private final static int NO_KEYWORD = -1;
 	private final static int NO_YEAR_INPUT = 1970;
 
-	static Date parseStartDate(ArrayList<String> input) throws ParseException, invalidTimeDateInput {
+	static Date parseStartDate(ArrayList<String> input) throws ParseException, invalidTimeDateInput, invalidParameters {
 		String result = "";
 		int indexOfNextKeyWord = NO_NEXT_KEYWORD;
 		int indexOfKeyWordFROM = input.lastIndexOf("FROM");
@@ -149,7 +149,7 @@ public class Parser {
 		return indexOfNextKeyWord;
 	}
 
-	static Date parseEndDate(ArrayList<String> input) throws ParseException, invalidTimeDateInput {
+	static Date parseEndDate(ArrayList<String> input) throws ParseException, invalidTimeDateInput, invalidParameters {
 		String result = "";
 		int indexOfNextKeyWord = NO_NEXT_KEYWORD;
 		int indexOfKeyWordTO = input.lastIndexOf("TO");
@@ -198,12 +198,16 @@ public class Parser {
 	}
 
 	private static String getInputBetweenArrayList(ArrayList<String> input, int indexOfKeyWord,
-			int indexOfNextKeyWord) {
+			int indexOfNextKeyWord) throws invalidParameters {
 		String result = "";
 		for (int i = 0; i < indexOfNextKeyWord - indexOfKeyWord - 1; i++) {
 			result = result + " " + input.remove(indexOfKeyWord + 1);
 		}
-		result = result.substring(1);
+		try {
+			result = result.substring(1);
+		} catch (StringIndexOutOfBoundsException e) {
+			throw new invalidParameters();
+		}
 		input.remove(indexOfKeyWord);
 		return result;
 	}
@@ -566,8 +570,7 @@ public class Parser {
 		return ID;
 	}
 
-	public static CommandDetails parse(String input)
-			throws ParseException, NumberFormatException, invalidTimeDateInput, invalidCommand, invalidParameters {
+	public static CommandDetails parse(String input) throws Exception {
 		String description;
 		Date start;
 		Date end;
@@ -605,12 +608,12 @@ public class Parser {
 		// to check if details correct
 
 		CommandDetails details = new CommandDetails(command, description, start, end, ID, recurring, endingDate);
-		validateCommandDetails(command, ID, description, start, end, input);
+		validateCommandDetails(command, ID, description, start, end, input, recurring, endingDate);
 		System.out.println(details);
 		return new CommandDetails(command, description, start, end, ID, recurring, endingDate);
 	}
 
-	private static Date parseEndingDate(ArrayList<String> input) throws ParseException, invalidTimeDateInput {
+	private static Date parseEndingDate(ArrayList<String> input) throws ParseException, invalidTimeDateInput, invalidParameters {
 
 		String result = "";
 		int indexOfNextKeyWord = NO_NEXT_KEYWORD;
@@ -622,36 +625,36 @@ public class Parser {
 			indexOfNextKeyWord = findNextKeyword(input, indexOfKeyWordEnding, indexOfNextKeyWord);
 		}
 		indexOfNextKeyWord = checkLastIndex(input, indexOfNextKeyWord);
-		
-			result = getInputBetweenArrayList(input, indexOfKeyWordEnding, indexOfNextKeyWord);
+
+		result = getInputBetweenArrayList(input, indexOfKeyWordEnding, indexOfNextKeyWord);
 
 		return createEndDate(result);
-		
+
 	}
 
 	private static String parseRecurring(ArrayList<String> strTokens) {
 
-		if(strTokens.indexOf("DAILY")!= -1){
+		if (strTokens.indexOf("DAILY") != -1) {
 			return strTokens.remove(strTokens.indexOf("DAILY"));
 		}
-		
-		if(strTokens.indexOf("MONTHLY")!= -1){
+
+		if (strTokens.indexOf("MONTHLY") != -1) {
 			return strTokens.remove(strTokens.indexOf("MONTHLY"));
 		}
-		
-		if(strTokens.indexOf("YEARLY")!= -1){
+
+		if (strTokens.indexOf("YEARLY") != -1) {
 			return strTokens.remove(strTokens.indexOf("YEARLY"));
 		}
-		
-		if(strTokens.indexOf("WEEKLY")!= -1){
+
+		if (strTokens.indexOf("WEEKLY") != -1) {
 			return strTokens.remove(strTokens.indexOf("WEEKLY"));
 		}
-		
+
 		return null;
 	}
 
 	private static void validateCommandDetails(CommandDetails.COMMANDS command, int ID, String description, Date start,
-			Date end, String input) throws invalidParameters {
+			Date end, String input, String recurring, Date endingDate) throws Exception {
 		if (command == CommandDetails.COMMANDS.HELP || command == CommandDetails.COMMANDS.REDO
 				|| command == CommandDetails.COMMANDS.UNDO || command == CommandDetails.COMMANDS.ALL
 				|| command == CommandDetails.COMMANDS.FLOATING || command == CommandDetails.COMMANDS.EVENTS
@@ -684,6 +687,28 @@ public class Parser {
 			if (description == null && (start == null && end == null)) {
 				throw new invalidParameters(input);
 			}
+		}
+
+		if (end != null && start != null) {
+			if (end.before(start)) {
+				throw new invalidTimeDateInput("End Date before Start Date");
+			}
+		}
+
+		if (recurring != null || endingDate != null) {
+
+			if (recurring != null && endingDate == null) {
+				throw new invalidParameters(input);
+			}
+
+			if (endingDate != null && recurring == null) {
+				throw new invalidParameters(input);
+			}
+
+			if (endingDate.before(start)) {
+				throw new invalidTimeDateInput("Recurring end Date before Start Date");
+			}
+
 		}
 
 	}
