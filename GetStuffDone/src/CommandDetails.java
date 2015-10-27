@@ -14,8 +14,9 @@ public class CommandDetails {
 	}
 
 	// constructor
-	
-	public CommandDetails(COMMANDS command, String description, Date startDate, Date deadline, int ID, String recurring, Date endingDate) {
+
+	public CommandDetails(COMMANDS command, String description, Date startDate, Date deadline, int ID, String recurring,
+			Date endingDate) {
 		this.deadline = deadline;
 		this.startDate = startDate;
 		this.description = description;
@@ -81,17 +82,18 @@ public class CommandDetails {
 	public String getRecurring() {
 		return this.recurring;
 	}
-	
+
 	public Date getEndingDate() {
 		return this.endingDate;
 	}
-	
+
 	// Overriding methods
 	@Override
 	public String toString() {
 		String result = "";
 		result = "command = " + command + "\n" + "ID = " + ID + "\n" + "description = " + description + "\n"
-				+ "startDate = " + startDate + "\n" + "deadline = " + deadline + "\n"+ "Recurring = " + recurring + "\n" + "end recurring = " + endingDate + "\n";
+				+ "startDate = " + startDate + "\n" + "deadline = " + deadline + "\n" + "Recurring = " + recurring
+				+ "\n" + "Ending Date = " + endingDate + "\n";
 		return result;
 	}
 }

@@ -485,17 +485,17 @@ public class GSDControl {
 		return "Add a floating task\n" + "Add a deadline task\n" + "Add an event\n" + "Add a recurring task\n"
 				+ "Search for task\n" + "Update a task\n" + "Delete a task\n" + "Mark a task as complete\n"
 				+ "Mark a task as incomplete\n" + "Undo last action\n" + "Redo last action\n" + "Display all tasks\n"
-				+ "Display floating tasks\n" + "Display events\n" + "Display deadlines\n" + "Set file path\n"
-				+ "Exit GSD\n";
+				+ "Display floating tasks\n" + "Display events\n" + "Display deadlines\n" + "Display recurring tasks\n"
+				+ "Set file path\n" + "Exit GSD\n";
 	}
 
 	private String helpSyntax() {
 		return "add <description>\n" + "add <description> BY <time> <date>\n"
 				+ "add <description> FROM <start time> <start date> TO <end time> <end date>\n"
-				+ "add [event/deadline] <end date> <recurrence> ENDING <ending date>\n" + "search <keyword/day/date>\n"
+				+ "add [event/deadline] <frequency> ENDING <ending date>\n" + "search <keyword/day/date>\n"
 				+ "update <ID> [floating/event/deadline]\n" + "delete <ID>\n" + "complete <ID>\n" + "incomplete <ID>\n"
-				+ "undo\n" + "redo\n" + "all\n" + "floating\n" + "events\n" + "deadlines\n" + "set <file path>\n"
-				+ "exit\n";
+				+ "undo\n" + "redo\n" + "all\n" + "floating\n" + "events\n" + "deadlines\n" + "recurring\n"
+				+ "set <file path>\n" + "exit\n";
 	}
 
 	private String executeHistoryCommand() {

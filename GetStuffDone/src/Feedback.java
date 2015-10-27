@@ -11,8 +11,9 @@ public class Feedback {
 		this.feedbackString = feedbackString;
 		this.infoString = infoString;
 	}
-	
-	public Feedback(String displayString, String feedbackString, String infoString, String helpCommandString, String helpSyntaxString)	{
+
+	public Feedback(String displayString, String feedbackString, String infoString, String helpCommandString,
+			String helpSyntaxString) {
 		this.displayString = displayString;
 		this.feedbackString = feedbackString;
 		this.infoString = infoString;
@@ -47,7 +48,7 @@ public class Feedback {
 	public String getInfoString() {
 		return infoString;
 	}
-	
+
 	public String getHelpSyntaxString() {
 		return helpSyntaxString;
 	}
