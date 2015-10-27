@@ -108,7 +108,7 @@ public class Parser {
 
 	};
 
-	private final static String[] keyWord = { "BY", "FROM", "TO", "AT" };
+	private final static String[] keyWord = { "BY", "FROM", "TO", "AT", "DAILY" , "MONTHLY" , "YEARLY", "WEEKLY"};
 	private final static String[] TimekeyWord = { "MONDAY", "TUESDAY", "WEDNESDAY", "THURSDAY", "FRIDAY", "SATURDAY",
 			"SUNDAY", "TODAY", "TOMORROW" };
 
@@ -315,13 +315,6 @@ public class Parser {
 				Date mydate = possibleFormats.parse(input);
 				Calendar cal = Calendar.getInstance();
 				cal.setTime(mydate);
-				/*
-				 * if (cal.get(Calendar.YEAR) == NO_YEAR_INPUT &&
-				 * cal.get(Calendar.MONTH) == 0 && cal.get(Calendar.DATE) == 1
-				 * && cal.get(Calendar.HOUR_OF_DAY) == 0 &&
-				 * cal.get(Calendar.MILLISECOND) == 0 &&
-				 * cal.get(Calendar.MINUTE) == 0)
-				 */
 				if (cal.get(Calendar.YEAR) == NO_YEAR_INPUT && (input.toUpperCase().contains("TODAY")
 						|| input.toUpperCase().contains("TOMORROW") || input.toUpperCase().contains("MONDAY")
 						|| input.toUpperCase().contains("TUESDAY") || input.toUpperCase().contains("WEDNESDAY")
@@ -579,6 +572,8 @@ public class Parser {
 		Date start;
 		Date end;
 		boolean copy = false;
+		String recurring = null;
+		Date endingDate = null;
 
 		int ID = NO_ID;
 
@@ -601,20 +596,62 @@ public class Parser {
 		if (copy) {
 			end = start;
 		}
+		//////////////////////////////////////
+		recurring = parseRecurring(strTokens);
+		endingDate = parseEndingDate(strTokens);
+		//////////////////////////////////////
 		description = parseDescription(strTokens);
 
 		// to check if details correct
 
-		CommandDetails details = new CommandDetails(command, description, start, end, ID);
+		CommandDetails details = new CommandDetails(command, description, start, end, ID, recurring, endingDate);
 		validateCommandDetails(command, ID, description, start, end, input);
 		System.out.println(details);
+		return new CommandDetails(command, description, start, end, ID, recurring, endingDate);
+	}
 
-		return new CommandDetails(command, description, start, end, ID);
+	private static Date parseEndingDate(ArrayList<String> input) throws ParseException, invalidTimeDateInput {
+
+		String result = "";
+		int indexOfNextKeyWord = NO_NEXT_KEYWORD;
+		int indexOfKeyWordEnding = input.lastIndexOf("ENDING");
+
+		if (notContainsKeyword(indexOfKeyWordEnding)) {
+			return null;
+		} else {
+			indexOfNextKeyWord = findNextKeyword(input, indexOfKeyWordEnding, indexOfNextKeyWord);
+		}
+		indexOfNextKeyWord = checkLastIndex(input, indexOfNextKeyWord);
+		
+			result = getInputBetweenArrayList(input, indexOfKeyWordEnding, indexOfNextKeyWord);
+
+		return createEndDate(result);
+		
+	}
+
+	private static String parseRecurring(ArrayList<String> strTokens) {
+
+		if(strTokens.indexOf("DAILY")!= -1){
+			return strTokens.remove(strTokens.indexOf("DAILY"));
+		}
+		
+		if(strTokens.indexOf("MONTHLY")!= -1){
+			return strTokens.remove(strTokens.indexOf("MONTHLY"));
+		}
+		
+		if(strTokens.indexOf("YEARLY")!= -1){
+			return strTokens.remove(strTokens.indexOf("YEARLY"));
+		}
+		
+		if(strTokens.indexOf("WEEKLY")!= -1){
+			return strTokens.remove(strTokens.indexOf("WEEKLY"));
+		}
+		
+		return null;
 	}
 
 	private static void validateCommandDetails(CommandDetails.COMMANDS command, int ID, String description, Date start,
 			Date end, String input) throws invalidParameters {
-		// TODO Auto-generated method stub
 		if (command == CommandDetails.COMMANDS.HELP || command == CommandDetails.COMMANDS.REDO
 				|| command == CommandDetails.COMMANDS.UNDO || command == CommandDetails.COMMANDS.ALL
 				|| command == CommandDetails.COMMANDS.FLOATING || command == CommandDetails.COMMANDS.EVENTS
