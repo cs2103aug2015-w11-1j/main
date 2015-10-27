@@ -24,13 +24,15 @@ public class Storage {
 	private static final String STATUS_NOT_COMPLETED = "Not completed";
 
 	// Indicate the number of lines required to store a task
-	private static final int LINES_PER_TASK = 4;
+	private static final int LINES_PER_TASK = 6;
 
 	// Indicate the relative positions of the attributes of a Task
 	private static final int OFFSET_DESCRIPTION = 0;
-	private static final int OFFSET_DATE_START = 1;
-	private static final int OFFSET_DATE_END = 2;
-	private static final int OFFSET_STATUS = 3;
+	private static final int OFFSET_STATUS = 1;
+	private static final int OFFSET_DATE_START = 2;
+	private static final int OFFSET_DATE_END = 3;
+	private static final int OFFSET_DATE_LAST = 4;
+	private static final int OFFSET_RECURRING = 5;
 
 	private SimpleDateFormat formatter = new SimpleDateFormat(DATE_FORMAT);
 
@@ -61,9 +63,11 @@ public class Storage {
 
 			for (Task task : tasks) {
 				writeString(writer, task.getDescription());
+				writeStatus(writer, task.getIsComplete());
 				writeDate(writer, task.getStartDate());
 				writeDate(writer, task.getDeadline());
-				writeStatus(writer, task.getIsComplete());
+				writeDate(writer, task.getEndingDate());
+				writeString(writer, task.getRecurring());
 			}
 
 			writer.close();
@@ -103,9 +107,11 @@ public class Storage {
 			Task task = new Task();
 
 			task.setDescription(parseString(lines.get(i + OFFSET_DESCRIPTION)));
+			task.setIsComplete(parseStatus(lines.get(i + OFFSET_STATUS)));
 			task.setStartDate(parseDate(lines.get(i + OFFSET_DATE_START)));
 			task.setDeadline(parseDate(lines.get(i + OFFSET_DATE_END)));
-			task.setIsComplete(parseStatus(lines.get(i + OFFSET_STATUS)));
+			task.setEndingDate(parseDate(lines.get(i + OFFSET_DATE_LAST)));
+			task.setRecurring(parseString(lines.get(i + OFFSET_RECURRING)));
 
 			tasks.add(task);
 		}

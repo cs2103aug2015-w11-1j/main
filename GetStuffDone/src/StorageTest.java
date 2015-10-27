@@ -21,6 +21,7 @@ public class StorageTest {
 	private Task taskFloating = null;
 	private Task taskEvent = null;
 	private Task taskDeadline = null;
+	private Task taskRecurring = null;
 
 	Date date = new Date();
 
@@ -46,6 +47,11 @@ public class StorageTest {
 		taskDeadline.setDescription("Deadline Task");
 		taskDeadline.setDeadline(new Date());
 		taskDeadline.setIsComplete(false);
+		
+		taskRecurring = new Task();
+		taskRecurring.setDescription("Recurring Task");
+		taskRecurring.setEndingDate(date);
+		taskRecurring.setRecurring("RECURRING");
 	}
 
 	@Test
@@ -132,6 +138,9 @@ public class StorageTest {
 
 		assertTrue(isSame(task1.getDescription(), task2.getDescription()));
 		assertTrue(isSame(task1.getStartDate(), task2.getStartDate()));
+		assertTrue(isSame(task1.getDeadline(), task2.getDeadline()));
+		assertTrue(isSame(task1.getEndingDate(), task2.getEndingDate()));
+		assertTrue(isSame(task1.getRecurring(), task2.getRecurring()));
 		assertEquals(task1.getIsComplete(), task2.getIsComplete());
 	}
 
