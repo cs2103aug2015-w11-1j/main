@@ -111,6 +111,7 @@ public class Parser {
 	private final static String[] keyWord = { "BY", "FROM", "TO", "AT", "DAILY", "MONTHLY", "YEARLY", "WEEKLY" };
 	private final static String[] TimekeyWord = { "MONDAY", "TUESDAY", "WEDNESDAY", "THURSDAY", "FRIDAY", "SATURDAY",
 			"SUNDAY", "TODAY", "TOMORROW" };
+	private final static String[] RECURRING_KEY_WORD = { "DAILY", "MONTHLY", "YEARLY", "WEEKLY" };
 
 	private final static int NO_NEXT_KEYWORD = -2;
 	private final static int NO_ID = -10;
@@ -120,8 +121,25 @@ public class Parser {
 	static Date parseStartDate(ArrayList<String> input) throws ParseException, invalidTimeDateInput, invalidParameters {
 		String result = "";
 		int indexOfNextKeyWord = NO_NEXT_KEYWORD;
-		int indexOfKeyWordFROM = input.lastIndexOf("FROM");
-		int indexOfKeyWordAT = input.lastIndexOf("AT");
+		int arrayListIndex = 0;
+
+		int indexOfKeyWordFROM = -1;
+		for (String temp : input) {
+			if (temp.equalsIgnoreCase("FROM")) {
+				indexOfKeyWordFROM = arrayListIndex;
+			}
+			arrayListIndex++;
+		}
+
+		arrayListIndex = 0;
+		int indexOfKeyWordAT = -1;
+		for (String temp : input) {
+			if (temp.equalsIgnoreCase("AT")) {
+				indexOfKeyWordAT = arrayListIndex;
+			}
+			arrayListIndex++;
+		}
+
 		if (notContainsKeyword(indexOfKeyWordFROM) && notContainsKeyword(indexOfKeyWordAT)) {
 			return null;
 		} else if (notContainsKeyword(indexOfKeyWordFROM) && !notContainsKeyword(indexOfKeyWordAT)) {
@@ -139,6 +157,7 @@ public class Parser {
 		if (notContainsKeyword(indexOfKeyWordFROM)) {
 			result = getInputBetweenArrayList(input, indexOfKeyWordAT, indexOfNextKeyWord);
 		}
+		//System.out.println(result);
 		return createStartDate(result);
 	}
 
@@ -152,8 +171,25 @@ public class Parser {
 	static Date parseEndDate(ArrayList<String> input) throws ParseException, invalidTimeDateInput, invalidParameters {
 		String result = "";
 		int indexOfNextKeyWord = NO_NEXT_KEYWORD;
-		int indexOfKeyWordTO = input.lastIndexOf("TO");
-		int indexOfKeyWordBY = input.lastIndexOf("BY");
+		int arrayListIndex = 0;
+
+		int indexOfKeyWordTO = -1;
+		for (String temp : input) {
+			if (temp.equalsIgnoreCase("TO")) {
+				indexOfKeyWordTO = arrayListIndex;
+			}
+			arrayListIndex++;
+		}
+
+		arrayListIndex = 0;
+		int indexOfKeyWordBY = -1;
+		for (String temp : input) {
+			if (temp.equalsIgnoreCase("BY")) {
+				indexOfKeyWordTO = arrayListIndex;
+			}
+			arrayListIndex++;
+		}
+
 		if (notContainsKeyword(indexOfKeyWordTO) && notContainsKeyword(indexOfKeyWordBY)) {
 			return null;
 		} else if (notContainsKeyword(indexOfKeyWordTO) && !notContainsKeyword(indexOfKeyWordBY)) {
@@ -176,7 +212,7 @@ public class Parser {
 
 	private static boolean isKeyWord(String input) {
 		for (int i = 0; i < keyWord.length; i++) {
-			if (keyWord[i].equals(input)) {
+			if (keyWord[i].equalsIgnoreCase(input)) {
 				return true;
 			}
 		}
@@ -218,8 +254,13 @@ public class Parser {
 		if (input.isEmpty()) {
 			return null;
 		}
+
 		while (!input.isEmpty()) {
-			result = result + " " + input.remove(0);
+			if (input.get(0).contains("/")) {
+				result = result + " " + input.remove(0).substring(1);
+			} else {
+				result = result + " " + input.remove(0);
+			}
 		}
 		return result.substring(1, result.length());
 	}
@@ -228,90 +269,71 @@ public class Parser {
 
 		switch (input.get(0).toUpperCase()) {
 		case "ADD":
-			System.out.println("ADD command");
 			input.remove(0);
 			return CommandDetails.COMMANDS.ADD;
 		case "a":
-			System.out.println("ADD command");
 			input.remove(0);
 			return CommandDetails.COMMANDS.ADD;
 		case "DELETE":
-			System.out.println("DELETE command");
 			input.remove(0);
 			return CommandDetails.COMMANDS.DELETE;
 		case "d":
-			System.out.println("DELETE command");
 			input.remove(0);
 			return CommandDetails.COMMANDS.DELETE;
 		case "COMPLETE":
-			System.out.println("COMPLETE command");
 			input.remove(0);
 			return CommandDetails.COMMANDS.COMPLETE;
 		case "INCOMPLETE":
-			System.out.println("INCOMPLETE command");
 			input.remove(0);
 			return CommandDetails.COMMANDS.INCOMPLETE;
 		case "HELP":
-			System.out.println("HELP command");
 			input.remove(0);
 			return CommandDetails.COMMANDS.HELP;
 		case "REDO":
-			System.out.println("REDO command");
 			input.remove(0);
 			return CommandDetails.COMMANDS.REDO;
 		case "SEARCH":
-			System.out.println("SEARCH command");
 			input.remove(0);
 			return CommandDetails.COMMANDS.SEARCH;
 		case "s":
-			System.out.println("SEARCH command");
 			input.remove(0);
 			return CommandDetails.COMMANDS.SEARCH;
 		case "UNDO":
-			System.out.println("UNDO command");
 			input.remove(0);
 			return CommandDetails.COMMANDS.UNDO;
 		case "ALL":
-			System.out.println("ALL command");
 			input.remove(0);
 			return CommandDetails.COMMANDS.ALL;
 		case "UPDATE":
-			System.out.println("UPDATE command");
 			input.remove(0);
 			return CommandDetails.COMMANDS.UPDATE;
 		case "u":
-			System.out.println("UPDATE command");
 			input.remove(0);
 			return CommandDetails.COMMANDS.UPDATE;
 		case "SET":
-			System.out.println("SET command");
 			input.remove(0);
 			return CommandDetails.COMMANDS.SET;
 		case "FLOATING":
-			System.out.println("FLOATING command");
 			input.remove(0);
 			return CommandDetails.COMMANDS.FLOATING;
 		case "EVENTS":
-			System.out.println("EVENTS command");
 			input.remove(0);
 			return CommandDetails.COMMANDS.EVENTS;
 		case "DEADLINES":
-			System.out.println("DEADLINES command");
 			input.remove(0);
 			return CommandDetails.COMMANDS.DEADLINES;
 		case "RECURRING":
-			System.out.println("RECURRING command");
 			input.remove(0);
 			return CommandDetails.COMMANDS.RECURRING;
 		case "EXIT":
-			System.out.println("EXIT command");
 			input.remove(0);
 			return CommandDetails.COMMANDS.EXIT;
 		default:
-			System.out.print("Invalid Command");
+			//System.out.print("Invalid Command");
 			// input.remove(0);
-			throw new invalidCommand(input.remove(0));
+			//throw new invalidCommand(input.remove(0));
 			// return CommandDetails.COMMANDS.INVALID;
+			return CommandDetails.COMMANDS.ADD; 
 		}
 	}
 
@@ -503,6 +525,16 @@ public class Parser {
 				 * {
 				 */
 
+				//System.out.println("format is " + temp);
+				if (temp.equals("dd/MM") || temp.equals("dd-MM") || temp.equals("dd-MMMM") || temp.equals("dd-MM-yy")
+						|| temp.equals("dd-MMMM-yy") || temp.equals("dd/MMMM") || temp.equals("dd/MM/yy")
+						|| temp.equals("dd/MMMM/yy") || temp.equals("dd MM") || temp.equals("dd MMMM")
+						|| temp.equals("dd MM yy") || temp.equals("dd MMMM yy")) {
+					cal.set(Calendar.HOUR_OF_DAY, 23);
+					cal.set(Calendar.MINUTE, 59);
+					//System.out.println("format is " + cal);
+				}
+
 				if (cal.get(Calendar.YEAR) == NO_YEAR_INPUT && (input.toUpperCase().contains("TODAY")
 						|| input.toUpperCase().contains("TOMORROW") || input.toUpperCase().contains("MONDAY")
 						|| input.toUpperCase().contains("TUESDAY") || input.toUpperCase().contains("WEDNESDAY")
@@ -526,7 +558,6 @@ public class Parser {
 				}
 
 				if (cal.get(Calendar.YEAR) == NO_YEAR_INPUT) {
-					cal.setTime(mydate);
 					cal.set(Calendar.YEAR, Calendar.getInstance().get(Calendar.YEAR));
 					mydate = cal.getTime();
 					return mydate;
@@ -619,9 +650,10 @@ public class Parser {
 
 		CommandDetails details = new CommandDetails(command, description, start, end, ID, recurring, originalStart,
 				originalEnd, endingDate);
+		System.out.println(details);
 		validateCommandDetails(command, ID, description, start, end, input, recurring, originalStart, originalEnd,
 				endingDate);
-		System.out.println(details);
+
 		return new CommandDetails(command, description, start, end, ID, recurring, originalStart, originalEnd,
 				endingDate);
 	}
@@ -631,7 +663,23 @@ public class Parser {
 
 		String result = "";
 		int indexOfNextKeyWord = NO_NEXT_KEYWORD;
-		int indexOfKeyWordEnding = input.lastIndexOf("ENDING");
+		// int indexOfKeyWordEnding = input.lastIndexOf("ENDING");
+
+		int arrayListIndex = 0;
+
+		int indexOfKeyWordEnding = -1;
+		for (String temp : input) {
+			if (temp.equalsIgnoreCase("ENDING")) {
+				indexOfKeyWordEnding = arrayListIndex;
+			}
+			arrayListIndex++;
+		}
+
+		/*
+		 * int indexOfKeyWordEnding = input.lastIndexOf("ENDING"); if
+		 * (input.lastIndexOf("ending") != -1) { indexOfKeyWordEnding =
+		 * input.lastIndexOf("ending"); }
+		 */
 
 		if (notContainsKeyword(indexOfKeyWordEnding)) {
 			return null;
@@ -647,21 +695,38 @@ public class Parser {
 	}
 
 	private static String parseRecurring(ArrayList<String> strTokens) {
-
-		if (strTokens.indexOf("DAILY") != -1) {
-			return strTokens.remove(strTokens.indexOf("DAILY"));
-		}
-
-		if (strTokens.indexOf("MONTHLY") != -1) {
-			return strTokens.remove(strTokens.indexOf("MONTHLY"));
-		}
-
-		if (strTokens.indexOf("YEARLY") != -1) {
-			return strTokens.remove(strTokens.indexOf("YEARLY"));
-		}
-
-		if (strTokens.indexOf("WEEKLY") != -1) {
-			return strTokens.remove(strTokens.indexOf("WEEKLY"));
+		/*
+		 * if (strTokens.indexOf("DAILY") != -1) { return
+		 * strTokens.remove(strTokens.indexOf("DAILY")); } if
+		 * (strTokens.indexOf("daily") != -1) { return
+		 * strTokens.remove(strTokens.indexOf("daily")); }
+		 * 
+		 * if (strTokens.indexOf("MONTHLY") != -1) { return
+		 * strTokens.remove(strTokens.indexOf("MONTHLY")); }
+		 * 
+		 * if (strTokens.indexOf("monthly") != -1) { return
+		 * strTokens.remove(strTokens.indexOf("monthly")); }
+		 * 
+		 * if (strTokens.indexOf("YEARLY") != -1) { return
+		 * strTokens.remove(strTokens.indexOf("YEARLY")); }
+		 * 
+		 * if (strTokens.indexOf("yearly") != -1) { return
+		 * strTokens.remove(strTokens.indexOf("yearly")); }
+		 * 
+		 * if (strTokens.indexOf("WEEKLY") != -1) { return
+		 * strTokens.remove(strTokens.indexOf("WEEKLY")); }
+		 * 
+		 * if (strTokens.indexOf("weekly") != -1) { return
+		 * strTokens.remove(strTokens.indexOf("weekly")); }
+		 */
+		int arrayListIndex = 0;
+		for (String temp : strTokens) {
+			for (int i = 0; i < RECURRING_KEY_WORD.length; i++) {
+				if (temp.equalsIgnoreCase(RECURRING_KEY_WORD[i])) {
+					return strTokens.remove(arrayListIndex).toUpperCase();
+				}
+			}
+			arrayListIndex++;
 		}
 
 		return null;
@@ -670,6 +735,15 @@ public class Parser {
 	private static void validateCommandDetails(CommandDetails.COMMANDS command, int ID, String description, Date start,
 			Date end, String input, String recurring, Date originalStart, Date originalEnd, Date endingDate)
 					throws invalidParameters, invalidTimeDateInput {
+
+		Calendar today = Calendar.getInstance();
+		today.set(Calendar.HOUR_OF_DAY, 0);
+		today.set(Calendar.MINUTE, 0);
+		today.set(Calendar.MILLISECOND, 0);
+		today.set(Calendar.SECOND, 0);
+		//System.out.println("current time " + today.getTime());
+		Date todayDate = today.getTime();
+
 		if (command == CommandDetails.COMMANDS.HELP || command == CommandDetails.COMMANDS.REDO
 				|| command == CommandDetails.COMMANDS.UNDO || command == CommandDetails.COMMANDS.ALL
 				|| command == CommandDetails.COMMANDS.FLOATING || command == CommandDetails.COMMANDS.EVENTS
@@ -711,15 +785,23 @@ public class Parser {
 			}
 		}
 
-		if (recurring != null || endingDate != null) {
+		if (start != null) {
+			if (start.before(todayDate)) {
+				throw new invalidTimeDateInput("Start Date have past");
+			}
+		}
 
+		if (recurring != null || endingDate != null) {
 			if (recurring != null && endingDate == null) {
 				throw new invalidParameters(input);
 			}
-
 			if (endingDate != null && recurring == null) {
 				throw new invalidParameters(input);
 			}
+			if (endingDate.before(end)) {
+				throw new invalidTimeDateInput("Recurring end Date before end Date");
+			}
+
 			if (start != null) {
 				if (endingDate.before(start)) {
 					throw new invalidTimeDateInput("Recurring end Date before Start Date");
@@ -733,22 +815,36 @@ public class Parser {
 
 		int count = 0;
 		for (String temp : strTokens) {
-			if (temp == "FROM" || temp == "AT") {
+			if (temp.equalsIgnoreCase("FROM") || temp.equalsIgnoreCase("AT")) {
 				count++;
 			}
 		}
-		if (count > 2) {
-			throw new ParseException(null, 0);
+		if (count > 1) {
+			throw new ParseException("multiple start date", 0);
 		}
 		count = 0;
+
 		for (String temp : strTokens) {
-			if (temp == "BY" || temp == "TO") {
+			if (temp.equalsIgnoreCase("BY") || temp.equalsIgnoreCase("TO")) {
 				count++;
 			}
 		}
-		if (count > 2) {
-			throw new ParseException(null, 0);
+		if (count > 1) {
+			throw new ParseException("multiple end date", 0);
 		}
+
+		count = 0;
+
+		for (String temp : strTokens) {
+			if (temp.equalsIgnoreCase("DAILY") || temp.equalsIgnoreCase("MONTHLY") || temp.equalsIgnoreCase("YEARLY")
+					|| temp.equalsIgnoreCase("WEEKLY")) {
+				count++;
+			}
+		}
+		if (count > 1) {
+			throw new ParseException("multiple end date", 0);
+		}
+
 	}
 }
 
