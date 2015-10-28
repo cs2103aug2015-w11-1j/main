@@ -605,14 +605,15 @@ public class Parser {
 		if (copy) {
 			end = start;
 		}
-		originalStart = start;
-		originalEnd = end;
+		
 		//////////////////////////////////////
 		recurring = parseRecurring(strTokens);
 		endingDate = parseEndingDate(strTokens);
 		//////////////////////////////////////
 		description = parseDescription(strTokens);
-
+		
+		originalStart = start;
+		originalEnd = end;
 		// to check if details correct
 
 		CommandDetails details = new CommandDetails(command, description, start, end, ID, recurring, originalStart, originalEnd, endingDate);

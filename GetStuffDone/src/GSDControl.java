@@ -324,6 +324,8 @@ public class GSDControl {
 								tasks.get(i).setRecurringCount(tasks.get(i).getRecurringCount() + 1);
 								break;
 							case "MONTHLY":
+								
+								/*
 								startDateCal.add(Calendar.MONTH, tasks.get(i).getRecurringCount());
 								deadlineCal.add(Calendar.MONTH, tasks.get(i).getRecurringCount());
 								tasks.get(i).setStartDate(originalStartDateCal.getTime());
@@ -331,6 +333,23 @@ public class GSDControl {
 								originalStartDateCal.setTime(tasks.get(i).getOriginalStartDate());
 								originalDeadlineCal.setTime(tasks.get(i).getOriginalDeadline());
 								tasks.get(i).setRecurringCount(tasks.get(i).getRecurringCount() + 1);
+								*/
+								
+								//copy original start date
+								startDateCal = (Calendar) originalStartDateCal.clone();
+								//copy original end date
+								deadlineCal = (Calendar) originalDeadlineCal.clone();
+								//add original with count to copy
+								startDateCal.add(Calendar.MONTH, tasks.get(i).getRecurringCount());
+								//add original with count to copy
+								deadlineCal.add(Calendar.MONTH, tasks.get(i).getRecurringCount());
+								// set task start date with edited copy
+								tasks.get(i).setStartDate(startDateCal.getTime());
+								// set task end date with edited copy
+								tasks.get(i).setDeadline(deadlineCal.getTime());
+								// add count
+								tasks.get(i).setRecurringCount(tasks.get(i).getRecurringCount() + 1);
+								
 								break;
 							case "YEARLY":
 								startDateCal.add(Calendar.YEAR, tasks.get(i).getRecurringCount());
