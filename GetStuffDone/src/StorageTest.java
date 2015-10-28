@@ -23,7 +23,8 @@ public class StorageTest {
 	private Task taskDeadline = null;
 	private Task taskRecurring = null;
 
-	Date date = new Date();
+	Date dateStart = new Date(0);
+	Date dateEnd = new Date();
 
 	@Before
 	public void setUp() {
@@ -39,19 +40,22 @@ public class StorageTest {
 
 		taskEvent = new Task();
 		taskEvent.setDescription("Event Task");
-		taskEvent.setStartDate(new Date());
-		taskEvent.setDeadline(new Date());
+		taskEvent.setStartDate(dateStart);
+		taskEvent.setDeadline(dateEnd);
 		taskEvent.setIsComplete(true);
 
 		taskDeadline = new Task();
 		taskDeadline.setDescription("Deadline Task");
-		taskDeadline.setDeadline(new Date());
+		taskDeadline.setDeadline(dateEnd);
 		taskDeadline.setIsComplete(false);
 		
 		taskRecurring = new Task();
 		taskRecurring.setDescription("Recurring Task");
-		taskRecurring.setEndingDate(date);
-		taskRecurring.setRecurring("RECURRING");
+		taskRecurring.setEndingDate(dateStart);
+		taskRecurring.setOriginalStartDate(dateStart);
+		taskRecurring.setOriginalDeadline(dateEnd);
+		taskRecurring.setRecurring("WEEKLY");
+		taskRecurring.setRecurringCount(5);
 	}
 
 	@Test
@@ -141,6 +145,9 @@ public class StorageTest {
 		assertTrue(isSame(task1.getDeadline(), task2.getDeadline()));
 		assertTrue(isSame(task1.getEndingDate(), task2.getEndingDate()));
 		assertTrue(isSame(task1.getRecurring(), task2.getRecurring()));
+		assertTrue(isSame(task1.getOriginalStartDate(), task2.getOriginalStartDate()));
+		assertTrue(isSame(task1.getOriginalDeadline(), task2.getOriginalDeadline()));
+		assertEquals(task1.getRecurringCount(), task2.getRecurringCount());
 		assertEquals(task1.isComplete(), task2.isComplete());
 	}
 

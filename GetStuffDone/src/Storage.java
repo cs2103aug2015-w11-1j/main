@@ -24,7 +24,7 @@ public class Storage {
 	private static final String STATUS_NOT_COMPLETED = "Not completed";
 
 	// Indicate the number of lines required to store a task
-	private static final int LINES_PER_TASK = 6;
+	private static final int LINES_PER_TASK = 9;
 
 	// Indicate the relative positions of the attributes of a Task
 	private static final int OFFSET_DESCRIPTION = 0;
@@ -32,7 +32,10 @@ public class Storage {
 	private static final int OFFSET_DATE_START = 2;
 	private static final int OFFSET_DATE_END = 3;
 	private static final int OFFSET_DATE_LAST = 4;
-	private static final int OFFSET_RECURRING = 5;
+	private static final int OFFSET_INTERVAL = 5;
+	private static final int OFFSET_DATE_START_ORIGINAL = 6;
+	private static final int OFFSET_DATE_END_ORIGINAL = 7;
+	private static final int OFFSET_COUNT = 8;
 
 	private SimpleDateFormat formatter = new SimpleDateFormat(DATE_FORMAT);
 
@@ -68,6 +71,9 @@ public class Storage {
 				writeDate(writer, task.getDeadline());
 				writeDate(writer, task.getEndingDate());
 				writeString(writer, task.getRecurring());
+				writeDate(writer, task.getOriginalStartDate());
+				writeDate(writer, task.getOriginalDeadline());
+				writeInt(writer, task.getRecurringCount());
 			}
 
 			writer.close();
@@ -111,7 +117,10 @@ public class Storage {
 			task.setStartDate(parseDate(lines.get(i + OFFSET_DATE_START)));
 			task.setDeadline(parseDate(lines.get(i + OFFSET_DATE_END)));
 			task.setEndingDate(parseDate(lines.get(i + OFFSET_DATE_LAST)));
-			task.setRecurring(parseString(lines.get(i + OFFSET_RECURRING)));
+			task.setRecurring(parseString(lines.get(i + OFFSET_INTERVAL)));
+			task.setOriginalStartDate(parseDate(lines.get(i + OFFSET_DATE_START_ORIGINAL)));
+			task.setOriginalDeadline(parseDate(lines.get(i + OFFSET_DATE_END_ORIGINAL)));
+			task.setRecurringCount(Integer.parseInt(lines.get(i + OFFSET_COUNT)));
 
 			tasks.add(task);
 		}
@@ -185,6 +194,10 @@ public class Storage {
 		} else {
 			writer.println(STATUS_NOT_COMPLETED);
 		}
+	}
+	
+	private void writeInt(PrintWriter writer, int num) {
+		writer.println(Integer.toString(num));
 	}
 
 	private String parseString(String string) {
