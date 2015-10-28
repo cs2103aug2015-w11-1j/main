@@ -137,7 +137,7 @@ public class Task implements Comparable<Task> {
 	}
 
 	public boolean isDeadline() {
-		return (this.startDate == null && this.deadline != null);
+		return (this.startDate == null && this.deadline != null && this.endingDate == null);
 	}
 
 	public boolean isFloating() {

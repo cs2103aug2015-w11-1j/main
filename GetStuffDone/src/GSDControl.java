@@ -394,27 +394,67 @@ public class GSDControl {
 		Calendar endingDateCal = Calendar.getInstance();
 
 		for (int i = 0; i < tasks.size(); i++) {
-			if (tasks.get(i).isRecurring()) {
-				originalStartDateCal.setTime(tasks.get(i).getOriginalStartDate());
+			if (tasks.get(i).isRecurring() && tasks.get(i).getStartDate() != null) {
 				originalDeadlineCal.setTime(tasks.get(i).getOriginalDeadline());
-				if (tasks.get(i).getStartDate() != null) {
-					startDateCal.setTime(tasks.get(i).getStartDate());
-				}
+				originalStartDateCal.setTime(tasks.get(i).getOriginalStartDate());
+				startDateCal.setTime(tasks.get(i).getStartDate());
 				deadlineCal.setTime(tasks.get(i).getDeadline());
 				endingDateCal.setTime(tasks.get(i).getEndingDate());
 				Task recurringTask = tasks.get(i);
-				updateRecurringTask(currentDateCal, originalStartDateCal, originalDeadlineCal, startDateCal,
+				updateRecurringEvent(currentDateCal, originalStartDateCal, originalDeadlineCal, startDateCal,
 						deadlineCal, endingDateCal, recurringTask);
+			} else if (tasks.get(i).isRecurring() && tasks.get(i).getStartDate() == null) {
+				originalDeadlineCal.setTime(tasks.get(i).getOriginalDeadline());
+				deadlineCal.setTime(tasks.get(i).getDeadline());
+				endingDateCal.setTime(tasks.get(i).getEndingDate());
+				Task recurringTask = tasks.get(i);
+				updateRecurringDeadline(currentDateCal, originalDeadlineCal, deadlineCal, endingDateCal, recurringTask);
 			}
 		}
 
 	}
 
-	private void updateRecurringTask(Calendar currentDateCal, Calendar originalStartDateCal,
+	private void updateRecurringDeadline(Calendar currentDateCal, Calendar originalDeadlineCal, Calendar deadlineCal,
+			Calendar endingDateCal, Task recurringTask) {
+
+		while (isDueForUpdateAndNotExpired(currentDateCal, deadlineCal, endingDateCal, recurringTask)) {
+			switch (recurringTask.getRecurring()) {
+			case "DAILY":
+				deadlineCal = (Calendar) originalDeadlineCal.clone();
+				deadlineCal.add(Calendar.DAY_OF_YEAR, recurringTask.getRecurringCount());
+				recurringTask.setDeadline(deadlineCal.getTime());
+				recurringTask.incrementRecurringCount();
+				break;
+			case "WEEKLY":
+				deadlineCal = (Calendar) originalDeadlineCal.clone();
+				deadlineCal.add(Calendar.DAY_OF_YEAR, 7 * recurringTask.getRecurringCount());
+				recurringTask.setDeadline(deadlineCal.getTime());
+				recurringTask.incrementRecurringCount();
+				break;
+			case "MONTHLY":
+				deadlineCal = (Calendar) originalDeadlineCal.clone();
+				deadlineCal.add(Calendar.MONTH, recurringTask.getRecurringCount());
+				recurringTask.setDeadline(deadlineCal.getTime());
+				recurringTask.incrementRecurringCount();
+				break;
+			case "YEARLY":
+				deadlineCal = (Calendar) originalDeadlineCal.clone();
+				deadlineCal.add(Calendar.YEAR, recurringTask.getRecurringCount());
+				recurringTask.setDeadline(deadlineCal.getTime());
+				recurringTask.incrementRecurringCount();
+				break;
+			}
+		}
+		if (isExpired(currentDateCal, endingDateCal)) {
+			recurringTask.resetRecurringCount();
+		}
+	}
+
+	private void updateRecurringEvent(Calendar currentDateCal, Calendar originalStartDateCal,
 			Calendar originalDeadlineCal, Calendar startDateCal, Calendar deadlineCal, Calendar endingDateCal,
 			Task recurringTask) {
 
-		if (isDueForUpdateAndNotExpired(currentDateCal, deadlineCal, endingDateCal, recurringTask)) {
+		while (isDueForUpdateAndNotExpired(currentDateCal, deadlineCal, endingDateCal, recurringTask)) {
 			switch (recurringTask.getRecurring()) {
 			case "DAILY":
 				startDateCal = (Calendar) originalStartDateCal.clone();
@@ -453,15 +493,20 @@ public class GSDControl {
 				recurringTask.incrementRecurringCount();
 				break;
 			}
-		} else {
+		}
+		if (isExpired(currentDateCal, endingDateCal)) {
 			recurringTask.resetRecurringCount();
 		}
 	}
 
 	private boolean isDueForUpdateAndNotExpired(Calendar currentDateCal, Calendar deadlineCal, Calendar endingDateCal,
 			Task recurringTask) {
-		return (currentDateCal.after(deadlineCal) || recurringTask.isComplete())
-				&& currentDateCal.before(endingDateCal);
+		return ((currentDateCal.after(deadlineCal) || recurringTask.isComplete())
+				&& currentDateCal.before(endingDateCal));
+	}
+
+	private boolean isExpired(Calendar currentDateCal, Calendar endingDateCal) {
+		return currentDateCal.after(endingDateCal);
 	}
 
 	/*************************************************************************************************
