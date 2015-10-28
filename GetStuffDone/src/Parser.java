@@ -197,8 +197,8 @@ public class Parser {
 		return indexOfKeyWord == NO_KEYWORD;
 	}
 
-	private static String getInputBetweenArrayList(ArrayList<String> input, int indexOfKeyWord,
-			int indexOfNextKeyWord) throws invalidParameters {
+	private static String getInputBetweenArrayList(ArrayList<String> input, int indexOfKeyWord, int indexOfNextKeyWord)
+			throws invalidParameters {
 		String result = "";
 		for (int i = 0; i < indexOfNextKeyWord - indexOfKeyWord - 1; i++) {
 			result = result + " " + input.remove(indexOfKeyWord + 1);
@@ -574,7 +574,8 @@ public class Parser {
 		return ID;
 	}
 
-	public static CommandDetails parse(String input) throws ParseException, invalidCommand, invalidParameters, invalidTimeDateInput {
+	public static CommandDetails parse(String input)
+			throws ParseException, invalidCommand, invalidParameters, invalidTimeDateInput {
 		String description;
 		Date start;
 		Date end;
@@ -605,24 +606,28 @@ public class Parser {
 		if (copy) {
 			end = start;
 		}
-		
+
 		//////////////////////////////////////
 		recurring = parseRecurring(strTokens);
 		endingDate = parseEndingDate(strTokens);
 		//////////////////////////////////////
 		description = parseDescription(strTokens);
-		
+
 		originalStart = start;
 		originalEnd = end;
 		// to check if details correct
 
-		CommandDetails details = new CommandDetails(command, description, start, end, ID, recurring, originalStart, originalEnd, endingDate);
-		validateCommandDetails(command, ID, description, start, end, input, recurring, originalStart, originalEnd, endingDate);
+		CommandDetails details = new CommandDetails(command, description, start, end, ID, recurring, originalStart,
+				originalEnd, endingDate);
+		validateCommandDetails(command, ID, description, start, end, input, recurring, originalStart, originalEnd,
+				endingDate);
 		System.out.println(details);
-		return new CommandDetails(command, description, start, end, ID, recurring, originalStart, originalEnd, endingDate);
+		return new CommandDetails(command, description, start, end, ID, recurring, originalStart, originalEnd,
+				endingDate);
 	}
 
-	private static Date parseEndingDate(ArrayList<String> input) throws ParseException, invalidTimeDateInput, invalidParameters {
+	private static Date parseEndingDate(ArrayList<String> input)
+			throws ParseException, invalidTimeDateInput, invalidParameters {
 
 		String result = "";
 		int indexOfNextKeyWord = NO_NEXT_KEYWORD;
@@ -663,11 +668,13 @@ public class Parser {
 	}
 
 	private static void validateCommandDetails(CommandDetails.COMMANDS command, int ID, String description, Date start,
-			Date end, String input, String recurring, Date originalStart, Date originalEnd, Date endingDate) throws invalidParameters, invalidTimeDateInput {
+			Date end, String input, String recurring, Date originalStart, Date originalEnd, Date endingDate)
+					throws invalidParameters, invalidTimeDateInput {
 		if (command == CommandDetails.COMMANDS.HELP || command == CommandDetails.COMMANDS.REDO
 				|| command == CommandDetails.COMMANDS.UNDO || command == CommandDetails.COMMANDS.ALL
 				|| command == CommandDetails.COMMANDS.FLOATING || command == CommandDetails.COMMANDS.EVENTS
-				|| command == CommandDetails.COMMANDS.DEADLINES || command == CommandDetails.COMMANDS.EXIT|| command == CommandDetails.COMMANDS.RECURRING) {
+				|| command == CommandDetails.COMMANDS.DEADLINES || command == CommandDetails.COMMANDS.EXIT
+				|| command == CommandDetails.COMMANDS.RECURRING) {
 			if (description != null || start != null || end != null || ID != -10) {
 				throw new invalidParameters(input);
 			}
@@ -713,11 +720,11 @@ public class Parser {
 			if (endingDate != null && recurring == null) {
 				throw new invalidParameters(input);
 			}
-
-			if (endingDate.before(start)) {
-				throw new invalidTimeDateInput("Recurring end Date before Start Date");
+			if (start != null) {
+				if (endingDate.before(start)) {
+					throw new invalidTimeDateInput("Recurring end Date before Start Date");
+				}
 			}
-
 		}
 
 	}
