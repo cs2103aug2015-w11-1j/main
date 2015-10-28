@@ -9,7 +9,7 @@ import java.util.Date;
  * Task knows the existence of commandDetails object
  */
 
-public class Task {
+public class Task implements Comparable<Task> {
 
 	private String description;
 	private Date startDate;
@@ -65,7 +65,7 @@ public class Task {
 	public void setRecurring(String recurring) {
 		this.recurring = recurring;
 	}
-	
+
 	public void setOriginalStartDate(Date originalStartDate) {
 		this.originalStartDate = originalStartDate;
 	}
@@ -77,23 +77,22 @@ public class Task {
 	public void setEndingDate(Date endingDate) {
 		this.endingDate = endingDate;
 	}
-	
-	public void incrementRecurringCount()	{
+
+	public void incrementRecurringCount() {
 		this.recurringCount++;
 	}
-	
-	public void resetRecurringCount()	{
+
+	public void resetRecurringCount() {
 		this.recurringCount = 1;
 	}
-	
-	public void setRecurringCount(int recurringCount)	{
+
+	public void setRecurringCount(int recurringCount) {
 		this.recurringCount = recurringCount;
 	}
 
 	public void setIsComplete(boolean isComplete) {
 		this.isComplete = isComplete;
 	}
-
 
 	// Accessors
 
@@ -112,7 +111,7 @@ public class Task {
 	public String getRecurring() {
 		return this.recurring;
 	}
-	
+
 	public Date getOriginalStartDate() {
 		return this.originalStartDate;
 	}
@@ -120,12 +119,12 @@ public class Task {
 	public Date getOriginalDeadline() {
 		return this.originalDeadline;
 	}
-	
+
 	public Date getEndingDate() {
 		return this.endingDate;
 	}
-	
-	public int getRecurringCount()	{
+
+	public int getRecurringCount() {
 		return this.recurringCount;
 	}
 
@@ -241,4 +240,16 @@ public class Task {
 					+ "\nEnding Date: " + ending + "\n");
 		}
 	}
+
+	@Override
+	public int compareTo(Task o) {
+		if ((getStartDate() == null || o.getStartDate() == null) && getDeadline() == null || o.getDeadline() == null) {
+			return 0;
+		}
+		if (getStartDate() == null || o.getStartDate() == null) {
+			return getDeadline().compareTo(o.getDeadline());
+		}
+		return getStartDate().compareTo(o.getStartDate());
+	}
+
 }

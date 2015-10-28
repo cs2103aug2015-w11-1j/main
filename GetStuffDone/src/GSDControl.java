@@ -121,8 +121,8 @@ public class GSDControl {
 					return new Feedback(updateTask(commandDetails.getID() - 1),
 							FEEDBACK_UPDATE + taskDescription + "\n", generateInfoBox());
 				}
-				return new Feedback(updateTask(commandDetails.getID() - 1), FEEDBACK_UPDATE
-						+ taskDescription + " to " + this.commandDetails.getDescription() + "\n",
+				return new Feedback(updateTask(commandDetails.getID() - 1),
+						FEEDBACK_UPDATE + taskDescription + " to " + this.commandDetails.getDescription() + "\n",
 						generateInfoBox());
 			} catch (IndexOutOfBoundsException e) {
 				isValidTaskNo = false;
@@ -302,7 +302,7 @@ public class GSDControl {
 	private String redoLastAction() {
 		return executeHistoryCommand();
 	}
-	
+
 	private String executeHistoryCommand() {
 		switch (this.commandDetails.getCommand()) {
 		case ADD:
@@ -397,7 +397,9 @@ public class GSDControl {
 			if (tasks.get(i).isRecurring()) {
 				originalStartDateCal.setTime(tasks.get(i).getOriginalStartDate());
 				originalDeadlineCal.setTime(tasks.get(i).getOriginalDeadline());
-				startDateCal.setTime(tasks.get(i).getStartDate());
+				if (tasks.get(i).getStartDate() != null) {
+					startDateCal.setTime(tasks.get(i).getStartDate());
+				}
 				deadlineCal.setTime(tasks.get(i).getDeadline());
 				endingDateCal.setTime(tasks.get(i).getEndingDate());
 				Task recurringTask = tasks.get(i);
@@ -511,6 +513,7 @@ public class GSDControl {
 
 	private String displayAllTasks() {
 		refreshRecurringTasks();
+		Collections.sort(tasks);
 		String displayAll = "";
 
 		for (int i = 0; i < tasks.size(); i++) {
@@ -541,6 +544,7 @@ public class GSDControl {
 
 	private String displayEvents() {
 		refreshRecurringTasks();
+		Collections.sort(tasks);
 		String events = "";
 
 		for (int i = 0; i < tasks.size(); i++) {
@@ -557,6 +561,7 @@ public class GSDControl {
 
 	private String displayDeadlines() {
 		refreshRecurringTasks();
+		Collections.sort(tasks);
 		String deadlines = "";
 
 		for (int i = 0; i < tasks.size(); i++) {
@@ -573,6 +578,7 @@ public class GSDControl {
 
 	private String displayRecurring() {
 		refreshRecurringTasks();
+		Collections.sort(tasks);
 		String recurring = "";
 
 		for (int i = 0; i < tasks.size(); i++) {
@@ -606,4 +612,5 @@ public class GSDControl {
 		return "Floating Tasks = " + floating + "\nEvents = " + events + "\nDeadlines = " + deadlines
 				+ "\nRecurring Tasks = " + recurring + "\nTotal No. of Tasks = " + totalTasks + "\n";
 	}
+
 }
