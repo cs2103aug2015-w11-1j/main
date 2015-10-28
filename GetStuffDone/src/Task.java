@@ -78,6 +78,14 @@ public class Task {
 		this.endingDate = endingDate;
 	}
 	
+	public void incrementRecurringCount()	{
+		this.recurringCount++;
+	}
+	
+	public void resetRecurringCount()	{
+		this.recurringCount = 1;
+	}
+	
 	public void setRecurringCount(int recurringCount)	{
 		this.recurringCount = recurringCount;
 	}

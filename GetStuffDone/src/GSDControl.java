@@ -8,6 +8,7 @@ import java.util.*;
  * GSDControl knows the existence of the main components Parser, Task, History and Storage
  * GSDControl knows the existence of stand-alone classes CommandDetails, Task and Feedback 
  * GSDControl does not know the existence of UI
+ * GSDControl returns a Feedback Object to UI for displaying
  */
 
 public class GSDControl {
@@ -47,6 +48,19 @@ public class GSDControl {
 	private static final String FEEDBACK_INVALID_DATE_FORMAT = ">> ERROR : INVALID DATE/TIME FORMAT\n";
 	private static final String FEEDBACK_INVALID_TIME_DATE_INPUT = ">> ERROR : INVALID DATE/TIME INPUT\n";
 
+	private static final String HELP_COMMANDS = "Add a floating task\n" + "Add a deadline task\n" + "Add an event\n"
+			+ "Add a recurring task\n" + "Search for task\n" + "Update a task\n" + "Delete a task\n"
+			+ "Mark a task as complete\n" + "Mark a task as incomplete\n" + "Undo last action\n" + "Redo last action\n"
+			+ "Display all tasks\n" + "Display floating tasks\n" + "Display events\n" + "Display deadlines\n"
+			+ "Display recurring tasks\n" + "Set file path\n" + "Exit GSD\n";
+
+	private static final String HELP_SYNTAX = "add <description>\n" + "add <description> BY <time> <date>\n"
+			+ "add <description> FROM <start time> <start date> TO <end time> <end date>\n"
+			+ "add [event/deadline] <frequency> ENDING <ending date>\n" + "search <keyword/day/date>\n"
+			+ "update <ID> [floating/event/deadline]\n" + "delete <ID>\n" + "complete <ID>\n" + "incomplete <ID>\n"
+			+ "undo\n" + "redo\n" + "all\n" + "floating\n" + "events\n" + "deadlines\n" + "recurring\n"
+			+ "set <file path>\n" + "exit\n";
+
 	private ArrayList<Task> tasks;
 	private CommandDetails commandDetails;
 	private Parser parser = new Parser();
@@ -71,15 +85,16 @@ public class GSDControl {
 			// eg delete 1 screw this up
 			// eg All banananaanananananaa
 		}
+		return executeCommand(input);
+	}
+
+	private Feedback executeCommand(String input) {
 		switch (this.commandDetails.getCommand()) {
 		case ADD:
 			this.commandDetails.setID(tasks.size());
-			history.insert(this.commandDetails);
 			return new Feedback(createTask(), FEEDBACK_ADD + commandDetails.getDescription() + "\n", generateInfoBox());
 		case DELETE:
 			try {
-				CommandDetails deletedDetails = generateDetails();
-				history.insert(deletedDetails);
 				String taskDescription = tasks.get(commandDetails.getID() - 1).getDescription();
 				return new Feedback(deleteTask(commandDetails.getID() - 1), FEEDBACK_DELETE + taskDescription + "\n",
 						generateInfoBox());
@@ -101,14 +116,13 @@ public class GSDControl {
 			return new Feedback(searchTask(), FEEDBACK_SEARCH + feedbackString + "\n", generateInfoBox());
 		case UPDATE:
 			try {
-				CommandDetails oldDetails = generateDetails();
-				history.insert(oldDetails);
+				String taskDescription = tasks.get(commandDetails.getID() - 1).getDescription();
 				if (this.commandDetails.getDescription() == null) {
 					return new Feedback(updateTask(commandDetails.getID() - 1),
-							FEEDBACK_UPDATE + oldDetails.getDescription() + "\n", generateInfoBox());
+							FEEDBACK_UPDATE + taskDescription + "\n", generateInfoBox());
 				}
 				return new Feedback(updateTask(commandDetails.getID() - 1), FEEDBACK_UPDATE
-						+ oldDetails.getDescription() + " to " + this.commandDetails.getDescription() + "\n",
+						+ taskDescription + " to " + this.commandDetails.getDescription() + "\n",
 						generateInfoBox());
 			} catch (IndexOutOfBoundsException e) {
 				isValidTaskNo = false;
@@ -121,7 +135,6 @@ public class GSDControl {
 			}
 		case COMPLETE:
 			try {
-				history.insert(this.commandDetails);
 				return new Feedback(completeTask(commandDetails.getID() - 1),
 						FEEDBACK_COMPLETE + tasks.get(this.commandDetails.getID() - 1).getDescription() + "\n",
 						generateInfoBox());
@@ -136,7 +149,6 @@ public class GSDControl {
 			}
 		case INCOMPLETE:
 			try {
-				history.insert(this.commandDetails);
 				return new Feedback(incompleteTask(commandDetails.getID() - 1),
 						FEEDBACK_INCOMPLETE + tasks.get(this.commandDetails.getID() - 1).getDescription() + "\n",
 						generateInfoBox());
@@ -172,7 +184,7 @@ public class GSDControl {
 		case RECURRING:
 			return new Feedback(displayRecurring(), FEEDBACK_RECURRING, generateInfoBox());
 		case HELP:
-			return new Feedback(null, FEEDBACK_HELP, generateInfoBox(), helpCommands(), helpSyntax());
+			return new Feedback(null, FEEDBACK_HELP, generateInfoBox(), HELP_COMMANDS, HELP_SYNTAX);
 		case EXIT:
 			System.exit(0);
 		case SET:
@@ -198,15 +210,18 @@ public class GSDControl {
 	public GSDControl() {
 	}
 
-	// For UI
+	/*************************************************************************************************
+	 ******************************************* UI METHOD *******************************************
+	 *************************************************************************************************/
 
 	public Feedback loadFromFile() {
 		try {
 			tasks = storage.load();
-			if(tasks==null)	{
+			if (tasks == null) {
 				tasks = new ArrayList<Task>();
 				return new Feedback(DISPLAY_NO_TASKS, FEEDBACK_NO_FILE, generateInfoBox());
 			}
+			refreshRecurringTasks();
 			return new Feedback(displayAllTasks(), FEEDBACK_WELCOME_MESSAGE, generateInfoBox());
 		} catch (IOException e) {
 			tasks = new ArrayList<Task>();
@@ -215,16 +230,17 @@ public class GSDControl {
 			tasks = new ArrayList<Task>();
 			return new Feedback(DISPLAY_NO_TASKS, FEEDBACK_LOAD_ERROR, generateInfoBox());
 		}
-		
 
-		
 	}
 
-	// Behavioural Methods
+	/*************************************************************************************************
+	 ******************************************* CRUD ************************************************
+	 *************************************************************************************************/
 
 	private String createTask() {
 		Task task = new Task(this.commandDetails);
 		tasks.add(task);
+		sendToHistory();
 		storage.save(tasks);
 		return displayAllTasks();
 	}
@@ -245,17 +261,15 @@ public class GSDControl {
 	}
 
 	private String updateTask(int ID) {
+		sendToHistory();
 		tasks.get(ID).updateDetails(commandDetails);
-		Task updatedTask = tasks.get(ID);
-		CommandDetails updatedDetails = new CommandDetails(CommandDetails.COMMANDS.UPDATE, updatedTask.getDescription(),
-				updatedTask.getStartDate(), updatedTask.getDeadline(), ID, updatedTask.getRecurring(),
-				updatedTask.getOriginalStartDate(), updatedTask.getOriginalDeadline(), updatedTask.getEndingDate());
-		history.insert(updatedDetails);
+		sendToHistory();
 		storage.save(tasks);
 		return displayAllTasks();
 	}
 
 	private String deleteTask(int ID) {
+		sendToHistory();
 		tasks.remove(ID);
 		storage.save(tasks);
 		return displayAllTasks();
@@ -273,110 +287,59 @@ public class GSDControl {
 		return displayAllTasks();
 	}
 
+	private boolean setFilePath() {
+		return storage.setFilePath(this.commandDetails.getDescription());
+	}
+
+	/*************************************************************************************************
+	 ******************************************* UNDO/REDO *******************************************
+	 *************************************************************************************************/
+
 	private String undoLastAction() {
-		this.commandDetails = reverseCommandDetails(this.commandDetails.getID());
-		return executeHistoryCommand();
+		return reverseAndExecuteHistoryCommand(this.commandDetails.getID());
 	}
 
 	private String redoLastAction() {
 		return executeHistoryCommand();
 	}
-
-	private void recurringTaskUpdate() {
-
-		Calendar currentDateCal = Calendar.getInstance();
-		Calendar originalStartDateCal = Calendar.getInstance();
-		Calendar originalDeadlineCal = Calendar.getInstance();
-		Calendar startDateCal = Calendar.getInstance();
-		Calendar deadlineCal = Calendar.getInstance();
-		Calendar endingDateCal = Calendar.getInstance();
-
-		for (int i = 0; i < tasks.size(); i++) {
-			if (tasks.get(i).isRecurring()) {
-				System.out.println("i = " + i);
-				originalStartDateCal.setTime(tasks.get(i).getOriginalStartDate());
-				originalDeadlineCal.setTime(tasks.get(i).getOriginalDeadline());
-				startDateCal.setTime(tasks.get(i).getStartDate());
-				deadlineCal.setTime(tasks.get(i).getDeadline());
-				endingDateCal.setTime(tasks.get(i).getEndingDate());
-				if (currentDateCal.after(deadlineCal) || tasks.get(i).isComplete()) {
-					System.out.println("PAST DEADLINE\n");
-					{
-						if (currentDateCal.before(endingDateCal)) {
-							System.out.println("BEFORE END DATE\n");
-							switch (tasks.get(i).getRecurring()) {
-							case "DAILY":
-								originalStartDateCal.add(Calendar.DAY_OF_YEAR, tasks.get(i).getRecurringCount());
-								originalDeadlineCal.add(Calendar.DAY_OF_YEAR, tasks.get(i).getRecurringCount());
-								tasks.get(i).setStartDate(originalStartDateCal.getTime());
-								tasks.get(i).setDeadline(originalDeadlineCal.getTime());
-								originalStartDateCal.setTime(tasks.get(i).getOriginalStartDate());
-								originalDeadlineCal.setTime(tasks.get(i).getOriginalDeadline());
-								tasks.get(i).setRecurringCount(tasks.get(i).getRecurringCount() + 1);
-								break;
-							case "WEEKLY":
-								startDateCal.add(Calendar.DAY_OF_YEAR, 7 * tasks.get(i).getRecurringCount());
-								deadlineCal.add(Calendar.DAY_OF_YEAR, 7 * tasks.get(i).getRecurringCount());
-								tasks.get(i).setStartDate(originalStartDateCal.getTime());
-								tasks.get(i).setDeadline(originalDeadlineCal.getTime());
-								originalStartDateCal.setTime(tasks.get(i).getOriginalStartDate());
-								originalDeadlineCal.setTime(tasks.get(i).getOriginalDeadline());
-								tasks.get(i).setRecurringCount(tasks.get(i).getRecurringCount() + 1);
-								break;
-							case "MONTHLY":
-								
-								/*
-								startDateCal.add(Calendar.MONTH, tasks.get(i).getRecurringCount());
-								deadlineCal.add(Calendar.MONTH, tasks.get(i).getRecurringCount());
-								tasks.get(i).setStartDate(originalStartDateCal.getTime());
-								tasks.get(i).setDeadline(originalDeadlineCal.getTime());
-								originalStartDateCal.setTime(tasks.get(i).getOriginalStartDate());
-								originalDeadlineCal.setTime(tasks.get(i).getOriginalDeadline());
-								tasks.get(i).setRecurringCount(tasks.get(i).getRecurringCount() + 1);
-								*/
-								
-								//copy original start date
-								startDateCal = (Calendar) originalStartDateCal.clone();
-								//copy original end date
-								deadlineCal = (Calendar) originalDeadlineCal.clone();
-								//add original with count to copy
-								startDateCal.add(Calendar.MONTH, tasks.get(i).getRecurringCount());
-								//add original with count to copy
-								deadlineCal.add(Calendar.MONTH, tasks.get(i).getRecurringCount());
-								// set task start date with edited copy
-								tasks.get(i).setStartDate(startDateCal.getTime());
-								// set task end date with edited copy
-								tasks.get(i).setDeadline(deadlineCal.getTime());
-								// add count
-								tasks.get(i).setRecurringCount(tasks.get(i).getRecurringCount() + 1);
-								
-								break;
-							case "YEARLY":
-								startDateCal.add(Calendar.YEAR, tasks.get(i).getRecurringCount());
-								deadlineCal.add(Calendar.YEAR, tasks.get(i).getRecurringCount());
-								tasks.get(i).setStartDate(originalStartDateCal.getTime());
-								tasks.get(i).setDeadline(originalDeadlineCal.getTime());
-								originalStartDateCal.setTime(tasks.get(i).getOriginalStartDate());
-								originalDeadlineCal.setTime(tasks.get(i).getOriginalDeadline());
-								tasks.get(i).setRecurringCount(tasks.get(i).getRecurringCount() + 1);
-								break;
-							}
-							// change to the next stated date according to the
-							// RECURRING string
-						} else {
-							// if recurring task expired
-							System.out.println("EXPIRED\n");
-							tasks.get(i).setRecurringCount(1);
-						}
-					}
-				}
-			}
+	
+	private String executeHistoryCommand() {
+		switch (this.commandDetails.getCommand()) {
+		case ADD:
+			return undoRedoCreateTask();
+		case DELETE:
+			return undoRedoDeleteTask();
+		case UPDATE:
+			return undoRedoUpdateTask(this.commandDetails.getID());
+		case COMPLETE:
+			return completeTask(commandDetails.getID() - 1);
+		case INCOMPLETE:
+			return incompleteTask(commandDetails.getID() - 1);
+		default:
+			return null;
 		}
-
 	}
 
-	private boolean setFilePath() {
-		return storage.setFilePath(this.commandDetails.getDescription());
+	private String reverseAndExecuteHistoryCommand(int ID) {
+		switch (this.commandDetails.getCommand()) {
+		case ADD:
+			this.commandDetails = reverseAdd();
+			return undoRedoDeleteTask();
+		case DELETE:
+			this.commandDetails = reverseDelete(ID);
+			return undoRedoCreateTask();
+		case UPDATE:
+			return undoRedoUpdateTask(ID);
+		case COMPLETE:
+			this.commandDetails = reverseComplete(ID);
+			return completeTask(commandDetails.getID() - 1);
+		case INCOMPLETE:
+			this.commandDetails = reverseIncomplete(ID);
+			return incompleteTask(commandDetails.getID() - 1);
+		default:
+			return null;
+
+		}
 	}
 
 	private String undoRedoCreateTask() {
@@ -398,26 +361,156 @@ public class GSDControl {
 		return displayAllTasks();
 	}
 
+	private CommandDetails reverseAdd() {
+		return new CommandDetails(CommandDetails.COMMANDS.DELETE, tasks.size() - 1);
+	}
+
+	private CommandDetails reverseDelete(int ID) {
+		return new CommandDetails(CommandDetails.COMMANDS.ADD, this.commandDetails.getDescription(),
+				this.commandDetails.getStartDate(), this.commandDetails.getDeadline(), this.commandDetails.getID(),
+				this.commandDetails.getRecurring(), this.commandDetails.getOriginalStartDate(),
+				this.commandDetails.getOriginalDeadline(), this.commandDetails.getEndingDate());
+	}
+
+	private CommandDetails reverseComplete(int ID) {
+		return new CommandDetails(CommandDetails.COMMANDS.INCOMPLETE, tasks.size());
+	}
+
+	private CommandDetails reverseIncomplete(int ID) {
+		return new CommandDetails(CommandDetails.COMMANDS.COMPLETE, tasks.size());
+	}
+
+	/*************************************************************************************************
+	 ******************************************* RECURRING *******************************************
+	 *************************************************************************************************/
+
+	private void refreshRecurringTasks() {
+
+		Calendar currentDateCal = Calendar.getInstance();
+		Calendar originalStartDateCal = Calendar.getInstance();
+		Calendar originalDeadlineCal = Calendar.getInstance();
+		Calendar startDateCal = Calendar.getInstance();
+		Calendar deadlineCal = Calendar.getInstance();
+		Calendar endingDateCal = Calendar.getInstance();
+
+		for (int i = 0; i < tasks.size(); i++) {
+			if (tasks.get(i).isRecurring()) {
+				originalStartDateCal.setTime(tasks.get(i).getOriginalStartDate());
+				originalDeadlineCal.setTime(tasks.get(i).getOriginalDeadline());
+				startDateCal.setTime(tasks.get(i).getStartDate());
+				deadlineCal.setTime(tasks.get(i).getDeadline());
+				endingDateCal.setTime(tasks.get(i).getEndingDate());
+				Task recurringTask = tasks.get(i);
+				updateRecurringTask(currentDateCal, originalStartDateCal, originalDeadlineCal, startDateCal,
+						deadlineCal, endingDateCal, recurringTask);
+			}
+		}
+
+	}
+
+	private void updateRecurringTask(Calendar currentDateCal, Calendar originalStartDateCal,
+			Calendar originalDeadlineCal, Calendar startDateCal, Calendar deadlineCal, Calendar endingDateCal,
+			Task recurringTask) {
+
+		if (isDueForUpdateAndNotExpired(currentDateCal, deadlineCal, endingDateCal, recurringTask)) {
+			switch (recurringTask.getRecurring()) {
+			case "DAILY":
+				startDateCal = (Calendar) originalStartDateCal.clone();
+				deadlineCal = (Calendar) originalDeadlineCal.clone();
+				startDateCal.add(Calendar.DAY_OF_YEAR, recurringTask.getRecurringCount());
+				deadlineCal.add(Calendar.DAY_OF_YEAR, recurringTask.getRecurringCount());
+				recurringTask.setStartDate(startDateCal.getTime());
+				recurringTask.setDeadline(deadlineCal.getTime());
+				recurringTask.incrementRecurringCount();
+				break;
+			case "WEEKLY":
+				startDateCal = (Calendar) originalStartDateCal.clone();
+				deadlineCal = (Calendar) originalDeadlineCal.clone();
+				startDateCal.add(Calendar.DAY_OF_YEAR, 7 * recurringTask.getRecurringCount());
+				deadlineCal.add(Calendar.DAY_OF_YEAR, 7 * recurringTask.getRecurringCount());
+				recurringTask.setStartDate(startDateCal.getTime());
+				recurringTask.setDeadline(deadlineCal.getTime());
+				recurringTask.incrementRecurringCount();
+				break;
+			case "MONTHLY":
+				startDateCal = (Calendar) originalStartDateCal.clone();
+				deadlineCal = (Calendar) originalDeadlineCal.clone();
+				startDateCal.add(Calendar.MONTH, recurringTask.getRecurringCount());
+				deadlineCal.add(Calendar.MONTH, recurringTask.getRecurringCount());
+				recurringTask.setStartDate(startDateCal.getTime());
+				recurringTask.setDeadline(deadlineCal.getTime());
+				recurringTask.incrementRecurringCount();
+				break;
+			case "YEARLY":
+				startDateCal = (Calendar) originalStartDateCal.clone();
+				deadlineCal = (Calendar) originalDeadlineCal.clone();
+				startDateCal.add(Calendar.YEAR, recurringTask.getRecurringCount());
+				deadlineCal.add(Calendar.YEAR, recurringTask.getRecurringCount());
+				recurringTask.setStartDate(startDateCal.getTime());
+				recurringTask.setDeadline(deadlineCal.getTime());
+				recurringTask.incrementRecurringCount();
+				break;
+			}
+		} else {
+			recurringTask.resetRecurringCount();
+		}
+	}
+
+	private boolean isDueForUpdateAndNotExpired(Calendar currentDateCal, Calendar deadlineCal, Calendar endingDateCal,
+			Task recurringTask) {
+		return (currentDateCal.after(deadlineCal) || recurringTask.isComplete())
+				&& currentDateCal.before(endingDateCal);
+	}
+
+	/*************************************************************************************************
+	 ******************************************* HISTORY *********************************************
+	 *************************************************************************************************/
+
+	private void sendToHistory() {
+		switch (this.commandDetails.getCommand()) {
+		case ADD:
+			history.insert(this.commandDetails);
+			break;
+		case DELETE:
+			history.insert(generateDetails());
+			break;
+		case UPDATE:
+			history.insert(generateDetails());
+			break;
+		case COMPLETE:
+			history.insert(this.commandDetails);
+			break;
+		case INCOMPLETE:
+			history.insert(this.commandDetails);
+			break;
+		default:
+			break;
+		}
+	}
+
 	private CommandDetails generateDetails() {
 		Task task = tasks.get(this.commandDetails.getID() - 1);
+		System.out.println(task);
 		switch (this.commandDetails.getCommand()) {
 		case DELETE:
-			CommandDetails deletedDetails = new CommandDetails(CommandDetails.COMMANDS.DELETE, task.getDescription(),
-					task.getStartDate(), task.getDeadline(), this.commandDetails.getID() - 1, task.getRecurring(),
+			return new CommandDetails(CommandDetails.COMMANDS.DELETE, task.getDescription(), task.getStartDate(),
+					task.getDeadline(), this.commandDetails.getID() - 1, task.getRecurring(),
 					task.getOriginalStartDate(), task.getOriginalDeadline(), task.getEndingDate());
-			return deletedDetails;
 		case UPDATE:
-			CommandDetails oldDetails = new CommandDetails(CommandDetails.COMMANDS.UPDATE, task.getDescription(),
-					task.getStartDate(), task.getDeadline(), this.commandDetails.getID() - 1, task.getRecurring(),
+			return new CommandDetails(CommandDetails.COMMANDS.UPDATE, task.getDescription(), task.getStartDate(),
+					task.getDeadline(), this.commandDetails.getID() - 1, task.getRecurring(),
 					task.getOriginalStartDate(), task.getOriginalDeadline(), task.getEndingDate());
-			return oldDetails;
 		default:
 			return null;
 		}
 	}
 
+	/*************************************************************************************************
+	 ******************************************* DISPLAY *********************************************
+	 *************************************************************************************************/
+
 	private String displayAllTasks() {
-		recurringTaskUpdate();
+		refreshRecurringTasks();
 		String displayAll = "";
 
 		for (int i = 0; i < tasks.size(); i++) {
@@ -431,7 +524,7 @@ public class GSDControl {
 	}
 
 	private String displayFloatingTasks() {
-		recurringTaskUpdate();
+		refreshRecurringTasks();
 		String floating = "";
 
 		for (int i = 0; i < tasks.size(); i++) {
@@ -447,7 +540,7 @@ public class GSDControl {
 	}
 
 	private String displayEvents() {
-		recurringTaskUpdate();
+		refreshRecurringTasks();
 		String events = "";
 
 		for (int i = 0; i < tasks.size(); i++) {
@@ -463,7 +556,7 @@ public class GSDControl {
 	}
 
 	private String displayDeadlines() {
-		recurringTaskUpdate();
+		refreshRecurringTasks();
 		String deadlines = "";
 
 		for (int i = 0; i < tasks.size(); i++) {
@@ -479,7 +572,7 @@ public class GSDControl {
 	}
 
 	private String displayRecurring() {
-		recurringTaskUpdate();
+		refreshRecurringTasks();
 		String recurring = "";
 
 		for (int i = 0; i < tasks.size(); i++) {
@@ -513,81 +606,4 @@ public class GSDControl {
 		return "Floating Tasks = " + floating + "\nEvents = " + events + "\nDeadlines = " + deadlines
 				+ "\nRecurring Tasks = " + recurring + "\nTotal No. of Tasks = " + totalTasks + "\n";
 	}
-
-	private String helpCommands() {
-		return "Add a floating task\n" + "Add a deadline task\n" + "Add an event\n" + "Add a recurring task\n"
-				+ "Search for task\n" + "Update a task\n" + "Delete a task\n" + "Mark a task as complete\n"
-				+ "Mark a task as incomplete\n" + "Undo last action\n" + "Redo last action\n" + "Display all tasks\n"
-				+ "Display floating tasks\n" + "Display events\n" + "Display deadlines\n" + "Display recurring tasks\n"
-				+ "Set file path\n" + "Exit GSD\n";
-	}
-
-	private String helpSyntax() {
-		return "add <description>\n" + "add <description> BY <time> <date>\n"
-				+ "add <description> FROM <start time> <start date> TO <end time> <end date>\n"
-				+ "add [event/deadline] <frequency> ENDING <ending date>\n" + "search <keyword/day/date>\n"
-				+ "update <ID> [floating/event/deadline]\n" + "delete <ID>\n" + "complete <ID>\n" + "incomplete <ID>\n"
-				+ "undo\n" + "redo\n" + "all\n" + "floating\n" + "events\n" + "deadlines\n" + "recurring\n"
-				+ "set <file path>\n" + "exit\n";
-	}
-
-	private String executeHistoryCommand() {
-		switch (this.commandDetails.getCommand()) {
-		case ADD:
-			return undoRedoCreateTask();
-		case DELETE:
-			return undoRedoDeleteTask();
-		case UPDATE:
-			return undoRedoUpdateTask(commandDetails.getID());
-		case COMPLETE:
-			return completeTask(commandDetails.getID() - 1);
-		case INCOMPLETE:
-			return incompleteTask(commandDetails.getID() - 1);
-		default:
-			return null;
-		}
-	}
-
-	private CommandDetails reverseCommandDetails(int ID) {
-		switch (this.commandDetails.getCommand()) {
-		case ADD:
-			return reverseAdd();
-		case DELETE:
-			return reverseDelete(ID);
-		case UPDATE:
-			return this.commandDetails; // don't need to reverse engineer
-		case COMPLETE:
-			return reverseComplete(ID);
-		case INCOMPLETE:
-			return reverseIncomplete(ID);
-		default:
-			return commandDetails;
-
-		}
-	}
-
-	private CommandDetails reverseAdd() {
-		CommandDetails addToDelete = new CommandDetails(CommandDetails.COMMANDS.DELETE, tasks.size() - 1);
-		return addToDelete;
-	}
-
-	private CommandDetails reverseDelete(int ID) {
-		CommandDetails taskDelete = new CommandDetails(CommandDetails.COMMANDS.ADD,
-				this.commandDetails.getDescription(), this.commandDetails.getStartDate(),
-				this.commandDetails.getDeadline(), this.commandDetails.getID(), this.commandDetails.getRecurring(),
-				this.commandDetails.getOriginalStartDate(), this.commandDetails.getOriginalDeadline(),
-				this.commandDetails.getEndingDate());
-		return taskDelete;
-	}
-
-	private CommandDetails reverseComplete(int ID) {
-		CommandDetails completeToIncomplete = new CommandDetails(CommandDetails.COMMANDS.INCOMPLETE, tasks.size());
-		return completeToIncomplete;
-	}
-
-	private CommandDetails reverseIncomplete(int ID) {
-		CommandDetails incompleteToComplete = new CommandDetails(CommandDetails.COMMANDS.COMPLETE, tasks.size());
-		return incompleteToComplete;
-	}
-
 }
