@@ -7,6 +7,8 @@ public class CommandDetails {
 	private COMMANDS command;
 	private int ID;
 	private String recurring;
+	private Date originalStartDate;
+	private Date originalDeadline;
 	private Date endingDate;
 
 	public enum COMMANDS {
@@ -16,13 +18,15 @@ public class CommandDetails {
 	// constructor
 
 	public CommandDetails(COMMANDS command, String description, Date startDate, Date deadline, int ID, String recurring,
-			Date endingDate) {
+			Date originalStartDate, Date originalDeadline, Date endingDate) {
 		this.deadline = deadline;
 		this.startDate = startDate;
 		this.description = description;
 		this.command = command;
 		this.ID = ID;
 		this.recurring = recurring;
+		this.originalStartDate = originalStartDate;
+		this.originalDeadline = originalDeadline;
 		this.endingDate = endingDate;
 	}
 
@@ -57,6 +61,22 @@ public class CommandDetails {
 		return this.ID;
 	}
 
+	public String getRecurring() {
+		return this.recurring;
+	}
+
+	public Date getOriginalStartDate() {
+		return this.originalStartDate;
+	}
+
+	public Date getOriginalDeadline() {
+		return this.originalDeadline;
+	}
+
+	public Date getEndingDate() {
+		return this.endingDate;
+	}
+
 	// Mutators
 
 	public void setCommand(COMMANDS command) {
@@ -79,21 +99,26 @@ public class CommandDetails {
 		this.description = description;
 	}
 
-	public String getRecurring() {
-		return this.recurring;
+	public void setOriginalStartDate(Date originalStartDate) {
+		this.originalStartDate = originalStartDate;
 	}
 
-	public Date getEndingDate() {
-		return this.endingDate;
+	public void setOriginalDeadline(Date originalDeadline) {
+		this.originalDeadline = originalDeadline;
+	}
+
+	public void setEndingDate(Date endingDate) {
+		this.endingDate = endingDate;
 	}
 
 	// Overriding methods
 	@Override
 	public String toString() {
 		String result = "";
-		result = "command = " + command + "\n" + "ID = " + ID + "\n" + "description = " + description + "\n"
-				+ "startDate = " + startDate + "\n" + "deadline = " + deadline + "\n" + "Recurring = " + recurring
-				+ "\n" + "Ending Date = " + endingDate + "\n";
+		result = "command = " + command + "\nID = " + ID + "\ndescription = " + description + "\nstartDate = "
+				+ startDate + "\ndeadline = " + deadline + "\nRecurring = " + recurring + "\noriginalStartDate = "
+				+ originalStartDate + "\noriginalDeadline = " + originalDeadline + "\nEnding Date = " + endingDate
+				+ "\n";
 		return result;
 	}
 }

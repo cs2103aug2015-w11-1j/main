@@ -15,12 +15,11 @@ public class Task {
 	private Date startDate;
 	private Date deadline;
 	private String recurring;
+	private Date originalStartDate;
+	private Date originalDeadline;
 	private Date endingDate;
+	private int recurringCount;
 	private boolean isComplete;
-	private boolean isEvent;
-	private boolean isDeadline;
-	private boolean isFloating;
-	private boolean isRecurring;
 
 	// Constructors
 
@@ -30,12 +29,12 @@ public class Task {
 		startDate = null;
 		deadline = null;
 		recurring = null;
+		originalStartDate = null;
+		originalDeadline = null;
 		endingDate = null;
+		recurringCount = 1;
 		isComplete = false;
-		isEvent = false;
-		isDeadline = false;
-		isFloating = false;
-		isRecurring = false;
+
 	}
 
 	public Task(CommandDetails details) {
@@ -43,6 +42,8 @@ public class Task {
 		this.startDate = details.getStartDate();
 		this.deadline = details.getDeadline();
 		this.recurring = details.getRecurring();
+		this.originalStartDate = details.getOriginalStartDate();
+		this.originalDeadline = details.getOriginalDeadline();
 		this.endingDate = details.getEndingDate();
 		this.isComplete = false;
 	}
@@ -64,9 +65,21 @@ public class Task {
 	public void setRecurring(String recurring) {
 		this.recurring = recurring;
 	}
+	
+	public void setOriginalStartDate(Date originalStartDate) {
+		this.originalStartDate = originalStartDate;
+	}
+
+	public void setOriginalDeadline(Date originalDeadline) {
+		this.originalDeadline = originalDeadline;
+	}
 
 	public void setEndingDate(Date endingDate) {
 		this.endingDate = endingDate;
+	}
+	
+	public void setRecurringCount(int recurringCount)	{
+		this.recurringCount = recurringCount;
 	}
 
 	public void setIsComplete(boolean isComplete) {
@@ -91,9 +104,21 @@ public class Task {
 	public String getRecurring() {
 		return this.recurring;
 	}
+	
+	public Date getOriginalStartDate() {
+		return this.originalStartDate;
+	}
 
+	public Date getOriginalDeadline() {
+		return this.originalDeadline;
+	}
+	
 	public Date getEndingDate() {
 		return this.endingDate;
+	}
+	
+	public int getRecurringCount()	{
+		return this.recurringCount;
 	}
 
 	public boolean isComplete() {
@@ -101,19 +126,19 @@ public class Task {
 	}
 
 	public boolean isEvent() {
-		return (startDate != null && deadline != null);
+		return (this.startDate != null && this.deadline != null && this.endingDate == null);
 	}
 
 	public boolean isDeadline() {
-		return (startDate == null && deadline != null);
+		return (this.startDate == null && this.deadline != null);
 	}
 
 	public boolean isFloating() {
-		return (startDate == null && deadline == null);
+		return (this.startDate == null && this.deadline == null);
 	}
 
 	public boolean isRecurring() {
-		return (recurring != null && endingDate != null);
+		return (this.recurring != null && this.endingDate != null);
 	}
 
 	// Behavioural methods
@@ -124,6 +149,8 @@ public class Task {
 		this.startDate = details.getStartDate();
 		this.deadline = details.getDeadline();
 		this.recurring = details.getRecurring();
+		this.originalStartDate = details.getOriginalStartDate();
+		this.originalDeadline = details.getOriginalDeadline();
 		this.endingDate = details.getEndingDate();
 
 	}
@@ -199,7 +226,7 @@ public class Task {
 		} else {
 			ending = df.format(endingDate);
 		}
-		if (!isRecurring) {
+		if (!isRecurring()) {
 			return (description + "\nStart Date: " + start + "\nDeadline: " + end + "\n");
 		} else {
 			return (description + "\nStart Date: " + start + "\nDeadline: " + end + "\n" + "Recurring " + recurring

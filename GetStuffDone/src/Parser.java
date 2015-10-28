@@ -578,6 +578,8 @@ public class Parser {
 		String description;
 		Date start;
 		Date end;
+		Date originalStart;
+		Date originalEnd;
 		boolean copy = false;
 		String recurring = null;
 		Date endingDate = null;
@@ -603,6 +605,8 @@ public class Parser {
 		if (copy) {
 			end = start;
 		}
+		originalStart = start;
+		originalEnd = end;
 		//////////////////////////////////////
 		recurring = parseRecurring(strTokens);
 		endingDate = parseEndingDate(strTokens);
@@ -611,10 +615,10 @@ public class Parser {
 
 		// to check if details correct
 
-		CommandDetails details = new CommandDetails(command, description, start, end, ID, recurring, endingDate);
-		validateCommandDetails(command, ID, description, start, end, input, recurring, endingDate);
+		CommandDetails details = new CommandDetails(command, description, start, end, ID, recurring, originalStart, originalEnd, endingDate);
+		validateCommandDetails(command, ID, description, start, end, input, recurring, originalStart, originalEnd, endingDate);
 		System.out.println(details);
-		return new CommandDetails(command, description, start, end, ID, recurring, endingDate);
+		return new CommandDetails(command, description, start, end, ID, recurring, originalStart, originalEnd, endingDate);
 	}
 
 	private static Date parseEndingDate(ArrayList<String> input) throws ParseException, invalidTimeDateInput, invalidParameters {
@@ -658,7 +662,7 @@ public class Parser {
 	}
 
 	private static void validateCommandDetails(CommandDetails.COMMANDS command, int ID, String description, Date start,
-			Date end, String input, String recurring, Date endingDate) throws invalidParameters, invalidTimeDateInput {
+			Date end, String input, String recurring, Date originalStart, Date originalEnd, Date endingDate) throws invalidParameters, invalidTimeDateInput {
 		if (command == CommandDetails.COMMANDS.HELP || command == CommandDetails.COMMANDS.REDO
 				|| command == CommandDetails.COMMANDS.UNDO || command == CommandDetails.COMMANDS.ALL
 				|| command == CommandDetails.COMMANDS.FLOATING || command == CommandDetails.COMMANDS.EVENTS
