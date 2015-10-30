@@ -82,7 +82,7 @@ public class Parser {
 			"HHmm dd MM", "HH.mm dd MM", "HH:mm dd MM", "hhmma dd MM", "hha dd MM", "hmma dd MM", "hh.mma dd MM",
 			"hh:mma dd MM", "dd MM",
 
-			"HHmm dd/MMMM/yy", "HH.mm dd/MMMMM/yy", "HH:mm dd/MM/yy", "hhmma dd/MMMM/yy", "hha dd/MMMM/yy",
+			"HHmm dd/MMMM/yy", "HH.mm dd/MMMMM/yy", "HH:mm dd/MMMM/yy", "hhmma dd/MMMM/yy", "hha dd/MMMM/yy",
 			"hmma dd/MMMM/yy", "hh.mma dd/MMMM/yy", "hh:mma dd/MMMM/yy", "dd/MMMM/yy",
 
 			"HHmm dd/MM/yy", "HH.mm dd/MM/yy", "HH:mm dd/MM/yy", "hhmma dd/MM/yy", "hha dd/MM/yy", "hmma dd/MM/yy",
@@ -104,11 +104,13 @@ public class Parser {
 			"hh.mma dd-MMMM", "hh:mma dd-MMMM", "dd-MMMM",
 
 			"HHmm dd-MM", "HH.mm dd-MM", "HH:mm dd-MM", "hhmma dd-MM", "hha dd-MM", "hmma dd-MM", "hh.mma dd-MM",
-			"hh:mma dd-MM", "dd-MM", "hhmma", "hha", "hmma", "hh.mma", "hh:mma", "HH.mm", "HH:mm", "HHmm",
+			"hh:mma dd-MM", "dd-MM",
+
+			"hhmma", "hha", "hmma", "hh.mma", "hh:mma", "HH.mm", "HH:mm", "HHmm",
 
 	};
 
-	private final static String[] keyWord = { "BY", "FROM", "TO", "AT", "DAILY", "MONTHLY", "YEARLY", "WEEKLY" };
+	private final static String[] keyWord = { "BY", "FROM", "TO", "AT", "ON", "DAILY", "MONTHLY", "YEARLY", "WEEKLY" };
 	private final static String[] TimekeyWord = { "MONDAY", "TUESDAY", "WEDNESDAY", "THURSDAY", "FRIDAY", "SATURDAY",
 			"SUNDAY", "TODAY", "TOMORROW" };
 	private final static String[] RECURRING_KEY_WORD = { "DAILY", "MONTHLY", "YEARLY", "WEEKLY" };
@@ -157,7 +159,7 @@ public class Parser {
 		if (notContainsKeyword(indexOfKeyWordFROM)) {
 			result = getInputBetweenArrayList(input, indexOfKeyWordAT, indexOfNextKeyWord);
 		}
-		//System.out.println(result);
+		// System.out.println(result);
 		return createStartDate(result);
 	}
 
@@ -190,23 +192,45 @@ public class Parser {
 			arrayListIndex++;
 		}
 
-		if (notContainsKeyword(indexOfKeyWordTO) && notContainsKeyword(indexOfKeyWordBY)) {
+		arrayListIndex = 0;
+		int indexOfKeyWordON = -1;
+		for (String temp : input) {
+			if (temp.equalsIgnoreCase("ON")) {
+				indexOfKeyWordON = arrayListIndex;
+			}
+			arrayListIndex++;
+		}
+
+		if (notContainsKeyword(indexOfKeyWordTO) && notContainsKeyword(indexOfKeyWordBY)
+				&& notContainsKeyword(indexOfKeyWordON)) {
 			return null;
-		} else if (notContainsKeyword(indexOfKeyWordTO) && !notContainsKeyword(indexOfKeyWordBY)) {
+		} else if (notContainsKeyword(indexOfKeyWordTO) && !notContainsKeyword(indexOfKeyWordBY)
+				&& notContainsKeyword(indexOfKeyWordON)) {
 			indexOfNextKeyWord = NO_NEXT_KEYWORD;
 			indexOfNextKeyWord = findNextKeyword(input, indexOfKeyWordBY, indexOfNextKeyWord);
+		} else if (notContainsKeyword(indexOfKeyWordTO) && notContainsKeyword(indexOfKeyWordBY)
+				&& !notContainsKeyword(indexOfKeyWordON)) {
+			indexOfNextKeyWord = NO_NEXT_KEYWORD;
+			indexOfNextKeyWord = findNextKeyword(input, indexOfKeyWordON, indexOfNextKeyWord);
 		} else {
 			indexOfNextKeyWord = findNextKeyword(input, indexOfKeyWordTO, indexOfNextKeyWord);
 		}
+
 		indexOfNextKeyWord = checkLastIndex(input, indexOfNextKeyWord);
-		// end date is FROM
-		if (notContainsKeyword(indexOfKeyWordBY)) {
+		// end date is TO
+		if (notContainsKeyword(indexOfKeyWordBY) && notContainsKeyword(indexOfKeyWordON)) {
 			result = getInputBetweenArrayList(input, indexOfKeyWordTO, indexOfNextKeyWord);
 		}
 		// end date is BY
-		if (notContainsKeyword(indexOfKeyWordTO)) {
+		if (notContainsKeyword(indexOfKeyWordTO) && notContainsKeyword(indexOfKeyWordON)) {
 			result = getInputBetweenArrayList(input, indexOfKeyWordBY, indexOfNextKeyWord);
-		} ///////////
+		}
+		// end date is ON
+		if (notContainsKeyword(indexOfKeyWordTO) && notContainsKeyword(indexOfKeyWordBY)) {
+			result = getInputBetweenArrayList(input, indexOfKeyWordON, indexOfNextKeyWord);
+		}
+
+		///////////
 		return createEndDate(result);
 	}
 
@@ -248,7 +272,7 @@ public class Parser {
 		return result;
 	}
 
-	private static String parseDescription(ArrayList<String> input) {
+	static String parseDescription(ArrayList<String> input) {
 		String result = "";
 
 		if (input.isEmpty()) {
@@ -329,11 +353,11 @@ public class Parser {
 			input.remove(0);
 			return CommandDetails.COMMANDS.EXIT;
 		default:
-			//System.out.print("Invalid Command");
+			// System.out.print("Invalid Command");
 			// input.remove(0);
-			//throw new invalidCommand(input.remove(0));
+			// throw new invalidCommand(input.remove(0));
 			// return CommandDetails.COMMANDS.INVALID;
-			return CommandDetails.COMMANDS.ADD; 
+			return CommandDetails.COMMANDS.ADD;
 		}
 	}
 
@@ -362,6 +386,17 @@ public class Parser {
 					return mydate;
 				}
 
+				Calendar currentTime = Calendar.getInstance();
+
+				if (temp.equals("hhmma") || temp.equals("hha") || temp.equals("hmma") || temp.equals("hh.mma")
+						|| temp.equals("hh:mma") || temp.equals("HH.mm") || temp.equals("HH:mm")
+						|| temp.equals("HHmm")) {
+					cal.set(Calendar.DAY_OF_YEAR, Calendar.getInstance().get(Calendar.DAY_OF_YEAR));
+					// cal.set(Calendar.DAY_OF_MONTH,
+					// Calendar.getInstance().get(Calendar.DAY_OF_MONTH));
+					// System.out.println("format is " + cal);
+				}
+
 				for (int i = 0; i < TimekeyWord.length; i++) {
 					if (input.toUpperCase().contains(TimekeyWord[i])) {
 						throw new invalidTimeDateInput(input);
@@ -369,7 +404,6 @@ public class Parser {
 				}
 
 				if (cal.get(Calendar.YEAR) == NO_YEAR_INPUT) {
-					cal.setTime(mydate);
 					cal.set(Calendar.YEAR, Calendar.getInstance().get(Calendar.YEAR));
 					mydate = cal.getTime();
 					return mydate;
@@ -525,14 +559,23 @@ public class Parser {
 				 * {
 				 */
 
-				//System.out.println("format is " + temp);
+				// System.out.println("format is " + temp);
 				if (temp.equals("dd/MM") || temp.equals("dd-MM") || temp.equals("dd-MMMM") || temp.equals("dd-MM-yy")
 						|| temp.equals("dd-MMMM-yy") || temp.equals("dd/MMMM") || temp.equals("dd/MM/yy")
 						|| temp.equals("dd/MMMM/yy") || temp.equals("dd MM") || temp.equals("dd MMMM")
 						|| temp.equals("dd MM yy") || temp.equals("dd MMMM yy")) {
 					cal.set(Calendar.HOUR_OF_DAY, 23);
 					cal.set(Calendar.MINUTE, 59);
-					//System.out.println("format is " + cal);
+					// System.out.println("format is " + cal);
+				}
+
+				if (temp.equals("hhmma") || temp.equals("hha") || temp.equals("hmma") || temp.equals("hh.mma")
+						|| temp.equals("hh:mma") || temp.equals("HH.mm") || temp.equals("HH:mm")
+						|| temp.equals("HHmm")) {
+					cal.set(Calendar.DAY_OF_YEAR, Calendar.getInstance().get(Calendar.DAY_OF_YEAR));
+					// cal.set(Calendar.DAY_OF_MONTH,
+					// Calendar.getInstance().get(Calendar.DAY_OF_MONTH));
+					// System.out.println("format is " + cal);
 				}
 
 				if (cal.get(Calendar.YEAR) == NO_YEAR_INPUT && (input.toUpperCase().contains("TODAY")
@@ -630,9 +673,13 @@ public class Parser {
 		}
 
 		end = parseEndDate(strTokens);
-		if (strTokens.contains("AT")) {
-			copy = true;
+
+		for (String temp : strTokens) {
+			if (temp.equalsIgnoreCase("AT")) {
+				copy = true;
+			}
 		}
+
 		start = parseStartDate(strTokens);
 		if (copy) {
 			end = start;
@@ -641,6 +688,10 @@ public class Parser {
 		//////////////////////////////////////
 		recurring = parseRecurring(strTokens);
 		endingDate = parseEndingDate(strTokens);
+		if (endingDate == null && recurring != null) {
+			SimpleDateFormat format = new SimpleDateFormat("dd/MM/yyyy");
+			endingDate = format.parse("31/12/8089");
+		}
 		//////////////////////////////////////
 		description = parseDescription(strTokens);
 
@@ -663,7 +714,6 @@ public class Parser {
 
 		String result = "";
 		int indexOfNextKeyWord = NO_NEXT_KEYWORD;
-		// int indexOfKeyWordEnding = input.lastIndexOf("ENDING");
 
 		int arrayListIndex = 0;
 
@@ -674,12 +724,6 @@ public class Parser {
 			}
 			arrayListIndex++;
 		}
-
-		/*
-		 * int indexOfKeyWordEnding = input.lastIndexOf("ENDING"); if
-		 * (input.lastIndexOf("ending") != -1) { indexOfKeyWordEnding =
-		 * input.lastIndexOf("ending"); }
-		 */
 
 		if (notContainsKeyword(indexOfKeyWordEnding)) {
 			return null;
@@ -695,30 +739,6 @@ public class Parser {
 	}
 
 	private static String parseRecurring(ArrayList<String> strTokens) {
-		/*
-		 * if (strTokens.indexOf("DAILY") != -1) { return
-		 * strTokens.remove(strTokens.indexOf("DAILY")); } if
-		 * (strTokens.indexOf("daily") != -1) { return
-		 * strTokens.remove(strTokens.indexOf("daily")); }
-		 * 
-		 * if (strTokens.indexOf("MONTHLY") != -1) { return
-		 * strTokens.remove(strTokens.indexOf("MONTHLY")); }
-		 * 
-		 * if (strTokens.indexOf("monthly") != -1) { return
-		 * strTokens.remove(strTokens.indexOf("monthly")); }
-		 * 
-		 * if (strTokens.indexOf("YEARLY") != -1) { return
-		 * strTokens.remove(strTokens.indexOf("YEARLY")); }
-		 * 
-		 * if (strTokens.indexOf("yearly") != -1) { return
-		 * strTokens.remove(strTokens.indexOf("yearly")); }
-		 * 
-		 * if (strTokens.indexOf("WEEKLY") != -1) { return
-		 * strTokens.remove(strTokens.indexOf("WEEKLY")); }
-		 * 
-		 * if (strTokens.indexOf("weekly") != -1) { return
-		 * strTokens.remove(strTokens.indexOf("weekly")); }
-		 */
 		int arrayListIndex = 0;
 		for (String temp : strTokens) {
 			for (int i = 0; i < RECURRING_KEY_WORD.length; i++) {
@@ -741,7 +761,6 @@ public class Parser {
 		today.set(Calendar.MINUTE, 0);
 		today.set(Calendar.MILLISECOND, 0);
 		today.set(Calendar.SECOND, 0);
-		//System.out.println("current time " + today.getTime());
 		Date todayDate = today.getTime();
 
 		if (command == CommandDetails.COMMANDS.HELP || command == CommandDetails.COMMANDS.REDO
@@ -792,12 +811,10 @@ public class Parser {
 		}
 
 		if (recurring != null || endingDate != null) {
-			if (recurring != null && endingDate == null) {
-				throw new invalidParameters(input);
-			}
 			if (endingDate != null && recurring == null) {
-				throw new invalidParameters(input);
+				throw new invalidParameters("Recurring interval");
 			}
+
 			if (endingDate.before(end)) {
 				throw new invalidTimeDateInput("Recurring end Date before end Date");
 			}
@@ -806,6 +823,12 @@ public class Parser {
 				if (endingDate.before(start)) {
 					throw new invalidTimeDateInput("Recurring end Date before Start Date");
 				}
+			}
+		}
+
+		if (end != null) {
+			if (end.before(todayDate)) {
+				throw new invalidTimeDateInput("event already ended");
 			}
 		}
 
