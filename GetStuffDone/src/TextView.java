@@ -1,5 +1,7 @@
+import java.awt.Color;
 import java.awt.Dimension;
 
+import javax.swing.JScrollPane;
 import javax.swing.JTextPane;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Style;
@@ -10,29 +12,33 @@ import javax.swing.text.StyledDocument;
  * TextView is an UI component for displaying text in different styles e.g.
  * font, size, text colour, background colour etc.
  */
-public class TextView extends JTextPane {
+public class TextView extends JScrollPane {
 
 	public static final String STYLE_NORMAL = "normal";
-	public static final String STYLE_BOLD = "bold";
-	public static final String STYLE_TITLE = "title";
+	public static final String STYLE_FEEDBACK = "feedback";
 
 	// Auto-generated code
 	private static final long serialVersionUID = 1L;
 
 	private static final int FONT_SIZE_NORMAL = 12;
-	private static final int FONT_SIZE_TITLE = 16;
 	
 	private static final String DEFAULT_FONT = "verdana";
 
-	private StyledDocument document = getStyledDocument();
+	private JTextPane textPane;
+	private StyledDocument document;
 
 	private Style styleNormal;
-	private Style styleTitle;
-	private Style styleBold;
+	private Style styleFeedback;
 
 	public TextView(int width, int height) {
-
-		setEditable(false);
+		
+		super(new JTextPane());
+		
+		textPane = (JTextPane) this.getViewport().getView();
+		textPane.setEditable(false);
+		
+		document = textPane.getStyledDocument();
+		
 		setPreferredSize(new Dimension(width, height));
 
 		initializeStyles();
@@ -52,11 +58,8 @@ public class TextView extends JTextPane {
 		case STYLE_NORMAL:
 			style = styleNormal;
 			break;
-		case STYLE_TITLE:
-			style = styleTitle;
-			break;
-		case STYLE_BOLD:
-			style = styleBold;
+		case STYLE_FEEDBACK:
+			style = styleFeedback;
 			break;
 		default:
 			style = styleNormal;
@@ -82,18 +85,26 @@ public class TextView extends JTextPane {
 		}
 	}
 	
-	private void initializeStyles(){
-		
-		styleNormal = createStyle(STYLE_NORMAL, FONT_SIZE_NORMAL, false);
-		styleBold = createStyle(STYLE_BOLD, FONT_SIZE_NORMAL, true);
-		styleTitle = createStyle(STYLE_TITLE, FONT_SIZE_TITLE, true);
+	public void scrollToTop() {
+		textPane.setCaretPosition(0);
 	}
 	
-	private Style createStyle(String name, int size, boolean isBold) {
+	public void scrollToBottom() {
+		textPane.setCaretPosition(document.getLength());
+	}
+	
+	private void initializeStyles(){
+		
+		styleNormal = createStyle(STYLE_NORMAL, Color.BLACK, FONT_SIZE_NORMAL, false);
+		styleFeedback = createStyle(STYLE_FEEDBACK, Color.BLUE, FONT_SIZE_NORMAL, true);
+	}
+	
+	private Style createStyle(String name, Color color, int size, boolean isBold) {
 		
 		Style style = document.addStyle(name, null);
 		
 		StyleConstants.setFontSize(style, size);
+		StyleConstants.setForeground(style, color);
 		StyleConstants.setBold(style, isBold);
 		StyleConstants.setFontFamily(style, DEFAULT_FONT);
 		

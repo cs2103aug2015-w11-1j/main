@@ -5,9 +5,7 @@ import java.awt.event.ActionListener;
 import javax.swing.BoxLayout;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
-import javax.swing.JScrollPane;
 import javax.swing.JTextField;
-import javax.swing.text.DefaultCaret;
 
 /**
  * User interface for GetStuffDone. Only interacts with the Logic component.
@@ -17,9 +15,9 @@ public class UI {
 	private static final String TITLE_MAIN = "GetStuffDone";
 	private static final String TITLE_HELP = "GetStuffDone Help";
 
-	private static final int DISPLAY_BOX_WIDTH = 350;
+	private static final int DISPLAY_BOX_WIDTH = 400;
 	private static final int DISPLAY_BOX_HEIGHT = 420;
-	private static final int FEEDBACK_BOX_WIDTH = 250;
+	private static final int FEEDBACK_BOX_WIDTH = 300;
 	private static final int FEEDBACK_BOX_HEIGHT = 300;
 	private static final int INFO_BOX_WIDTH = 250;
 	private static final int INFO_BOX_HEIGHT = 120;
@@ -52,16 +50,12 @@ public class UI {
 		JPanel panel = new JPanel();
 		panel.setLayout(new BoxLayout(panel, BoxLayout.PAGE_AXIS));
 
-		panel.add(new JScrollPane(feedbackBox));
-		panel.add(new JScrollPane(infoBox));
+		panel.add(feedbackBox);
+		panel.add(infoBox);
 
-		frame.add(new JScrollPane(displayBox), BorderLayout.LINE_START);
+		frame.add(displayBox, BorderLayout.LINE_START);
 		frame.add(panel, BorderLayout.LINE_END);
 		frame.add(commandBar, BorderLayout.PAGE_END);
-
-		// Auto scrolling for Feedback Box
-		DefaultCaret caret = (DefaultCaret) feedbackBox.getCaret();
-		caret.setUpdatePolicy(DefaultCaret.ALWAYS_UPDATE);
 
 		// Process the input when Enter is pressed
 		commandBar.addActionListener(new ActionListener() {
@@ -97,7 +91,7 @@ public class UI {
 
 	private void show(Feedback feedback) {
 
-		showInFeedbackBox(feedback.getFeedbackString(), TextView.STYLE_BOLD);
+		showInFeedbackBox(feedback.getFeedbackString(), TextView.STYLE_FEEDBACK);
 		showInDisplayBox(feedback.getDisplayString(), TextView.STYLE_NORMAL);
 		showInInfoBox(feedback.getInfoString(), TextView.STYLE_NORMAL);
 		showHelpBox(feedback.getHelpCommandString(), feedback.getHelpSyntaxString());
@@ -107,6 +101,7 @@ public class UI {
 
 		if (isValidString(string)) {
 			feedbackBox.display(string, style);
+			feedbackBox.scrollToBottom();
 		}
 	}
 
@@ -115,6 +110,7 @@ public class UI {
 		if (isValidString(string)) {
 			displayBox.clear();
 			displayBox.display(string, style);
+			displayBox.scrollToTop();
 		}
 	}
 
