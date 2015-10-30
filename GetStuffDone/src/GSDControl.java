@@ -63,7 +63,7 @@ public class GSDControl {
 
 	private ArrayList<Task> tasks;
 	private CommandDetails commandDetails;
-	private Parser parser = new Parser();
+	//private Parser parser = new Parser();
 	private Storage storage = new Storage();
 	private History history = new History();
 	private boolean isValidTaskNo = true;
@@ -77,7 +77,8 @@ public class GSDControl {
 
 	public Feedback processInput(String input) {
 		try {
-			this.commandDetails = parser.parse(input);
+			this.commandDetails = Parser.parse(input);
+			//this.commandDetails = parser.parse(input);
 		} catch (ParseException e) { // Invalid Date Format
 			return new Feedback(null, FEEDBACK_INVALID_DATE_FORMAT, generateInfoBox());
 		} catch (NumberFormatException f) {
