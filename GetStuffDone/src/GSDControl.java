@@ -83,11 +83,11 @@ public class GSDControl {
 			return new Feedback(null, FEEDBACK_INVALID_DATE_FORMAT, generateInfoBox());
 		} catch (NumberFormatException f) {
 			return new Feedback(null, FEEDBACK_INVALID_TASK_NUMBER, generateInfoBox());
-		} catch (invalidTimeDateInput g) { // Not in the form [Time] [Date]
+		} catch (invalidTimeDateInputException g) { // Not in the form [Time] [Date]
 			return new Feedback(null, FEEDBACK_INVALID_TIME_DATE_INPUT, generateInfoBox());
-		} catch (invalidCommand h) {
+		} catch (invalidCommandException h) {
 			return new Feedback(null, FEEDBACK_INVALID_COMMAND, generateInfoBox());
-		} catch (invalidParameters i) {
+		} catch (invalidParametersException i) {
 			return new Feedback(null, FEEDBACK_INVALID_COMMAND_FORMAT, generateInfoBox());
 			// Invalid parameters
 			// eg delete 1 screw this up

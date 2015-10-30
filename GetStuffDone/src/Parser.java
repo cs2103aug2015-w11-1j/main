@@ -69,7 +69,7 @@ import java.util.Calendar;
 import java.util.Date;
 
 public class Parser {
-	
+
 	private final static String[] DATE_FORMAT = { "HHmm dd MMMM yy", "HH.mm dd MMMM yy", "HH:mm dd MMMM yy",
 			"hhmma dd MMMM yy", "hha dd MMMM yy", "hmma dd MMMM yy", "hh.mma dd MMMM yy", "hh:mma dd MMMM yy",
 			"dd MMMM yy",
@@ -113,17 +113,17 @@ public class Parser {
 
 	private final static String[] DATE_ONLY_FORMAT = { "dd/MM", "dd-MM", "dd-MMMM", "dd-MM-yy", "dd-MMMM-yy", "dd/MMMM",
 			"dd/MM/yy", "dd/MMMM/yy", "dd MM", "dd MMMM", "dd MM yy", "dd MMMM yy" };
-	
+
 	private final static String[] TIME_ONLY_FORMAT = { "hhmma", "hha", "hmma", "hh.mma", "hh:mma", "HH.mm", "HH:mm",
-	"HHmm" };
-	
+			"HHmm" };
+
 	private final static String[] TimekeyWord = { "MONDAY", "TUESDAY", "WEDNESDAY", "THURSDAY", "FRIDAY", "SATURDAY",
 			"SUNDAY", "TODAY", "TOMORROW" };
-	
+
 	private final static String[] RECURRING_KEY_WORD = { "DAILY", "MONTHLY", "YEARLY", "WEEKLY" };
-	
+
 	private final static String[] keyWord = { "BY", "FROM", "TO", "AT", "ON", "DAILY", "MONTHLY", "YEARLY", "WEEKLY" };
-	
+
 	private final static int NO_NEXT_KEYWORD = -2;
 	private final static int NO_ID = -10;
 	private final static int NO_KEYWORD = -1;
@@ -133,6 +133,9 @@ public class Parser {
 	 ************************************* GENERAL USED METHODS **************************************
 	 *************************************************************************************************/
 
+	/**
+	 * Returns the index of the keyword or -1 if not found
+	 */
 	private static int indexOfkeyWord(ArrayList<String> input, String keyword) {
 		int arrayListIndex = 0;
 		int indexOfKeyWord = -1;
@@ -145,11 +148,18 @@ public class Parser {
 		return indexOfKeyWord;
 	}
 
+	/**
+	 * Returns true if arrayList contains keyword
+	 */
 	private static boolean containsKeyword(int indexOfKeyWord) {
 		return indexOfKeyWord != NO_KEYWORD;
 	}
 
-	private static int findNextKeyword(ArrayList<String> input, int indexOfKeyWord, int indexOfNextKeyWord) {
+	/**
+	 * Returns index of next keyword
+	 */
+	private static int findNextKeyword(ArrayList<String> input, int indexOfKeyWord) {
+		int indexOfNextKeyWord = NO_NEXT_KEYWORD;
 		for (int i = indexOfKeyWord + 1; i < input.size(); i++) {
 			if (isKeyWord(input.get(i))) {
 				indexOfNextKeyWord = i;
@@ -159,6 +169,9 @@ public class Parser {
 		return indexOfNextKeyWord;
 	}
 
+	/**
+	 * Return true if string is a keyword
+	 */
 	private static boolean isKeyWord(String input) {
 		for (int i = 0; i < keyWord.length; i++) {
 			if (keyWord[i].equalsIgnoreCase(input)) {
@@ -168,8 +181,13 @@ public class Parser {
 		return false;
 	}
 
+	/**
+	 * Takes in 2 index of a arrayList
+	 * Remove the Strings in between the index and append them as a string
+	 * Returns the result String
+	 */
 	private static String getInputBetweenArrayList(ArrayList<String> input, int indexOfKeyWord, int indexOfNextKeyWord)
-			throws invalidParameters {
+			throws invalidParametersException {
 		String result = "";
 		for (int i = 0; i < indexOfNextKeyWord - indexOfKeyWord - 1; i++) {
 			result = result + " " + input.remove(indexOfKeyWord + 1);
@@ -177,12 +195,15 @@ public class Parser {
 		try {
 			result = result.substring(1);
 		} catch (StringIndexOutOfBoundsException e) {
-			throw new invalidParameters();
+			throw new invalidParametersException();
 		}
 		input.remove(indexOfKeyWord);
 		return result;
 	}
 
+	/**
+	 * If Index of next Keyword is NO_NEXT_KEYWORD, returns the last index of arrayList
+	 */
 	private static int checkLastIndex(ArrayList<String> input, int indexOfNextKeyWord) {
 		if (indexOfNextKeyWord == NO_NEXT_KEYWORD) {
 			indexOfNextKeyWord = input.size();
@@ -194,8 +215,14 @@ public class Parser {
 	 ************************************* TIME AND DATE PARSING *************************************
 	 *************************************************************************************************/
 
+	/**
+	 * Parse user input determines the start date Throws invalidCommandException
+	 * when command is invalid Throws invalidParametersException when command
+	 * details parameters are missing Throws invalidTimeDateInputException when
+	 * time/date format is not supported
+	 */
 	private static Date parseStartDate(ArrayList<String> input)
-			throws ParseException, invalidTimeDateInput, invalidParameters {
+			throws ParseException, invalidTimeDateInputException, invalidParametersException {
 		String result = "";
 		int indexOfNextKeyWord = NO_NEXT_KEYWORD;
 		int indexOfKeyWordFROM = indexOfkeyWord(input, "FROM");
@@ -204,9 +231,9 @@ public class Parser {
 		if (!containsKeyword(indexOfKeyWordFROM) && !containsKeyword(indexOfKeyWordAT)) {
 			return null;
 		} else if (containsKeyword(indexOfKeyWordAT)) {
-			indexOfNextKeyWord = findNextKeyword(input, indexOfKeyWordAT, indexOfNextKeyWord);
+			indexOfNextKeyWord = findNextKeyword(input, indexOfKeyWordAT);
 		} else {
-			indexOfNextKeyWord = findNextKeyword(input, indexOfKeyWordFROM, indexOfNextKeyWord);
+			indexOfNextKeyWord = findNextKeyword(input, indexOfKeyWordFROM);
 		}
 		indexOfNextKeyWord = checkLastIndex(input, indexOfNextKeyWord);
 		// Start date is FROM
@@ -221,8 +248,14 @@ public class Parser {
 		return createDate(result, "START");
 	}
 
+	/**
+	 * Parse user input determines the end date Throws invalidCommandException
+	 * when command is invalid Throws invalidParametersException when command
+	 * details parameters are missing Throws invalidTimeDateInputException when
+	 * time/date format is not supported
+	 */
 	private static Date parseEndDate(ArrayList<String> input)
-			throws ParseException, invalidTimeDateInput, invalidParameters {
+			throws ParseException, invalidTimeDateInputException, invalidParametersException {
 		String result = "";
 		int indexOfNextKeyWord = NO_NEXT_KEYWORD;
 		int indexOfKeyWordTO = indexOfkeyWord(input, "TO");
@@ -233,11 +266,11 @@ public class Parser {
 				&& !containsKeyword(indexOfKeyWordON)) {
 			return null;
 		} else if (containsKeyword(indexOfKeyWordBY)) {
-			indexOfNextKeyWord = findNextKeyword(input, indexOfKeyWordBY, indexOfNextKeyWord);
+			indexOfNextKeyWord = findNextKeyword(input, indexOfKeyWordBY);
 		} else if (containsKeyword(indexOfKeyWordON)) {
-			indexOfNextKeyWord = findNextKeyword(input, indexOfKeyWordON, indexOfNextKeyWord);
+			indexOfNextKeyWord = findNextKeyword(input, indexOfKeyWordON);
 		} else {
-			indexOfNextKeyWord = findNextKeyword(input, indexOfKeyWordTO, indexOfNextKeyWord);
+			indexOfNextKeyWord = findNextKeyword(input, indexOfKeyWordTO);
 		}
 
 		indexOfNextKeyWord = checkLastIndex(input, indexOfNextKeyWord);
@@ -256,7 +289,13 @@ public class Parser {
 		return createDate(result, "END");
 	}
 
-	private static Date createDate(String input, String method) throws ParseException, invalidTimeDateInput {
+	/**
+	 * Creates the Date object with the parsed date string Throws ParseException
+	 * when time/date format is not found Throws invalidTimeDateInputException
+	 * when time/date format is not supported if method is set to START, default
+	 * time is set as 0000 if method is set to END, default time is set as 2359
+	 */
+	private static Date createDate(String input, String method) throws invalidTimeDateInputException, ParseException {
 		Date myDate = null;
 		Calendar cal = Calendar.getInstance();
 
@@ -288,7 +327,7 @@ public class Parser {
 						}
 					}
 				}
-				
+
 				for (String time : TIME_ONLY_FORMAT) {
 					if (temp.equals(time)) {
 						cal.set(Calendar.DAY_OF_YEAR, Calendar.getInstance().get(Calendar.DAY_OF_YEAR));
@@ -301,7 +340,7 @@ public class Parser {
 				}
 				for (int i = 0; i < TimekeyWord.length; i++) {
 					if (input.toUpperCase().contains(TimekeyWord[i])) {
-						throw new invalidTimeDateInput(input);
+						throw new invalidTimeDateInputException(input);
 					}
 				}
 				return myDate;
@@ -337,6 +376,9 @@ public class Parser {
 		throw new ParseException(input, 0);
 	}
 
+	/**
+	 * Add day accordingly to keywords stated in input
+	 */
 	private static void keyWords(String input, Calendar cal) {
 		Calendar now = Calendar.getInstance();
 		int weekday = cal.get(Calendar.DAY_OF_WEEK);
@@ -353,7 +395,6 @@ public class Parser {
 		}
 
 		switch (TimekeyWord[i]) {
-
 		case "TOMORROW":
 			cal.add(Calendar.DAY_OF_YEAR, 1);
 			break;
@@ -423,6 +464,9 @@ public class Parser {
 
 	}
 
+	/**
+	 * Increment day to the following week
+	 */
 	private static void incrementDay(Calendar cal, int days) {
 		if (days < 0) {
 			days = days + 7;
@@ -434,7 +478,12 @@ public class Parser {
 	 ************************************* COMMAND PARSING *******************************************
 	 *************************************************************************************************/
 
-	private static CommandDetails.COMMANDS parseCommandType(ArrayList<String> input) throws invalidCommand {
+	/**
+	 * Parse Type of command throws invalidCommandException when command is not
+	 * supported returns as CommandDetails.COMMANDS returns as an ADD command
+	 * type if not stated
+	 */
+	private static CommandDetails.COMMANDS parseCommandType(ArrayList<String> input) throws invalidCommandException {
 
 		switch (input.get(0).toUpperCase()) {
 		case "ADD":
@@ -510,12 +559,16 @@ public class Parser {
 	 ************************************* TASK ID PARSING *******************************************
 	 *************************************************************************************************/
 
-	private static int parseID(ArrayList<String> input) throws invalidParameters {
+	/**
+	 * Parse Task ID throws invalidParametersException when ID is missing
+	 * returns as integer
+	 */
+	private static int parseID(ArrayList<String> input) throws invalidParametersException {
 		int ID = -10;
 		try {
 			ID = Integer.parseInt(input.remove(0));
 		} catch (IndexOutOfBoundsException e) {
-			throw new invalidParameters();
+			throw new invalidParametersException();
 		}
 		return ID;
 	}
@@ -524,6 +577,9 @@ public class Parser {
 	 ************************************* RECURRING PARSING *****************************************
 	 *************************************************************************************************/
 
+	/**
+	 * Parse Recurring task interval returns as a String
+	 */
 	private static String parseRecurring(ArrayList<String> strTokens) {
 		int arrayListIndex = 0;
 		for (String temp : strTokens) {
@@ -537,15 +593,21 @@ public class Parser {
 		return null;
 	}
 
+	/**
+	 * Parse Recurring task ending date Throws ParseException when time/date
+	 * format is not found Throws invalidTimeDateInputException when time/date
+	 * format is not supported Throws invalidParametersException when ending
+	 * time/date is not stated
+	 */
 	private static Date parseEndingDate(ArrayList<String> input)
-			throws ParseException, invalidTimeDateInput, invalidParameters {
+			throws ParseException, invalidTimeDateInputException, invalidParametersException {
 		String result = "";
 		int indexOfNextKeyWord = NO_NEXT_KEYWORD;
 		int indexOfKeyWordEnding = indexOfkeyWord(input, "ENDING");
 		if (!containsKeyword(indexOfKeyWordEnding)) {
 			return null;
 		} else {
-			indexOfNextKeyWord = findNextKeyword(input, indexOfKeyWordEnding, indexOfNextKeyWord);
+			indexOfNextKeyWord = findNextKeyword(input, indexOfKeyWordEnding);
 		}
 		indexOfNextKeyWord = checkLastIndex(input, indexOfNextKeyWord);
 		result = getInputBetweenArrayList(input, indexOfKeyWordEnding, indexOfNextKeyWord);
@@ -556,6 +618,9 @@ public class Parser {
 	 ************************************* DESCRIPTION PARSING ***************************************
 	 *************************************************************************************************/
 
+	/**
+	 * Parse task description and remove escape character "/" Returns a String
+	 */
 	static String parseDescription(ArrayList<String> input) {
 		String result = "";
 		if (input.isEmpty()) {
@@ -575,8 +640,16 @@ public class Parser {
 	 ************************************* USER INPUT PARSING ****************************************
 	 *************************************************************************************************/
 
+	/**
+	 * Parse user input from control and validates the input before returning a
+	 * Command Detail object to control with each parameter parsed Throws
+	 * invalidCommandException when command is invalid Throws
+	 * invalidParametersException when command details parameters are missing
+	 * Throws invalidTimeDateInputException when time/date format is not
+	 * supported
+	 */
 	public static CommandDetails parse(String input)
-			throws ParseException, invalidCommand, invalidParameters, invalidTimeDateInput {
+			throws ParseException, invalidCommandException, invalidParametersException, invalidTimeDateInputException {
 		String description;
 		String recurring = null;
 		Date start;
@@ -618,6 +691,10 @@ public class Parser {
 				endingDate);
 	}
 
+	/**
+	 * Set Recurring ending date to last possible date in java.util.Date if not
+	 * stated
+	 */
 	private static Date defaultEndingDate(String recurring, Date endingDate) throws ParseException {
 		if (endingDate == null && recurring != null) {
 			SimpleDateFormat format = new SimpleDateFormat("HHmm dd/MM/yyyy");
@@ -626,6 +703,9 @@ public class Parser {
 		return endingDate;
 	}
 
+	/**
+	 * Return True if keyword is AT
+	 */
 	private static boolean isEventTaskofAT(boolean copy, ArrayList<String> strTokens) {
 		for (String temp : strTokens) {
 			if (temp.equalsIgnoreCase("AT")) {
@@ -635,6 +715,9 @@ public class Parser {
 		return copy;
 	}
 
+	/**
+	 * Return True Command Type requires a Task ID
+	 */
 	private static boolean requiresTaskID(CommandDetails.COMMANDS command) {
 		return command == CommandDetails.COMMANDS.DELETE || command == CommandDetails.COMMANDS.COMPLETE
 				|| command == CommandDetails.COMMANDS.INCOMPLETE || command == CommandDetails.COMMANDS.UPDATE;
@@ -644,88 +727,114 @@ public class Parser {
 	 ************************************* VALIDATIONS **********************************************
 	 *************************************************************************************************/
 
+	/**
+	 * Validates Command Details parameters before creating Command Details and
+	 * return to Control
+	 */
 	private static void validateCommandDetails(CommandDetails.COMMANDS command, int ID, String description, Date start,
 			Date end, String input, String recurring, Date originalStart, Date originalEnd, Date endingDate)
-					throws invalidParameters, invalidTimeDateInput {
+					throws invalidParametersException, invalidTimeDateInputException {
 		validateCommand(command, ID, description, start, end, input);
 		validateDateTime(start, end, recurring, endingDate);
-
+		if (recurring != null || endingDate != null) {
+			validateRecurringDate(start, end, recurring, endingDate);
+		}
 	}
 
+	/**
+	 * Validates if start and end time/date are correct start date is before end
+	 * date start date have not yet past end date have not yet past
+	 * 
+	 * Throws invalidTimeDateInputException
+	 */
 	private static void validateDateTime(Date start, Date end, String recurring, Date endingDate)
-			throws invalidTimeDateInput, invalidParameters {
+			throws invalidTimeDateInputException {
 		Calendar today = Calendar.getInstance();
-		today.set(Calendar.HOUR_OF_DAY, 0);
-		today.set(Calendar.MINUTE, 0);
-		today.set(Calendar.MILLISECOND, 0);
-		today.set(Calendar.SECOND, 0);
+		// today.set(Calendar.HOUR_OF_DAY, 0);
+		// today.set(Calendar.MINUTE, 0);
+		// today.set(Calendar.MILLISECOND, 0);
+		// today.set(Calendar.SECOND, 0);
 		Date todayDate = today.getTime();
 
 		if (end != null && start != null) {
 			if (end.before(start)) {
-				throw new invalidTimeDateInput("End Date before Start Date");
+				throw new invalidTimeDateInputException("End Date before Start Date");
 			}
 		}
 		if (start != null) {
 			if (start.before(todayDate)) {
-				throw new invalidTimeDateInput("Start Date have past");
-			}
-		}
-		if (recurring != null || endingDate != null) {
-			if (endingDate != null && recurring == null) {
-				throw new invalidParameters("Recurring interval");
-			}
-			if (endingDate.before(end)) {
-				throw new invalidTimeDateInput("Recurring end Date before end Date");
-			}
-
-			if (start != null) {
-				if (endingDate.before(start)) {
-					throw new invalidTimeDateInput("Recurring end Date before Start Date");
-				}
+				throw new invalidTimeDateInputException("Start Date have past");
 			}
 		}
 		if (end != null) {
 			if (end.before(todayDate)) {
-				throw new invalidTimeDateInput("event already ended");
+				throw new invalidTimeDateInputException("event already ended");
 			}
 		}
 	}
 
+	/**
+	 * Validates if recurring task date/time input are correct Recurring task
+	 * have a recurring interval stated Task recurring end date is after task
+	 * start date Task recurring end date is after task end date
+	 */
+	private static void validateRecurringDate(Date start, Date end, String recurring, Date endingDate)
+			throws invalidParametersException, invalidTimeDateInputException {
+
+		if (endingDate != null && recurring == null) {
+			throw new invalidParametersException("Recurring interval");
+		}
+		if (endingDate.before(end)) {
+			throw new invalidTimeDateInputException("Recurring end Date before end Date");
+		}
+		if (start != null) {
+			if (endingDate.before(start)) {
+				throw new invalidTimeDateInputException("Recurring end Date before Start Date");
+			}
+		}
+		if (end == null) {
+			throw new invalidParametersException("Date missing");
+		}
+	}
+
+	/**
+	 * Validates if parameters are correct given its corresponding Command Type
+	 */
 	private static void validateCommand(CommandDetails.COMMANDS command, int ID, String description, Date start,
-			Date end, String input) throws invalidParameters {
+			Date end, String input) throws invalidParametersException {
 		if (command == CommandDetails.COMMANDS.HELP || command == CommandDetails.COMMANDS.REDO
 				|| command == CommandDetails.COMMANDS.UNDO || command == CommandDetails.COMMANDS.ALL
 				|| command == CommandDetails.COMMANDS.FLOATING || command == CommandDetails.COMMANDS.EVENTS
 				|| command == CommandDetails.COMMANDS.DEADLINES || command == CommandDetails.COMMANDS.EXIT
 				|| command == CommandDetails.COMMANDS.RECURRING) {
 			if (description != null || start != null || end != null || ID != -10) {
-				throw new invalidParameters(input);
+				throw new invalidParametersException(input);
 			}
 		}
 		if (command == CommandDetails.COMMANDS.DELETE || command == CommandDetails.COMMANDS.COMPLETE
 				|| command == CommandDetails.COMMANDS.INCOMPLETE) {
 			if (description != null || start != null || end != null) {
-				throw new invalidParameters(input);
+				throw new invalidParametersException(input);
 			}
 		}
 		if (command == CommandDetails.COMMANDS.ADD || command == CommandDetails.COMMANDS.UPDATE) {
 			if (description == null) {
-				throw new invalidParameters(input);
+				throw new invalidParametersException(input);
 			}
 		}
 		if (command == CommandDetails.COMMANDS.SET) {
 			if (description == null || start != null || end != null) {
-				throw new invalidParameters(input);
+				throw new invalidParametersException(input);
 			}
 		}
 		if (command == CommandDetails.COMMANDS.SEARCH) {
 			if (description == null && (start == null && end == null)) {
-				throw new invalidParameters(input);
+				throw new invalidParametersException(input);
 			}
 		}
 	}
 
+	/** Validates the user string input from control */
 	private static void validateInput(ArrayList<String> strTokens) throws ParseException {
 		validateStartDate(strTokens);
 		validateEndDate(strTokens);
@@ -733,19 +842,23 @@ public class Parser {
 
 	}
 
-	private static void validateRecurring(ArrayList<String> strTokens) throws ParseException {
-		int count = 0;
+	/** Validates if there are multiple start time and throws ParseException */
+	private static void validateStartDate(ArrayList<String> strTokens) throws ParseException {
+		int count;
+		count = 0;
 		for (String temp : strTokens) {
-			if (temp.equalsIgnoreCase("DAILY") || temp.equalsIgnoreCase("MONTHLY") || temp.equalsIgnoreCase("YEARLY")
-					|| temp.equalsIgnoreCase("WEEKLY")) {
+			if (temp.equalsIgnoreCase("FROM") || temp.equalsIgnoreCase("AT")) {
 				count++;
 			}
 		}
 		if (count > 1) {
-			throw new ParseException("multiple end date", 0);
+			throw new ParseException("multiple start date", 0);
 		}
 	}
 
+	/**
+	 * Validates if there are multiple end time/date and throws ParseException
+	 */
 	private static void validateEndDate(ArrayList<String> strTokens) throws ParseException {
 		int count;
 		count = 0;
@@ -760,63 +873,71 @@ public class Parser {
 		}
 	}
 
-	private static void validateStartDate(ArrayList<String> strTokens) throws ParseException {
-		int count;
-		count = 0;
+	/**
+	 * Validates if there are multiple recurring time/date and
+	 * throwsParseException
+	 */
+	private static void validateRecurring(ArrayList<String> strTokens) throws ParseException {
+		int count = 0;
 		for (String temp : strTokens) {
-			if (temp.equalsIgnoreCase("FROM") || temp.equalsIgnoreCase("AT")) {
+			if (temp.equalsIgnoreCase("DAILY") || temp.equalsIgnoreCase("MONTHLY") || temp.equalsIgnoreCase("YEARLY")
+					|| temp.equalsIgnoreCase("WEEKLY")) {
 				count++;
 			}
 		}
 		if (count > 1) {
-			throw new ParseException("multiple start date", 0);
+			throw new ParseException("multiple end date", 0);
 		}
 	}
 }
 
-class invalidTimeDateInput extends Exception {
+/*************************************************************************************************
+ ************************************* EXCEPTIONS ************************************************
+ *************************************************************************************************/
+
+class invalidTimeDateInputException extends Exception {
+
 	/**
-	 * 
+	 * Throws when Time/Date input is not supported
 	 */
 	private static final long serialVersionUID = 1L;
 
-	// Parameterless Constructor
-	public invalidTimeDateInput() {
+	public invalidTimeDateInputException() {
 	}
 
-	// Constructor that accepts a message
-	public invalidTimeDateInput(String message) {
+	public invalidTimeDateInputException(String message) {
 		super(message);
 	}
 }
 
-class invalidCommand extends Exception {
+class invalidCommandException extends Exception {
 
 	/**
-	 * 
+	 * Throws when Command is invalid
 	 */
 	private static final long serialVersionUID = 1L;
 
-	public invalidCommand() {
+	public invalidCommandException() {
 	}
 
-	public invalidCommand(String message) {
+	public invalidCommandException(String message) {
 		super(message);
 	}
 
 }
 
-class invalidParameters extends Exception {
+class invalidParametersException extends Exception {
 
 	/**
-	 * 
+	 * Throws when parameters are missing Time of recurring task is missing Task
+	 * ID is missing when Command type requires ID
 	 */
 	private static final long serialVersionUID = 1L;
 
-	public invalidParameters() {
+	public invalidParametersException() {
 	}
 
-	public invalidParameters(String message) {
+	public invalidParametersException(String message) {
 		super(message);
 	}
 

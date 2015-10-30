@@ -1032,10 +1032,10 @@ public class ParserTest {
 
 	@Test
 	public void startTest109() throws Exception {
-		String input = "add dinner AT 1130pm";
+		String input = "add dinner AT 1159pm";
 
 		SimpleDateFormat sdf = new SimpleDateFormat("hhmma");
-		Date date = sdf.parse("1130pm");
+		Date date = sdf.parse("1159pm");
 		date = setDefaultMonthYear(date);
 		assertEquals(date, Parser.parse(input).getStartDate());
 	}
@@ -1061,30 +1061,30 @@ public class ParserTest {
 
 	@Test
 	public void startTest111() throws Exception {
-		String input = "add dinner AT 130pm";
+		String input = "add dinner AT 959pm";
 
 		SimpleDateFormat sdf = new SimpleDateFormat("hmma");
-		Date date = sdf.parse("130pm");
+		Date date = sdf.parse("959pm");
 		date = setDefaultMonthYear(date);
 		assertEquals(date, Parser.parse(input).getStartDate());
 	}
 
 	@Test
 	public void startTest112() throws Exception {
-		String input = "add dinner AT 11.30pm";
+		String input = "add dinner AT 11.59pm";
 
 		SimpleDateFormat sdf = new SimpleDateFormat("hh.mma");
-		Date date = sdf.parse("11.30pm");
+		Date date = sdf.parse("11.59pm");
 		date = setDefaultMonthYear(date);
 		assertEquals(date, Parser.parse(input).getStartDate());
 	}
 
 	@Test
 	public void startTest113() throws Exception {
-		String input = "add dinner AT 11:30pm";
+		String input = "add dinner AT 11:59pm";
 
 		SimpleDateFormat sdf = new SimpleDateFormat("hh:mma");
-		Date date = sdf.parse("11:30pm");
+		Date date = sdf.parse("11:59pm");
 		date = setDefaultMonthYear(date);
 		assertEquals(date, Parser.parse(input).getStartDate());
 	}
@@ -2220,10 +2220,10 @@ public class ParserTest {
 
 	@Test
 	public void endTest109() throws Exception {
-		String input = "add dinner on 1130pm";
+		String input = "add dinner on 1159pm";
 
 		SimpleDateFormat sdf = new SimpleDateFormat("hhmma");
-		Date date = sdf.parse("1130pm");
+		Date date = sdf.parse("1159pm");
 		date = setDefaultMonthYear(date);
 		assertEquals(date, Parser.parse(input).getDeadline());
 	}
@@ -2240,30 +2240,30 @@ public class ParserTest {
 
 	@Test
 	public void endTest111() throws Exception {
-		String input = "add dinner on 130pm";
+		String input = "add dinner on 959pm";
 
 		SimpleDateFormat sdf = new SimpleDateFormat("hmma");
-		Date date = sdf.parse("130pm");
+		Date date = sdf.parse("959pm");
 		date = setDefaultMonthYear(date);
 		assertEquals(date, Parser.parse(input).getDeadline());
 	}
 
 	@Test
 	public void endTest112() throws Exception {
-		String input = "add dinner on 11.30pm";
+		String input = "add dinner on 11.59pm";
 
 		SimpleDateFormat sdf = new SimpleDateFormat("hh.mma");
-		Date date = sdf.parse("11.30pm");
+		Date date = sdf.parse("11.59pm");
 		date = setDefaultMonthYear(date);
 		assertEquals(date, Parser.parse(input).getDeadline());
 	}
 
 	@Test
 	public void endTest113() throws Exception {
-		String input = "add dinner on 11:30pm";
+		String input = "add dinner on 11:59pm";
 
 		SimpleDateFormat sdf = new SimpleDateFormat("hh:mma");
-		Date date = sdf.parse("11:30pm");
+		Date date = sdf.parse("11:59pm");
 		date = setDefaultMonthYear(date);
 		assertEquals(date, Parser.parse(input).getDeadline());
 	}
