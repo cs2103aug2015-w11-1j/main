@@ -299,6 +299,8 @@ public class Parser {
 		Date myDate = null;
 		Calendar cal = Calendar.getInstance();
 
+
+		checkKeywords(input);
 		for (String temp : DATE_FORMAT) {
 			try {
 				SimpleDateFormat possibleFormats = new SimpleDateFormat(temp);
@@ -309,7 +311,8 @@ public class Parser {
 				for (String days : TimekeyWord) {
 					if (input.toUpperCase().contains(days)) {
 						myDate = addDefaultDate(input, myDate, cal);
-						return myDate;
+						break;
+						// return myDate;
 					}
 				}
 
@@ -320,13 +323,11 @@ public class Parser {
 				for (String time : TIME_ONLY_FORMAT) {
 					addDefaultDay(cal, temp, time);
 				}
+
 				if (cal.get(Calendar.YEAR) == NO_YEAR_INPUT) {
 					myDate = addDefaultYear(cal);
 				}
 
-				for (int i = 0; i < TimekeyWord.length; i++) {
-					checkKeywords(input, i);
-				}
 				return myDate;
 			} catch (ParseException e) {
 				// Does not match format, proceed to compare next format
@@ -359,9 +360,15 @@ public class Parser {
 	 * Checks if input contains multiple Time keywords and throw
 	 * invalidTimeDateInputException
 	 */
-	private static void checkKeywords(String input, int i) throws invalidTimeDateInputException {
-		if (input.toUpperCase().contains(TimekeyWord[i])) {
-			throw new invalidTimeDateInputException(input);
+	private static void checkKeywords(String input) throws invalidTimeDateInputException {
+		int count = 0;
+		for (int i = 0; i < TimekeyWord.length; i++) {
+			if (input.toUpperCase().contains(TimekeyWord[i])) {
+				count++;
+			}
+			if (count > 2) {
+				throw new invalidTimeDateInputException(input);
+			}
 		}
 	}
 
