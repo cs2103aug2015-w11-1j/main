@@ -182,9 +182,8 @@ public class Parser {
 	}
 
 	/**
-	 * Takes in 2 index of a arrayList
-	 * Remove the Strings in between the index and append them as a string
-	 * Returns the result String
+	 * Takes in 2 index of a arrayList Remove the Strings in between the index
+	 * and append them as a string Returns the result String
 	 */
 	private static String getInputBetweenArrayList(ArrayList<String> input, int indexOfKeyWord, int indexOfNextKeyWord)
 			throws invalidParametersException {
@@ -202,7 +201,8 @@ public class Parser {
 	}
 
 	/**
-	 * If Index of next Keyword is NO_NEXT_KEYWORD, returns the last index of arrayList
+	 * If Index of next Keyword is NO_NEXT_KEYWORD, returns the last index of
+	 * arrayList
 	 */
 	private static int checkLastIndex(ArrayList<String> input, int indexOfNextKeyWord) {
 		if (indexOfNextKeyWord == NO_NEXT_KEYWORD) {
@@ -305,43 +305,27 @@ public class Parser {
 				possibleFormats.setLenient(false);
 				myDate = possibleFormats.parse(input);
 				cal.setTime(myDate);
-				if (cal.get(Calendar.YEAR) == NO_YEAR_INPUT) {
-					for (String days : TimekeyWord) {
-						if (input.toUpperCase().contains(days)) {
-							cal.setTime(myDate);
-							cal.set(Calendar.DATE, Calendar.getInstance().get(Calendar.DATE));
-							cal.set(Calendar.MONTH, Calendar.getInstance().get(Calendar.MONTH));
-							cal.set(Calendar.YEAR, Calendar.getInstance().get(Calendar.YEAR));
-							keyWords(input, cal);
-							myDate = cal.getTime();
-							return myDate;
-						}
+
+				for (String days : TimekeyWord) {
+					if (input.toUpperCase().contains(days)) {
+						myDate = addDefaultDate(input, myDate, cal);
+						return myDate;
 					}
 				}
 
 				if (method.equals("END")) {
-					for (String date : DATE_ONLY_FORMAT) {
-						if (temp.equals(date)) {
-							cal.set(Calendar.HOUR_OF_DAY, 23);
-							cal.set(Calendar.MINUTE, 59);
-						}
-					}
+					addDefaultTime(cal, temp);
 				}
 
 				for (String time : TIME_ONLY_FORMAT) {
-					if (temp.equals(time)) {
-						cal.set(Calendar.DAY_OF_YEAR, Calendar.getInstance().get(Calendar.DAY_OF_YEAR));
-					}
+					addDefaultDay(cal, temp, time);
 				}
 				if (cal.get(Calendar.YEAR) == NO_YEAR_INPUT) {
-					cal.set(Calendar.YEAR, Calendar.getInstance().get(Calendar.YEAR));
-					myDate = cal.getTime();
-					return myDate;
+					myDate = addDefaultYear(cal);
 				}
+
 				for (int i = 0; i < TimekeyWord.length; i++) {
-					if (input.toUpperCase().contains(TimekeyWord[i])) {
-						throw new invalidTimeDateInputException(input);
-					}
+					checkKeywords(input, i);
 				}
 				return myDate;
 			} catch (ParseException e) {
@@ -361,12 +345,7 @@ public class Parser {
 						endTimeOfDay = "2359";
 					}
 					myDate = format.parse(endTimeOfDay);
-					cal.setTime(myDate);
-					cal.set(Calendar.DATE, Calendar.getInstance().get(Calendar.DATE));
-					cal.set(Calendar.MONTH, Calendar.getInstance().get(Calendar.MONTH));
-					cal.set(Calendar.YEAR, Calendar.getInstance().get(Calendar.YEAR));
-					keyWords(input, cal);
-					myDate = cal.getTime();
+					myDate = addDefaultDate(input, myDate, cal);
 					return myDate;
 				} catch (ParseException e) {
 					// self set time format, ignore
@@ -374,6 +353,63 @@ public class Parser {
 			}
 		}
 		throw new ParseException(input, 0);
+	}
+
+	/**
+	 * Checks if input contains multiple Time keywords and throw
+	 * invalidTimeDateInputException
+	 */
+	private static void checkKeywords(String input, int i) throws invalidTimeDateInputException {
+		if (input.toUpperCase().contains(TimekeyWord[i])) {
+			throw new invalidTimeDateInputException(input);
+		}
+	}
+
+	/**
+	 * Returns a calendar object with year set as current year if year is not
+	 * specified
+	 */
+	private static Date addDefaultYear(Calendar cal) {
+		Date myDate;
+		cal.set(Calendar.YEAR, Calendar.getInstance().get(Calendar.YEAR));
+		myDate = cal.getTime();
+		return myDate;
+	}
+
+	/**
+	 * Returns a calendar object with date set as today if date is not specified
+	 */
+	private static Date addDefaultDate(String input, Date myDate, Calendar cal) {
+		cal.setTime(myDate);
+		cal.set(Calendar.DATE, Calendar.getInstance().get(Calendar.DATE));
+		cal.set(Calendar.MONTH, Calendar.getInstance().get(Calendar.MONTH));
+		cal.set(Calendar.YEAR, Calendar.getInstance().get(Calendar.YEAR));
+		keyWords(input, cal);
+		myDate = cal.getTime();
+		return myDate;
+	}
+
+	/**
+	 * Returns a calendar object with day set as current day if day is not
+	 * stated
+	 */
+	private static void addDefaultDay(Calendar cal, String temp, String time) {
+		if (temp.equals(time)) {
+			cal.set(Calendar.DAY_OF_YEAR, Calendar.getInstance().get(Calendar.DAY_OF_YEAR));
+		}
+	}
+
+	/**
+	 * Returns a calendar object with time set as 2359 if method is end and time
+	 * is not stated
+	 */
+	private static void addDefaultTime(Calendar cal, String temp) {
+		for (String date : DATE_ONLY_FORMAT) {
+			if (temp.equals(date)) {
+				cal.set(Calendar.HOUR_OF_DAY, 23);
+				cal.set(Calendar.MINUTE, 59);
+			}
+		}
 	}
 
 	/**
