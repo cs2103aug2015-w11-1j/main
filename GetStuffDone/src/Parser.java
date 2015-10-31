@@ -1,4 +1,5 @@
 
+
 /*
 	<------------------------------------------------------->
 	Command keywords demarked by (case insensitive)
@@ -804,11 +805,12 @@ public class Parser {
 				throw new invalidTimeDateInputException("End Date before Start Date");
 			}
 		}
-		if (start != null) {
+		
+		/*if (start != null) {
 			if (start.before(todayDate)) {
 				throw new invalidTimeDateInputException("Start Date have past");
 			}
-		}
+		}*/
 		if (end != null) {
 			if (end.before(todayDate)) {
 				throw new invalidTimeDateInputException("event already ended");
