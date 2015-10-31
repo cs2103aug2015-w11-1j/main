@@ -70,10 +70,15 @@ public class GSDControl {
 			+ "update <ID> [floating/event/deadline]\n" + "delete <ID>\n" + "complete <ID>\n" + "incomplete <ID>\n"
 			+ "undo\n" + "redo\n" + "all\n" + "floating\n" + "events\n" + "deadlines\n" + "recurring\n"
 			+ "set <file path>\n" + "exit\n";
+	
+	private static final int SEVEN_DAYS = 7;
+	private static final int ONE_DAY_BEFORE = -1;
+	private static final int ONE_WEEK_BEFORE = -7;
+	private static final int ONE_MONTH_BEFORE = -1;
+	private static final int ONE_YEAR_BEFORE = -1;
 
 	private ArrayList<Task> tasks;
 	private CommandDetails commandDetails;
-	//private Parser parser = new Parser();
 	private Storage storage = new Storage();
 	private History history = new History();
 	private boolean isValidTaskNo = true;
@@ -88,7 +93,7 @@ public class GSDControl {
 	public Feedback processInput(String input) {
 		try {
 			this.commandDetails = Parser.parse(input);
-			//this.commandDetails = parser.parse(input);
+			// this.commandDetails = parser.parse(input);
 		} catch (ParseException e) { // Invalid Date Format
 			return new Feedback(null, FEEDBACK_INVALID_DATE_FORMAT, generateInfoBox());
 		} catch (NumberFormatException f) {
@@ -289,12 +294,14 @@ public class GSDControl {
 	}
 
 	private String completeTask(int ID) {
+		sendToHistory();
 		tasks.get(ID).markAsComplete();
 		storage.save(tasks);
 		return displayAllTasks();
 	}
 
 	private String incompleteTask(int ID) {
+		sendToHistory();
 		tasks.get(ID).markAsIncomplete();
 		storage.save(tasks);
 		return displayAllTasks();
@@ -345,10 +352,10 @@ public class GSDControl {
 			return undoRedoUpdateTask(ID);
 		case COMPLETE:
 			this.commandDetails = reverseComplete(ID);
-			return completeTask(commandDetails.getID() - 1);
+			return incompleteTask(commandDetails.getID() - 1);
 		case INCOMPLETE:
 			this.commandDetails = reverseIncomplete(ID);
-			return incompleteTask(commandDetails.getID() - 1);
+			return completeTask(commandDetails.getID() - 1);
 		default:
 			return null;
 
@@ -435,31 +442,55 @@ public class GSDControl {
 			case "DAILY":
 				deadlineCal = (Calendar) originalDeadlineCal.clone();
 				deadlineCal.add(Calendar.DAY_OF_YEAR, recurringTask.getRecurringCount());
+				if(deadlineCal.after(endingDateCal))	{
+					break;
+				}
 				recurringTask.setDeadline(deadlineCal.getTime());
 				recurringTask.incrementRecurringCount();
+				recurringTask.setIsComplete(false);
 				break;
 			case "WEEKLY":
 				deadlineCal = (Calendar) originalDeadlineCal.clone();
-				deadlineCal.add(Calendar.DAY_OF_YEAR, 7 * recurringTask.getRecurringCount());
+				deadlineCal.add(Calendar.DAY_OF_YEAR, SEVEN_DAYS * recurringTask.getRecurringCount());
 				recurringTask.setDeadline(deadlineCal.getTime());
 				recurringTask.incrementRecurringCount();
+				recurringTask.setIsComplete(false);
 				break;
 			case "MONTHLY":
 				deadlineCal = (Calendar) originalDeadlineCal.clone();
 				deadlineCal.add(Calendar.MONTH, recurringTask.getRecurringCount());
 				recurringTask.setDeadline(deadlineCal.getTime());
 				recurringTask.incrementRecurringCount();
+				recurringTask.setIsComplete(false);
 				break;
 			case "YEARLY":
 				deadlineCal = (Calendar) originalDeadlineCal.clone();
 				deadlineCal.add(Calendar.YEAR, recurringTask.getRecurringCount());
 				recurringTask.setDeadline(deadlineCal.getTime());
 				recurringTask.incrementRecurringCount();
+				recurringTask.setIsComplete(false);
 				break;
 			}
 		}
-		if (isExpired(currentDateCal, endingDateCal)) {
-			recurringTask.resetRecurringCount();
+		if (isExpired(currentDateCal, deadlineCal, endingDateCal)) {
+			switch (recurringTask.getRecurring()) {
+			case "DAILY":
+				deadlineCal.add(Calendar.DAY_OF_YEAR,  ONE_DAY_BEFORE);
+				endRecurringTask(recurringTask);
+				break;
+			case "WEEKLY":
+				deadlineCal.add(Calendar.DAY_OF_YEAR,  ONE_WEEK_BEFORE);
+				endRecurringTask(recurringTask);
+				break;
+			case "MONTHLY":
+				deadlineCal.add(Calendar.MONTH,  ONE_MONTH_BEFORE);
+				endRecurringTask(recurringTask);
+				break;
+			case "YEARLY":
+				deadlineCal.add(Calendar.YEAR,  ONE_YEAR_BEFORE);
+				endRecurringTask(recurringTask);
+				break;
+			}
 		}
 	}
 
@@ -474,15 +505,22 @@ public class GSDControl {
 				deadlineCal = (Calendar) originalDeadlineCal.clone();
 				startDateCal.add(Calendar.DAY_OF_YEAR, recurringTask.getRecurringCount());
 				deadlineCal.add(Calendar.DAY_OF_YEAR, recurringTask.getRecurringCount());
+				if(startDateCal.after(endingDateCal) || deadlineCal.after(endingDateCal))	{
+					break;
+				}
 				recurringTask.setStartDate(startDateCal.getTime());
 				recurringTask.setDeadline(deadlineCal.getTime());
 				recurringTask.incrementRecurringCount();
+				recurringTask.setIsComplete(false);
 				break;
 			case "WEEKLY":
 				startDateCal = (Calendar) originalStartDateCal.clone();
 				deadlineCal = (Calendar) originalDeadlineCal.clone();
-				startDateCal.add(Calendar.DAY_OF_YEAR, 7 * recurringTask.getRecurringCount());
-				deadlineCal.add(Calendar.DAY_OF_YEAR, 7 * recurringTask.getRecurringCount());
+				startDateCal.add(Calendar.DAY_OF_YEAR, SEVEN_DAYS * recurringTask.getRecurringCount());
+				deadlineCal.add(Calendar.DAY_OF_YEAR, SEVEN_DAYS * recurringTask.getRecurringCount());
+				if(startDateCal.after(endingDateCal) || deadlineCal.after(endingDateCal))	{
+					break;
+				}
 				recurringTask.setStartDate(startDateCal.getTime());
 				recurringTask.setDeadline(deadlineCal.getTime());
 				recurringTask.incrementRecurringCount();
@@ -492,6 +530,9 @@ public class GSDControl {
 				deadlineCal = (Calendar) originalDeadlineCal.clone();
 				startDateCal.add(Calendar.MONTH, recurringTask.getRecurringCount());
 				deadlineCal.add(Calendar.MONTH, recurringTask.getRecurringCount());
+				if(startDateCal.after(endingDateCal) || deadlineCal.after(endingDateCal))	{
+					break;
+				}
 				recurringTask.setStartDate(startDateCal.getTime());
 				recurringTask.setDeadline(deadlineCal.getTime());
 				recurringTask.incrementRecurringCount();
@@ -501,25 +542,53 @@ public class GSDControl {
 				deadlineCal = (Calendar) originalDeadlineCal.clone();
 				startDateCal.add(Calendar.YEAR, recurringTask.getRecurringCount());
 				deadlineCal.add(Calendar.YEAR, recurringTask.getRecurringCount());
+				if(startDateCal.after(endingDateCal) || deadlineCal.after(endingDateCal))	{
+					break;
+				}
 				recurringTask.setStartDate(startDateCal.getTime());
 				recurringTask.setDeadline(deadlineCal.getTime());
 				recurringTask.incrementRecurringCount();
 				break;
 			}
 		}
-		if (isExpired(currentDateCal, endingDateCal)) {
-			recurringTask.resetRecurringCount();
+		if (isExpired(currentDateCal, startDateCal, endingDateCal)) {
+			switch (recurringTask.getRecurring()) {
+			case "DAILY":
+				startDateCal.add(Calendar.DAY_OF_YEAR, ONE_DAY_BEFORE);
+				deadlineCal.add(Calendar.DAY_OF_YEAR, ONE_DAY_BEFORE);
+				endRecurringTask(recurringTask);
+				break;
+			case "WEEKLY":
+				startDateCal.add(Calendar.DAY_OF_YEAR, ONE_WEEK_BEFORE);
+				deadlineCal.add(Calendar.DAY_OF_YEAR, ONE_WEEK_BEFORE);
+				endRecurringTask(recurringTask);
+				break;
+			case "MONTHLY":
+				startDateCal.add(Calendar.MONTH, ONE_MONTH_BEFORE);
+				deadlineCal.add(Calendar.MONTH, ONE_MONTH_BEFORE);
+				endRecurringTask(recurringTask);
+				break;
+			case "YEARLY":
+				startDateCal.add(Calendar.YEAR, ONE_YEAR_BEFORE);
+				deadlineCal.add(Calendar.YEAR, ONE_YEAR_BEFORE);
+				endRecurringTask(recurringTask);
+				break;
+			}
 		}
 	}
 
 	private boolean isDueForUpdateAndNotExpired(Calendar currentDateCal, Calendar deadlineCal, Calendar endingDateCal,
 			Task recurringTask) {
-		return ((currentDateCal.after(deadlineCal) || recurringTask.isComplete())
-				&& currentDateCal.before(endingDateCal));
+		return (((currentDateCal.after(deadlineCal) && currentDateCal.before(endingDateCal)) && deadlineCal.before(endingDateCal)));
 	}
 
-	private boolean isExpired(Calendar currentDateCal, Calendar endingDateCal) {
-		return currentDateCal.after(endingDateCal);
+	private boolean isExpired(Calendar currentDateCal, Calendar latestDateCal, Calendar endingDateCal) {
+		return currentDateCal.after(endingDateCal) || latestDateCal.after(endingDateCal);
+	}
+	
+	private void endRecurringTask(Task recurringTask)	{
+		recurringTask.resetRecurringCount();
+		recurringTask.setIsComplete(true);
 	}
 
 	/*************************************************************************************************
@@ -548,6 +617,12 @@ public class GSDControl {
 		}
 	}
 
+	/*
+	 * Creates a CommandDetails object that matches the current CommandDetails
+	 * object in GSDControl. This method is only used for DELETE and UPDATE
+	 * Commands due to the nature of the Commands i.e. Requires history of both
+	 * old and new versions of Tasks.
+	 */
 	private CommandDetails generateDetails() {
 		Task task = tasks.get(this.commandDetails.getID() - 1);
 		System.out.println(task);
@@ -571,81 +646,169 @@ public class GSDControl {
 
 	private String displayAllTasks() {
 		refreshRecurringTasks();
-		Collections.sort(tasks);
 		String displayAll = "";
+		String displayIncomplete = "";
+		String displayComplete = "";
 
 		for (int i = 0; i < tasks.size(); i++) {
-			displayAll += i + 1 + ". " + tasks.get(i).toString();
+			if (!tasks.get(i).isComplete())
+				displayIncomplete += i + 1 + ". " + tasks.get(i).toString() + "\n";
 		}
 
-		if (displayAll.isEmpty()) {
-			displayAll = DISPLAY_NO_TASKS;
+		for (int i = 0; i < tasks.size(); i++) {
+			if (tasks.get(i).isComplete())
+				displayComplete += i + 1 + ". " + tasks.get(i).toString() + "\n";
 		}
+
+		if (!displayIncomplete.isEmpty()) {
+			displayIncomplete = "\t\tINCOMPLETED\n\n" + displayIncomplete;
+		}
+
+		if (!displayComplete.isEmpty()) {
+			displayComplete = "\t\tCOMPLETED\n\n" + displayComplete;
+		}
+
+		displayAll = displayIncomplete + displayComplete;
+
+		if (displayAll.isEmpty()) {
+			return displayAll = DISPLAY_NO_TASKS;
+		}
+
 		return displayAll;
 	}
 
 	private String displayFloatingTasks() {
 		refreshRecurringTasks();
 		String floating = "";
+		String floatingIncomplete = "";
+		String floatingComplete = "";
 
 		for (int i = 0; i < tasks.size(); i++) {
-			if (tasks.get(i).isFloating()) {
-				floating += i + 1 + ". " + tasks.get(i).toString();
+			if (tasks.get(i).isFloating() && !tasks.get(i).isComplete()) {
+				floatingIncomplete += i + 1 + ". " + tasks.get(i).toString() + "\n";
 			}
 		}
 
+		for (int i = 0; i < tasks.size(); i++) {
+			if (tasks.get(i).isFloating() && tasks.get(i).isComplete()) {
+				floatingComplete += i + 1 + ". " + tasks.get(i).toString() + "\n";
+			}
+		}
+
+		if (!floatingIncomplete.isEmpty()) {
+			floatingIncomplete = "\t\tINCOMPLETED\n\n" + floatingIncomplete;
+		}
+
+		if (!floatingComplete.isEmpty()) {
+			floatingComplete = "\t\tCOMPLETED\n\n" + floatingComplete;
+		}
+
+		floating = floatingIncomplete + floatingComplete;
+
 		if (floating.isEmpty()) {
-			floating = DISPLAY_NO_FLOATING_TASKS;
+			return floating = DISPLAY_NO_FLOATING_TASKS;
 		}
 		return floating;
 	}
 
 	private String displayEvents() {
 		refreshRecurringTasks();
-		Collections.sort(tasks);
 		String events = "";
+		String eventsIncomplete = "";
+		String eventsComplete = "";
 
 		for (int i = 0; i < tasks.size(); i++) {
-			if (tasks.get(i).isEvent()) {
-				events += i + 1 + ". " + tasks.get(i).toString();
+			if (tasks.get(i).isEvent() && !tasks.get(i).isComplete()) {
+				eventsIncomplete += i + 1 + ". " + tasks.get(i).toString() + "\n";
 			}
 		}
 
+		for (int i = 0; i < tasks.size(); i++) {
+			if (tasks.get(i).isEvent() && tasks.get(i).isComplete()) {
+				eventsComplete += i + 1 + ". " + tasks.get(i).toString() + "\n";
+			}
+		}
+
+		if (!eventsIncomplete.isEmpty()) {
+			eventsIncomplete = "\t\tINCOMPLETED\n\n" + eventsIncomplete;
+		}
+
+		if (!eventsComplete.isEmpty()) {
+			eventsComplete = "\t\tCOMPLETED\n\n" + eventsComplete;
+		}
+
+		events = eventsIncomplete + eventsComplete;
+
 		if (events.isEmpty()) {
-			events = DISPLAY_NO_EVENTS;
+			return events = DISPLAY_NO_EVENTS;
 		}
 		return events;
 	}
 
 	private String displayDeadlines() {
 		refreshRecurringTasks();
-		Collections.sort(tasks);
 		String deadlines = "";
+		String deadlinesIncomplete = "";
+		String deadlinesComplete = "";
 
 		for (int i = 0; i < tasks.size(); i++) {
-			if (tasks.get(i).isDeadline()) {
-				deadlines += i + 1 + ". " + tasks.get(i).toString();
+			if (tasks.get(i).isDeadline() && !tasks.get(i).isComplete()) {
+				deadlinesIncomplete += i + 1 + ". " + tasks.get(i).toString() + "\n";
 			}
 		}
 
+		for (int i = 0; i < tasks.size(); i++) {
+			if (tasks.get(i).isDeadline() && tasks.get(i).isComplete()) {
+				deadlinesComplete += i + 1 + ". " + tasks.get(i).toString() + "\n";
+			}
+		}
+
+		if (!deadlinesIncomplete.isEmpty()) {
+			deadlinesIncomplete = "\t\tINCOMPLETED\n\n" + deadlinesIncomplete;
+		}
+
+		if (!deadlinesComplete.isEmpty()) {
+			deadlinesComplete = "\t\tCOMPLETED\n\n" + deadlinesComplete;
+		}
+
+		deadlines = deadlinesIncomplete + deadlinesComplete;
+
 		if (deadlines.isEmpty()) {
-			deadlines = DISPLAY_NO_DEADLINES;
+			return deadlines = DISPLAY_NO_DEADLINES;
 		}
 		return deadlines;
 	}
 
 	private String displayRecurring() {
 		refreshRecurringTasks();
-		Collections.sort(tasks);
 		String recurring = "";
+		String recurringIncomplete = "";
+		String recurringComplete = "";
 
 		for (int i = 0; i < tasks.size(); i++) {
-			if (tasks.get(i).isRecurring()) {
-				recurring += i + 1 + ". " + tasks.get(i).toString();
+			if (tasks.get(i).isRecurring() && !tasks.get(i).isComplete()) {
+				recurringIncomplete += i + 1 + ". " + tasks.get(i).toString() + "\n";
 			}
 		}
+
+		for (int i = 0; i < tasks.size(); i++) {
+			if (tasks.get(i).isRecurring() && tasks.get(i).isComplete()) {
+				recurringComplete += i + 1 + ". " + tasks.get(i).toString() + "\n";
+			}
+		}
+
+		if (!recurringIncomplete.isEmpty()) {
+			recurringIncomplete = "\t\tINCOMPLETED\n\n" + recurringIncomplete;
+		}
+
+		if (!recurringComplete.isEmpty()) {
+			recurringComplete = "\t\tCOMPLETED\n\n" + recurringComplete;
+		}
+
+		recurring = recurringIncomplete + recurringComplete;
+
 		if (recurring.isEmpty()) {
-			recurring = DISPLAY_NO_RECURRING;
+			return recurring = DISPLAY_NO_RECURRING;
 		}
 		return recurring;
 	}

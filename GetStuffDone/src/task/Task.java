@@ -12,7 +12,7 @@ import commandDetail.CommandDetails;
  * Task knows the existence of commandDetails object
  */
 
-public class Task implements Comparable<Task> {
+public class Task {
 
 	private String description;
 	private Date startDate;
@@ -22,7 +22,7 @@ public class Task implements Comparable<Task> {
 	private Date originalDeadline;
 	private Date endingDate;
 	private int recurringCount;
-	private boolean isComplete;
+	private Boolean isComplete;
 
 	// Constructors
 
@@ -36,7 +36,7 @@ public class Task implements Comparable<Task> {
 		originalDeadline = null;
 		endingDate = null;
 		recurringCount = 1;
-		isComplete = false;
+		isComplete = new Boolean(false);
 
 	}
 
@@ -131,7 +131,7 @@ public class Task implements Comparable<Task> {
 		return this.recurringCount;
 	}
 
-	public boolean isComplete() {
+	public Boolean isComplete() {
 		return this.isComplete;
 	}
 
@@ -166,11 +166,11 @@ public class Task implements Comparable<Task> {
 	}
 
 	public void markAsComplete() {
-		isComplete = true;
+		isComplete = Boolean.TRUE;
 	}
 
 	public void markAsIncomplete() {
-		isComplete = false;
+		isComplete = Boolean.FALSE;
 	}
 	// Overriding methods
 
@@ -236,23 +236,15 @@ public class Task implements Comparable<Task> {
 		} else {
 			ending = df.format(endingDate);
 		}
-		if (!isRecurring()) {
+		if (isFloating()) {
+			return (description + "\nStart Date: -\nDeadline: -\n");
+		} else if (isEvent()) {
 			return (description + "\nStart Date: " + start + "\nDeadline: " + end + "\n");
+		} else if (isDeadline()) {
+			return description + "\nStart Date: -\nDeadline: " + end + "\n";
 		} else {
 			return (description + "\nStart Date: " + start + "\nDeadline: " + end + "\n" + "Recurring " + recurring
 					+ "\nEnding Date: " + ending + "\n");
 		}
 	}
-
-	@Override
-	public int compareTo(Task o) {
-		if ((getStartDate() == null || o.getStartDate() == null) && getDeadline() == null || o.getDeadline() == null) {
-			return 0;
-		}
-		if (getStartDate() == null || o.getStartDate() == null) {
-			return getDeadline().compareTo(o.getDeadline());
-		}
-		return getStartDate().compareTo(o.getStartDate());
-	}
-
 }
