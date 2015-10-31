@@ -17,7 +17,6 @@ public class runParser {
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
-			sc.close();
 		}
 	}
 }

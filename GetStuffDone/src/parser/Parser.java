@@ -727,7 +727,6 @@ public class Parser {
 		originalEnd = end;
 		validateCommandDetails(command, ID, description, start, end, input, recurring, originalStart, originalEnd,
 				endingDate);
-
 		return new CommandDetails(command, description, start, end, ID, recurring, originalStart, originalEnd,
 				endingDate);
 	}
@@ -861,6 +860,10 @@ public class Parser {
 		}
 		if (command == CommandDetails.COMMANDS.ADD || command == CommandDetails.COMMANDS.UPDATE) {
 			if (description == null) {
+				throw new InvalidParametersException(input);
+			}
+			
+			if(description.equals("")){
 				throw new InvalidParametersException(input);
 			}
 		}
