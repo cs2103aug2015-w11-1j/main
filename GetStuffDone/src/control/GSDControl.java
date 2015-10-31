@@ -1,8 +1,17 @@
+package control;
+
 import java.io.IOException;
+import parser.Parser;
 import java.nio.file.InvalidPathException;
 import java.text.ParseException;
 import java.util.*;
-
+import commandDetail.CommandDetails;
+import history.History;
+import storage.Storage;
+import task.Task;
+import ui.Feedback;
+import parser.InvalidCommandException;
+import parser.InvalidParametersException;
 /*
  * GSDControl deals with handling of input commands, CRUD of tasks, update of History and update of Storage
  * GSDControl knows the existence of the main components Parser, Task, History and Storage
@@ -10,6 +19,7 @@ import java.util.*;
  * GSDControl does not know the existence of UI
  * GSDControl returns a Feedback Object to UI for displaying
  */
+import parser.InvalidTimeDateInputException;
 
 public class GSDControl {
 
@@ -83,11 +93,11 @@ public class GSDControl {
 			return new Feedback(null, FEEDBACK_INVALID_DATE_FORMAT, generateInfoBox());
 		} catch (NumberFormatException f) {
 			return new Feedback(null, FEEDBACK_INVALID_TASK_NUMBER, generateInfoBox());
-		} catch (invalidTimeDateInputException g) { // Not in the form [Time] [Date]
+		} catch (InvalidTimeDateInputException g) { // Not in the form [Time] [Date]
 			return new Feedback(null, FEEDBACK_INVALID_TIME_DATE_INPUT, generateInfoBox());
-		} catch (invalidCommandException h) {
+		} catch (InvalidCommandException h) {
 			return new Feedback(null, FEEDBACK_INVALID_COMMAND, generateInfoBox());
-		} catch (invalidParametersException i) {
+		} catch (InvalidParametersException i) {
 			return new Feedback(null, FEEDBACK_INVALID_COMMAND_FORMAT, generateInfoBox());
 			// Invalid parameters
 			// eg delete 1 screw this up

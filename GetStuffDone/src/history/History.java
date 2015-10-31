@@ -1,4 +1,7 @@
+package history;
 import java.util.Stack;
+
+import commandDetail.CommandDetails;
 
 public class History {
 

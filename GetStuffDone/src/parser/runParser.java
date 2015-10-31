@@ -1,5 +1,6 @@
-import java.text.ParseException;
+package parser;
 import java.util.Scanner;
+import commandDetail.CommandDetails;
 
 public class runParser {
 
@@ -12,9 +13,11 @@ public class runParser {
 
 			try {
 				CommandDetails details = Parser.parse(input);
+				System.out.println(details);
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
+			sc.close();
 		}
 	}
 }

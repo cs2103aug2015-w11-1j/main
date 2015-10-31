@@ -1,4 +1,7 @@
+package history;
 import org.junit.Test;
+
+import commandDetail.CommandDetails;
 
 import static org.junit.Assert.assertEquals;
 import java.util.Date;

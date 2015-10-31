@@ -1,3 +1,4 @@
+package ui;
 
 public class Feedback {
 	private String displayString = null;

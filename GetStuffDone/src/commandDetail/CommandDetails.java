@@ -1,3 +1,4 @@
+package commandDetail;
 import java.util.Date;
 
 public class CommandDetails {

@@ -1,7 +1,10 @@
+package task;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
+
+import commandDetail.CommandDetails;
 
 /*
  * Task is an object used in GetStuffDone
