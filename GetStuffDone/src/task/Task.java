@@ -195,8 +195,11 @@ public class Task {
 		if (details.getDeadline() != null) {
 			taskDeadlineCal.setTime(details.getDeadline());
 		}
+		
+		System.out.println("Start: " + taskStartDateCal.getTime() + "\nDeadline: " + taskDeadlineCal.getTime());
+		System.out.println("Details : " + details.getStartDate() + "\n" + details.getDeadline());
 
-		if (details.getDescription() != null && details.getDescription().contains(this.description)) {
+		if (details.getDescription() != null && this.description.contains(details.getDescription())) {
 			return true;
 		}
 
@@ -242,9 +245,10 @@ public class Task {
 			return (description + "\nStart Date: " + start + "\nDeadline: " + end + "\n");
 		} else if (isDeadline()) {
 			return description + "\nStart Date: -\nDeadline: " + end + "\n";
-		} else {
+		} else if (isRecurring()){
 			return (description + "\nStart Date: " + start + "\nDeadline: " + end + "\n" + "Recurring " + recurring
 					+ "\nEnding Date: " + ending + "\n");
 		}
+		return null;
 	}
 }
