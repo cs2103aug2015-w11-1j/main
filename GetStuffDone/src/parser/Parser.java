@@ -1,7 +1,5 @@
 package parser;
 
-
-
 /*
 	<------------------------------------------------------->
 	Command keywords demarked by (case insensitive)
@@ -114,6 +112,43 @@ public class Parser {
 
 	};
 
+	private final static String[] NOT_TIME_ONLY_FORMAT = { "HHmm dd MMMM yy", "HH.mm dd MMMM yy", "HH:mm dd MMMM yy",
+			"hhmma dd MMMM yy", "hha dd MMMM yy", "hmma dd MMMM yy", "hh.mma dd MMMM yy", "hh:mma dd MMMM yy",
+			"dd MMMM yy",
+
+			"HHmm dd MM yy", "HH.mm dd MM yy", "HH:mm dd MM yy", "hhmma dd MM yy", "hha dd MM yy", "hmma dd MM yy",
+			"hh.mma dd MM yy", "hh:mma dd MM yy", "dd MM yy",
+
+			"HHmm dd MMMM", "HH.mm dd MMMM", "HH:mm dd MMMM", "hhmma dd MMMM", "hha dd MMMM", "hmma dd MMMM",
+			"hh.mma dd MMMM", "hh:mma dd MMMM", "dd MMMM",
+
+			"HHmm dd MM", "HH.mm dd MM", "HH:mm dd MM", "hhmma dd MM", "hha dd MM", "hmma dd MM", "hh.mma dd MM",
+			"hh:mma dd MM", "dd MM",
+
+			"HHmm dd/MMMM/yy", "HH.mm dd/MMMMM/yy", "HH:mm dd/MMMM/yy", "hhmma dd/MMMM/yy", "hha dd/MMMM/yy",
+			"hmma dd/MMMM/yy", "hh.mma dd/MMMM/yy", "hh:mma dd/MMMM/yy", "dd/MMMM/yy",
+
+			"HHmm dd/MM/yy", "HH.mm dd/MM/yy", "HH:mm dd/MM/yy", "hhmma dd/MM/yy", "hha dd/MM/yy", "hmma dd/MM/yy",
+			"hh.mma dd/MM/yy", "hh:mma dd/MM/yy", "dd/MM/yy",
+
+			"HHmm dd/MMMM", "HH.mm dd/MMMM", "HH:mm dd/MMMM", "hhmma dd/MMMM", "hha dd/MMMM", "hmma dd/MMMM",
+			"hh.mma dd/MMMM", "hh:mma dd/MMMM", "dd/MMMM",
+
+			"HHmm dd/MM", "HH.mm dd/MM", "HH:mm dd/MM", "hhmma dd/MM", "hha dd/MM", "hmma dd/MM", "hh.mma dd/MM",
+			"hh:mma dd/MM", "dd/MM",
+
+			"HHmm dd-MMMM-yy", "HH.mm dd-MMMM-yy", "HH:mm dd-MMMM-yy", "hhmma dd-MMMM-yy", "hha dd-MMMM-yy",
+			"hmma dd-MMMM-yy", "hh.mma dd-MMMM-yy", "hh:mma dd-MMMM-yy", "dd-MMMM-yy",
+
+			"HHmm dd-MM-yy", "HH.mm dd-MM-yy", "HH:mm dd-MM-yy", "hhmma dd-MM-yy", "hha dd-MM-yy", "hmma dd-MM-yy",
+			"hh.mma dd-MM-yy", "hh:mma dd-MM-yy", "dd-MM-yy",
+
+			"HHmm dd-MMMM", "HH.mm dd-MMMM", "HH:mm dd-MMMM", "hhmma dd-MMMM", "hha dd-MMMM", "hmma dd-MMMM",
+			"hh.mma dd-MMMM", "hh:mma dd-MMMM", "dd-MMMM",
+
+			"HHmm dd-MM", "HH.mm dd-MM", "HH:mm dd-MM", "hhmma dd-MM", "hha dd-MM", "hmma dd-MM", "hh.mma dd-MM",
+			"hh:mma dd-MM", "dd-MM", };
+
 	private final static String[] DATE_ONLY_FORMAT = { "dd/MM", "dd-MM", "dd-MMMM", "dd-MM-yy", "dd-MMMM-yy", "dd/MMMM",
 			"dd/MM/yy", "dd/MMMM/yy", "dd MM", "dd MMMM", "dd MM yy", "dd MMMM yy" };
 
@@ -142,8 +177,8 @@ public class Parser {
 	private static int indexOfkeyWord(ArrayList<String> input, String keyword) {
 		int arrayListIndex = 0;
 		int indexOfKeyWord = -1;
-		for (String temp : input) {
-			if (temp.equalsIgnoreCase(keyword)) {
+		for (String tokens : input) {
+			if (tokens.equalsIgnoreCase(keyword)) {
 				indexOfKeyWord = arrayListIndex;
 			}
 			arrayListIndex++;
@@ -302,29 +337,28 @@ public class Parser {
 		Date myDate = null;
 		Calendar cal = Calendar.getInstance();
 
-
-		checkKeywords(input);
-		for (String temp : DATE_FORMAT) {
+		for (String formatParsed : DATE_FORMAT) {
 			try {
-				SimpleDateFormat possibleFormats = new SimpleDateFormat(temp);
+				SimpleDateFormat possibleFormats = new SimpleDateFormat(formatParsed);
 				possibleFormats.setLenient(false);
 				myDate = possibleFormats.parse(input);
 				cal.setTime(myDate);
+
+				checkKeywords(input, formatParsed);
 
 				for (String days : TimekeyWord) {
 					if (input.toUpperCase().contains(days)) {
 						myDate = addDefaultDate(input, myDate, cal);
 						break;
-						// return myDate;
 					}
 				}
 
 				if (method.equals("END")) {
-					addDefaultTime(cal, temp);
+					addDefaultTime(cal, formatParsed);
 				}
 
 				for (String time : TIME_ONLY_FORMAT) {
-					addDefaultDay(cal, temp, time);
+					addDefaultDay(cal, formatParsed, time);
 				}
 
 				if (cal.get(Calendar.YEAR) == NO_YEAR_INPUT) {
@@ -363,16 +397,25 @@ public class Parser {
 	 * Checks if input contains multiple Time keywords and throw
 	 * InvalidTimeDateInputException
 	 */
-	private static void checkKeywords(String input) throws InvalidTimeDateInputException {
+	private static void checkKeywords(String input, String formatParsed) throws InvalidTimeDateInputException {
 		int count = 0;
 		for (int i = 0; i < TimekeyWord.length; i++) {
 			if (input.toUpperCase().contains(TimekeyWord[i])) {
 				count++;
 			}
-			if (count > 2) {
+			if (count > 1) {
 				throw new InvalidTimeDateInputException(input);
 			}
 		}
+
+		for (String format : NOT_TIME_ONLY_FORMAT) {
+			for (int i = 0; i < TimekeyWord.length; i++) {
+				if (input.toUpperCase().contains(TimekeyWord[i]) && formatParsed.equals(format)) {
+					throw new InvalidTimeDateInputException(input);
+				}
+			}
+		}
+		
 	}
 
 	/**
@@ -403,8 +446,8 @@ public class Parser {
 	 * Returns a calendar object with day set as current day if day is not
 	 * stated
 	 */
-	private static void addDefaultDay(Calendar cal, String temp, String time) {
-		if (temp.equals(time)) {
+	private static void addDefaultDay(Calendar cal, String formatParsed, String time) {
+		if (formatParsed.equals(time)) {
 			cal.set(Calendar.DAY_OF_YEAR, Calendar.getInstance().get(Calendar.DAY_OF_YEAR));
 		}
 	}
@@ -413,9 +456,9 @@ public class Parser {
 	 * Returns a calendar object with time set as 2359 if method is end and time
 	 * is not stated
 	 */
-	private static void addDefaultTime(Calendar cal, String temp) {
+	private static void addDefaultTime(Calendar cal, String formatParsed) {
 		for (String date : DATE_ONLY_FORMAT) {
-			if (temp.equals(date)) {
+			if (formatParsed.equals(date)) {
 				cal.set(Calendar.HOUR_OF_DAY, 23);
 				cal.set(Calendar.MINUTE, 59);
 			}
@@ -528,76 +571,84 @@ public class Parser {
 	 * Parse Type of command throws invalidCommandException when command is not
 	 * supported returns as CommandDetails.COMMANDS returns as an ADD command
 	 * type if not stated
+	 * 
+	 * @throws InvalidParametersException
 	 */
-	private static CommandDetails.COMMANDS parseCommandType(ArrayList<String> input) throws InvalidCommandException {
+	private static CommandDetails.COMMANDS parseCommandType(ArrayList<String> input)
+			throws InvalidCommandException, InvalidParametersException {
 
-		switch (input.get(0).toUpperCase()) {
-		case "ADD":
-			input.remove(0);
-			return CommandDetails.COMMANDS.ADD;
-		case "a":
-			input.remove(0);
-			return CommandDetails.COMMANDS.ADD;
-		case "DELETE":
-			input.remove(0);
-			return CommandDetails.COMMANDS.DELETE;
-		case "d":
-			input.remove(0);
-			return CommandDetails.COMMANDS.DELETE;
-		case "COMPLETE":
-			input.remove(0);
-			return CommandDetails.COMMANDS.COMPLETE;
-		case "INCOMPLETE":
-			input.remove(0);
-			return CommandDetails.COMMANDS.INCOMPLETE;
-		case "HELP":
-			input.remove(0);
-			return CommandDetails.COMMANDS.HELP;
-		case "REDO":
-			input.remove(0);
-			return CommandDetails.COMMANDS.REDO;
-		case "SEARCH":
-			input.remove(0);
-			return CommandDetails.COMMANDS.SEARCH;
-		case "s":
-			input.remove(0);
-			return CommandDetails.COMMANDS.SEARCH;
-		case "UNDO":
-			input.remove(0);
-			return CommandDetails.COMMANDS.UNDO;
-		case "ALL":
-			input.remove(0);
-			return CommandDetails.COMMANDS.ALL;
-		case "UPDATE":
-			input.remove(0);
-			return CommandDetails.COMMANDS.UPDATE;
-		case "u":
-			input.remove(0);
-			return CommandDetails.COMMANDS.UPDATE;
-		case "SET":
-			input.remove(0);
-			return CommandDetails.COMMANDS.SET;
-		case "FLOATING":
-			input.remove(0);
-			return CommandDetails.COMMANDS.FLOATING;
-		case "EVENTS":
-			input.remove(0);
-			return CommandDetails.COMMANDS.EVENTS;
-		case "DEADLINES":
-			input.remove(0);
-			return CommandDetails.COMMANDS.DEADLINES;
-		case "RECURRING":
-			input.remove(0);
-			return CommandDetails.COMMANDS.RECURRING;
-		case "EXIT":
-			input.remove(0);
-			return CommandDetails.COMMANDS.EXIT;
-		default:
-			// System.out.print("Invalid Command");
-			// input.remove(0);
-			// throw new invalidCommand(input.remove(0));
-			// return CommandDetails.COMMANDS.INVALID;
-			return CommandDetails.COMMANDS.ADD;
+		try {
+			switch (input.get(0).toUpperCase()) {
+			case "ADD":
+				input.remove(0);
+				return CommandDetails.COMMANDS.ADD;
+			case "a":
+				input.remove(0);
+				return CommandDetails.COMMANDS.ADD;
+			case "DELETE":
+				input.remove(0);
+				return CommandDetails.COMMANDS.DELETE;
+			case "d":
+				input.remove(0);
+				return CommandDetails.COMMANDS.DELETE;
+			case "COMPLETE":
+				input.remove(0);
+				return CommandDetails.COMMANDS.COMPLETE;
+			case "INCOMPLETE":
+				input.remove(0);
+				return CommandDetails.COMMANDS.INCOMPLETE;
+			case "HELP":
+				input.remove(0);
+				return CommandDetails.COMMANDS.HELP;
+			case "REDO":
+				input.remove(0);
+				return CommandDetails.COMMANDS.REDO;
+			case "SEARCH":
+				input.remove(0);
+				return CommandDetails.COMMANDS.SEARCH;
+			case "s":
+				input.remove(0);
+				return CommandDetails.COMMANDS.SEARCH;
+			case "UNDO":
+				input.remove(0);
+				return CommandDetails.COMMANDS.UNDO;
+			case "ALL":
+				input.remove(0);
+				return CommandDetails.COMMANDS.ALL;
+			case "UPDATE":
+				input.remove(0);
+				return CommandDetails.COMMANDS.UPDATE;
+			case "u":
+				input.remove(0);
+				return CommandDetails.COMMANDS.UPDATE;
+			case "SET":
+				input.remove(0);
+				return CommandDetails.COMMANDS.SET;
+			case "FLOATING":
+				input.remove(0);
+				return CommandDetails.COMMANDS.FLOATING;
+			case "EVENTS":
+				input.remove(0);
+				return CommandDetails.COMMANDS.EVENTS;
+			case "DEADLINES":
+				input.remove(0);
+				return CommandDetails.COMMANDS.DEADLINES;
+			case "RECURRING":
+				input.remove(0);
+				return CommandDetails.COMMANDS.RECURRING;
+			case "EXIT":
+				input.remove(0);
+				return CommandDetails.COMMANDS.EXIT;
+			default:
+				// System.out.print("Invalid Command");
+				// input.remove(0);
+				// throw new invalidCommand(input.remove(0));
+				// return CommandDetails.COMMANDS.INVALID;
+				return CommandDetails.COMMANDS.ADD;
+			}
+		} catch (IndexOutOfBoundsException e) {
+			throw new InvalidParametersException();
+
 		}
 	}
 
@@ -628,9 +679,9 @@ public class Parser {
 	 */
 	private static String parseRecurring(ArrayList<String> strTokens) {
 		int arrayListIndex = 0;
-		for (String temp : strTokens) {
+		for (String tokens : strTokens) {
 			for (int i = 0; i < RECURRING_KEY_WORD.length; i++) {
-				if (temp.equalsIgnoreCase(RECURRING_KEY_WORD[i])) {
+				if (tokens.equalsIgnoreCase(RECURRING_KEY_WORD[i])) {
 					return strTokens.remove(arrayListIndex).toUpperCase();
 				}
 			}
@@ -747,8 +798,8 @@ public class Parser {
 	 * Return True if keyword is AT
 	 */
 	private static boolean isEventTaskofAT(boolean copy, ArrayList<String> strTokens) {
-		for (String temp : strTokens) {
-			if (temp.equalsIgnoreCase("AT")) {
+		for (String tokens : strTokens) {
+			if (tokens.equalsIgnoreCase("AT")) {
 				copy = true;
 			}
 		}
@@ -790,10 +841,6 @@ public class Parser {
 	private static void validateDateTime(Date start, Date end, String recurring, Date endingDate)
 			throws InvalidTimeDateInputException {
 		Calendar today = Calendar.getInstance();
-		// today.set(Calendar.HOUR_OF_DAY, 0);
-		// today.set(Calendar.MINUTE, 0);
-		// today.set(Calendar.MILLISECOND, 0);
-		// today.set(Calendar.SECOND, 0);
 		Date todayDate = today.getTime();
 
 		if (end != null && start != null) {
@@ -801,12 +848,7 @@ public class Parser {
 				throw new InvalidTimeDateInputException("End Date before Start Date");
 			}
 		}
-		
-		/*if (start != null) {
-			if (start.before(todayDate)) {
-				throw new InvalidTimeDateInputException("Start Date have past");
-			}
-		}*/
+
 		if (end != null) {
 			if (end.before(todayDate)) {
 				throw new InvalidTimeDateInputException("event already ended");
@@ -843,6 +885,12 @@ public class Parser {
 	 */
 	private static void validateCommand(CommandDetails.COMMANDS command, int ID, String description, Date start,
 			Date end, String input) throws InvalidParametersException {
+		String checkDescription = description;
+		try {
+			checkDescription = checkDescription.replaceAll(" ", "");
+		} catch (NullPointerException e) {
+		}
+
 		if (command == CommandDetails.COMMANDS.HELP || command == CommandDetails.COMMANDS.REDO
 				|| command == CommandDetails.COMMANDS.UNDO || command == CommandDetails.COMMANDS.ALL
 				|| command == CommandDetails.COMMANDS.FLOATING || command == CommandDetails.COMMANDS.EVENTS
@@ -862,8 +910,8 @@ public class Parser {
 			if (description == null) {
 				throw new InvalidParametersException(input);
 			}
-			
-			if(description.equals("")){
+
+			if (checkDescription.equals("")) {
 				throw new InvalidParametersException(input);
 			}
 		}
@@ -874,6 +922,10 @@ public class Parser {
 		}
 		if (command == CommandDetails.COMMANDS.SEARCH) {
 			if (description == null && (start == null && end == null)) {
+				throw new InvalidParametersException(input);
+			}
+
+			if (checkDescription.equals("")) {
 				throw new InvalidParametersException(input);
 			}
 		}
@@ -891,8 +943,8 @@ public class Parser {
 	private static void validateStartDate(ArrayList<String> strTokens) throws ParseException {
 		int count;
 		count = 0;
-		for (String temp : strTokens) {
-			if (temp.equalsIgnoreCase("FROM") || temp.equalsIgnoreCase("AT")) {
+		for (String tokens : strTokens) {
+			if (tokens.equalsIgnoreCase("FROM") || tokens.equalsIgnoreCase("AT")) {
 				count++;
 			}
 		}
@@ -908,8 +960,8 @@ public class Parser {
 		int count;
 		count = 0;
 
-		for (String temp : strTokens) {
-			if (temp.equalsIgnoreCase("BY") || temp.equalsIgnoreCase("TO")) {
+		for (String tokens : strTokens) {
+			if (tokens.equalsIgnoreCase("BY") || tokens.equalsIgnoreCase("TO")) {
 				count++;
 			}
 		}
@@ -924,9 +976,9 @@ public class Parser {
 	 */
 	private static void validateRecurring(ArrayList<String> strTokens) throws ParseException {
 		int count = 0;
-		for (String temp : strTokens) {
-			if (temp.equalsIgnoreCase("DAILY") || temp.equalsIgnoreCase("MONTHLY") || temp.equalsIgnoreCase("YEARLY")
-					|| temp.equalsIgnoreCase("WEEKLY")) {
+		for (String tokens : strTokens) {
+			if (tokens.equalsIgnoreCase("DAILY") || tokens.equalsIgnoreCase("MONTHLY") || tokens.equalsIgnoreCase("YEARLY")
+					|| tokens.equalsIgnoreCase("WEEKLY")) {
 				count++;
 			}
 		}
