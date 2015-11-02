@@ -160,7 +160,7 @@ public class Parser {
 
 	private final static String[] RECURRING_KEY_WORD = { "DAILY", "MONTHLY", "YEARLY", "WEEKLY" };
 
-	private final static String[] keyWord = { "BY", "FROM", "TO", "AT", "ON", "DAILY", "MONTHLY", "YEARLY", "WEEKLY" };
+	private final static String[] keyWord = { "BY", "FROM", "TO", "AT", "ON", "DAILY", "MONTHLY", "YEARLY", "WEEKLY","ENDING" };
 
 	private final static int NO_NEXT_KEYWORD = -2;
 	private final static int NO_ID = -10;
