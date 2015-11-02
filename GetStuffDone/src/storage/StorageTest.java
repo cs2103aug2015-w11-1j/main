@@ -86,8 +86,7 @@ public class StorageTest {
 		storage.save(tasks);
 		tasks = storage.load();
 
-		Task task = tasks.remove(0);
-		assertSameTask(task, new Task());
+		assertEquals(tasks.remove(0).toString(), (new Task()).toString());
 	}
 
 	@Test
@@ -100,9 +99,9 @@ public class StorageTest {
 		storage.save(tasks);
 		tasks = storage.load();
 
-		assertSameTask(taskFloating, tasks.get(0));
-		assertSameTask(taskEvent, tasks.get(1));
-		assertSameTask(taskDeadline, tasks.get(2));
+		assertEquals(taskFloating.toString(), tasks.get(0).toString());
+		assertEquals(taskEvent.toString(), tasks.get(1).toString());
+		assertEquals(taskDeadline.toString(), tasks.get(2).toString());
 	}
 
 	@Test
@@ -139,44 +138,5 @@ public class StorageTest {
 	public void tearDown() {
 		File file = new File(PATH_CURRENT + FILENAME);
 		file.delete();
-	}
-
-	private static void assertSameTask(Task task1, Task task2) {
-
-		assertTrue(isSame(task1.getDescription(), task2.getDescription()));
-		assertTrue(isSame(task1.getStartDate(), task2.getStartDate()));
-		assertTrue(isSame(task1.getDeadline(), task2.getDeadline()));
-		assertTrue(isSame(task1.getEndingDate(), task2.getEndingDate()));
-		assertTrue(isSame(task1.getRecurring(), task2.getRecurring()));
-		assertTrue(isSame(task1.getOriginalStartDate(), task2.getOriginalStartDate()));
-		assertTrue(isSame(task1.getOriginalDeadline(), task2.getOriginalDeadline()));
-		assertEquals(task1.getRecurringCount(), task2.getRecurringCount());
-		assertEquals(task1.isComplete(), task2.isComplete());
-	}
-
-	private static boolean isSame(String string1, String string2) {
-
-		if (string1 == null && string2 == null) {
-			return true;
-		}
-
-		if (string1 != null && string1.equals(string2)) {
-			return true;
-		}
-
-		return false;
-	}
-
-	private static boolean isSame(Date date1, Date date2) {
-
-		if (date1 == null && date2 == null) {
-			return true;
-		}
-
-		if (date1 != null && date1.toString().equals(date2.toString())) {
-			return true;
-		}
-
-		return false;
 	}
 }

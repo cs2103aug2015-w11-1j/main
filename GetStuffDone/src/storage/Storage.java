@@ -21,7 +21,7 @@ public class Storage {
 
 	private static final String DEFAULT_PATH = "GetStuffDone.txt";
 
-	private static final String DATE_FORMAT = "dd MMMM yy HH:mm:ss";
+	private static final String DATE_FORMAT = "hh:mma dd/MMM/yyyy";
 
 	private static final String STATUS_COMPLETED = "Completed";
 	private static final String STATUS_NOT_COMPLETED = "Not completed";
