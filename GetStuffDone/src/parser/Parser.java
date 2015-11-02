@@ -160,7 +160,8 @@ public class Parser {
 
 	private final static String[] RECURRING_KEY_WORD = { "DAILY", "MONTHLY", "YEARLY", "WEEKLY" };
 
-	private final static String[] keyWord = { "BY", "FROM", "TO", "AT", "ON", "DAILY", "MONTHLY", "YEARLY", "WEEKLY","ENDING" };
+	private final static String[] keyWord = { "BY", "FROM", "TO", "AT", "ON", "DAILY", "MONTHLY", "YEARLY", "WEEKLY",
+			"ENDING" };
 
 	private final static int NO_NEXT_KEYWORD = -2;
 	private final static int NO_ID = -10;
@@ -415,7 +416,7 @@ public class Parser {
 				}
 			}
 		}
-		
+
 	}
 
 	/**
@@ -924,9 +925,10 @@ public class Parser {
 			if (description == null && (start == null && end == null)) {
 				throw new InvalidParametersException(input);
 			}
-
-			if (checkDescription.equals("")) {
-				throw new InvalidParametersException(input);
+			if (checkDescription != null) {
+				if (checkDescription.equals("") && (start == null && end == null)) {
+					throw new InvalidParametersException(input);
+				}
 			}
 		}
 	}
@@ -977,8 +979,8 @@ public class Parser {
 	private static void validateRecurring(ArrayList<String> strTokens) throws ParseException {
 		int count = 0;
 		for (String tokens : strTokens) {
-			if (tokens.equalsIgnoreCase("DAILY") || tokens.equalsIgnoreCase("MONTHLY") || tokens.equalsIgnoreCase("YEARLY")
-					|| tokens.equalsIgnoreCase("WEEKLY")) {
+			if (tokens.equalsIgnoreCase("DAILY") || tokens.equalsIgnoreCase("MONTHLY")
+					|| tokens.equalsIgnoreCase("YEARLY") || tokens.equalsIgnoreCase("WEEKLY")) {
 				count++;
 			}
 		}
