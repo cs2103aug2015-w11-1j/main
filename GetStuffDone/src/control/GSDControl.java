@@ -243,7 +243,7 @@ public class GSDControl {
 			return new Feedback(displayAllTasks(), FEEDBACK_WELCOME_MESSAGE, generateInfoBox());
 		} catch (IOException e) {
 			tasks = new ArrayList<Task>();
-			return new Feedback(DISPLAY_NO_TASKS, FEEDBACK_LOAD_ERROR, generateInfoBox());
+			return new Feedback(DISPLAY_NO_TASKS, FEEDBACK_WELCOME_MESSAGE, generateInfoBox());
 		} catch (ParseException f) {
 			tasks = new ArrayList<Task>();
 			return new Feedback(DISPLAY_NO_TASKS, FEEDBACK_LOAD_ERROR, generateInfoBox());

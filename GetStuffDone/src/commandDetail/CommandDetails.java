@@ -1,4 +1,5 @@
 package commandDetail;
+
 import java.util.Date;
 
 public class CommandDetails {
@@ -116,7 +117,7 @@ public class CommandDetails {
 	@Override
 	public String toString() {
 		String result = "";
-		result = "command = " + command + "\nID = " + ID + "\ndescription = " + description+ "\nstartDate = "
+		result = "command = " + command + "\nID = " + ID + "\ndescription = " + description + "\nstartDate = "
 				+ startDate + "\ndeadline = " + deadline + "\nRecurring = " + recurring + "\noriginalStartDate = "
 				+ originalStartDate + "\noriginalDeadline = " + originalDeadline + "\nEnding Date = " + endingDate
 				+ "\n";
