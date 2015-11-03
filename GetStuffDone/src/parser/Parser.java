@@ -164,11 +164,12 @@ public class Parser {
 
 	private final static String[] keyWord = { "BY", "FROM", "TO", "AT", "ON", "DAILY", "MONTHLY", "YEARLY", "WEEKLY",
 			"ENDING" };
-	private final static int daysInWeek = 7;
+	private final static int DAYS_IN_A_WEEK = 7;
 	private final static int NO_NEXT_KEYWORD = -2;
 	private final static int NO_ID = -10;
 	private final static int NO_KEYWORD = -1;
 	private final static int NO_YEAR_INPUT = 1970;
+	private final static int FIRST_IN_ARRAYLIST = 0;
 
 	/*************************************************************************************************
 	 ************************************* GENERAL USED METHODS **************************************
@@ -259,7 +260,7 @@ public class Parser {
 		try {
 			input = input.trim().replaceAll(" +", " ");
 		} catch (NullPointerException e) {
-			// parameters
+			//No parameters
 		}
 		return input;
 	}
@@ -352,7 +353,7 @@ public class Parser {
 	private static Date createDate(String input, String method) throws InvalidTimeDateInputException {
 		Date myDate = null;
 		Calendar cal = Calendar.getInstance();
-		input = formatString(input);
+		//input = formatString(input);
 
 		for (String formatParsed : DATE_FORMAT) {
 			try {
@@ -509,70 +510,73 @@ public class Parser {
 			break;
 		case "MONDAY":
 			if (weekday != Calendar.MONDAY) {
-				int days = (Calendar.MONDAY - weekday) % daysInWeek;
+				int days = (Calendar.MONDAY - weekday) % DAYS_IN_A_WEEK;
 				incrementDay(cal, days);
 			} else if (isBeforeCurrentTime) {
-				cal.add(Calendar.DAY_OF_YEAR, daysInWeek);
+				cal.add(Calendar.DAY_OF_YEAR, DAYS_IN_A_WEEK);
 			}
 			break;
 		case "TUESDAY":
 			weekday = cal.get(Calendar.DAY_OF_WEEK);
 			if (weekday != Calendar.TUESDAY) {
-				int days = (Calendar.TUESDAY - weekday) % daysInWeek;
+				int days = (Calendar.TUESDAY - weekday) % DAYS_IN_A_WEEK;
 				incrementDay(cal, days);
 			} else if (isBeforeCurrentTime) {
-				cal.add(Calendar.DAY_OF_YEAR, daysInWeek);
+				cal.add(Calendar.DAY_OF_YEAR, DAYS_IN_A_WEEK);
 			}
 			break;
 		case "WEDNESDAY":
 			weekday = cal.get(Calendar.DAY_OF_WEEK);
 			if (weekday != Calendar.WEDNESDAY) {
-				int days = (Calendar.WEDNESDAY - weekday) % daysInWeek;
+				int days = (Calendar.WEDNESDAY - weekday) % DAYS_IN_A_WEEK;
 				incrementDay(cal, days);
 			} else if (isBeforeCurrentTime) {
-				cal.add(Calendar.DAY_OF_YEAR, daysInWeek);
+				cal.add(Calendar.DAY_OF_YEAR, DAYS_IN_A_WEEK);
 			}
 			break;
 		case "THURSDAY":
 			weekday = cal.get(Calendar.DAY_OF_WEEK);
 			if (weekday != Calendar.THURSDAY) {
-				int days = (Calendar.THURSDAY - weekday) % daysInWeek;
+				int days = (Calendar.THURSDAY - weekday) % DAYS_IN_A_WEEK;
 				incrementDay(cal, days);
 			} else if (isBeforeCurrentTime) {
-				cal.add(Calendar.DAY_OF_YEAR, daysInWeek);
+				cal.add(Calendar.DAY_OF_YEAR, DAYS_IN_A_WEEK);
 			}
 			break;
 		case "FRIDAY":
 			weekday = cal.get(Calendar.DAY_OF_WEEK);
 			if (weekday != Calendar.FRIDAY) {
-				int days = (Calendar.FRIDAY - weekday) % daysInWeek;
+				int days = (Calendar.FRIDAY - weekday) % DAYS_IN_A_WEEK;
 				incrementDay(cal, days);
 			} else if (isBeforeCurrentTime) {
-				cal.add(Calendar.DAY_OF_YEAR, daysInWeek);
+				cal.add(Calendar.DAY_OF_YEAR, DAYS_IN_A_WEEK);
 			}
 			break;
 		case "SATURDAY":
 			weekday = cal.get(Calendar.DAY_OF_WEEK);
 			if (weekday != Calendar.SATURDAY) {
-				int days = (Calendar.SATURDAY - weekday) % daysInWeek;
+				int days = (Calendar.SATURDAY - weekday) % DAYS_IN_A_WEEK;
 				incrementDay(cal, days);
 			} else if (isBeforeCurrentTime) {
-				cal.add(Calendar.DAY_OF_YEAR, daysInWeek);
+				cal.add(Calendar.DAY_OF_YEAR, DAYS_IN_A_WEEK);
 			}
 			break;
 		case "SUNDAY":
 			weekday = cal.get(Calendar.DAY_OF_WEEK);
 			if (weekday != Calendar.SUNDAY) {
-				int days = (Calendar.SUNDAY - weekday) % daysInWeek;
+				int days = (Calendar.SUNDAY - weekday) % DAYS_IN_A_WEEK;
 				incrementDay(cal, days);
 			} else if (isBeforeCurrentTime) {
-				cal.add(Calendar.DAY_OF_YEAR, daysInWeek);
+				cal.add(Calendar.DAY_OF_YEAR, DAYS_IN_A_WEEK);
 			}
 			break;
 		}
 
 	}
 
+	/**
+	 * Returns true if before current time
+	 */
 	private static boolean checkBeforeCurrentTIme(int HOUR_OF_DAY, int MINUTE, int NOW_HOUR_OF_DAY, int NOW_MINUTE) {
 		return HOUR_OF_DAY < NOW_HOUR_OF_DAY || (HOUR_OF_DAY == NOW_HOUR_OF_DAY && MINUTE < NOW_MINUTE);
 	}
@@ -582,7 +586,7 @@ public class Parser {
 	 */
 	private static void incrementDay(Calendar cal, int days) {
 		if (days < 0) {
-			days = days + daysInWeek;
+			days = days + DAYS_IN_A_WEEK;
 		}
 		cal.add(Calendar.DAY_OF_YEAR, days);
 	}
@@ -602,71 +606,70 @@ public class Parser {
 			throws InvalidCommandException, InvalidParametersException {
 
 		try {
-			switch (input.get(0).toUpperCase()) {
+			switch (input.get(FIRST_IN_ARRAYLIST).toUpperCase()) {
 			case "ADD":
-				input.remove(0);
+				input.remove(FIRST_IN_ARRAYLIST);
 				return CommandDetails.COMMANDS.ADD;
 			case "a":
-				input.remove(0);
+				input.remove(FIRST_IN_ARRAYLIST);
 				return CommandDetails.COMMANDS.ADD;
 			case "DELETE":
-				input.remove(0);
+				input.remove(FIRST_IN_ARRAYLIST);
 				return CommandDetails.COMMANDS.DELETE;
 			case "d":
-				input.remove(0);
+				input.remove(FIRST_IN_ARRAYLIST);
 				return CommandDetails.COMMANDS.DELETE;
 			case "COMPLETE":
-				input.remove(0);
+				input.remove(FIRST_IN_ARRAYLIST);
 				return CommandDetails.COMMANDS.COMPLETE;
 			case "INCOMPLETE":
-				input.remove(0);
+				input.remove(FIRST_IN_ARRAYLIST);
 				return CommandDetails.COMMANDS.INCOMPLETE;
 			case "HELP":
-				input.remove(0);
+				input.remove(FIRST_IN_ARRAYLIST);
 				return CommandDetails.COMMANDS.HELP;
 			case "REDO":
-				input.remove(0);
+				input.remove(FIRST_IN_ARRAYLIST);
 				return CommandDetails.COMMANDS.REDO;
 			case "SEARCH":
-				input.remove(0);
+				input.remove(FIRST_IN_ARRAYLIST);
 				return CommandDetails.COMMANDS.SEARCH;
 			case "s":
-				input.remove(0);
+				input.remove(FIRST_IN_ARRAYLIST);
 				return CommandDetails.COMMANDS.SEARCH;
 			case "UNDO":
-				input.remove(0);
+				input.remove(FIRST_IN_ARRAYLIST);
 				return CommandDetails.COMMANDS.UNDO;
 			case "ALL":
-				input.remove(0);
+				input.remove(FIRST_IN_ARRAYLIST);
 				return CommandDetails.COMMANDS.ALL;
 			case "UPDATE":
-				input.remove(0);
+				input.remove(FIRST_IN_ARRAYLIST);
 				return CommandDetails.COMMANDS.UPDATE;
 			case "u":
-				input.remove(0);
+				input.remove(FIRST_IN_ARRAYLIST);
 				return CommandDetails.COMMANDS.UPDATE;
 			case "SET":
-				input.remove(0);
+				input.remove(FIRST_IN_ARRAYLIST);
 				return CommandDetails.COMMANDS.SET;
 			case "FLOATING":
-				input.remove(0);
+				input.remove(FIRST_IN_ARRAYLIST);
 				return CommandDetails.COMMANDS.FLOATING;
 			case "EVENTS":
-				input.remove(0);
+				input.remove(FIRST_IN_ARRAYLIST);
 				return CommandDetails.COMMANDS.EVENTS;
 			case "DEADLINES":
-				input.remove(0);
+				input.remove(FIRST_IN_ARRAYLIST);
 				return CommandDetails.COMMANDS.DEADLINES;
 			case "RECURRING":
-				input.remove(0);
+				input.remove(FIRST_IN_ARRAYLIST);
 				return CommandDetails.COMMANDS.RECURRING;
 			case "EXIT":
-				input.remove(0);
+				input.remove(FIRST_IN_ARRAYLIST);
 				return CommandDetails.COMMANDS.EXIT;
 			default:
 				// System.out.print("Invalid Command");
-				// input.remove(0);
-				// throw new invalidCommand(input.remove(0));
+				// throw new invalidCommand(input.remove(FIRST_IN_ARRAYLIST));
 				// return CommandDetails.COMMANDS.INVALID;
 				return CommandDetails.COMMANDS.ADD;
 			}
@@ -685,10 +688,10 @@ public class Parser {
 	 * returns as integer
 	 */
 	private static int parseID(ArrayList<String> input) throws InvalidParametersException {
-		int ID = -10;
+		int ID = NO_ID;
 
 		try {
-			ID = Integer.parseInt(input.remove(0));
+			ID = Integer.parseInt(input.remove(FIRST_IN_ARRAYLIST));
 		} catch (IndexOutOfBoundsException e) {
 			throw new InvalidParametersException();
 		}
@@ -749,10 +752,11 @@ public class Parser {
 			return null;
 		}
 		while (!input.isEmpty()) {
-			if (input.get(0).contains("/")) {
-				result = result + " " + input.remove(0).substring(1);
+			if (input.get(FIRST_IN_ARRAYLIST).contains("/")) {
+				//Removes escape character
+				result = result + " " + input.remove(FIRST_IN_ARRAYLIST).substring(1);
 			} else {
-				result = result + " " + input.remove(0);
+				result = result + " " + input.remove(FIRST_IN_ARRAYLIST);
 			}
 		}
 		result = formatString(result);
@@ -781,8 +785,9 @@ public class Parser {
 		Date originalEnd;
 		Date endingDate = null;
 		int ID = NO_ID;
-		boolean copy = false;
-		input = input.trim().replaceAll(" +", " ");
+		boolean isKeywordAt = false;
+		
+		input = formatString(input);
 		ArrayList<String> strTokens = new ArrayList<String>(Arrays.asList(input.split(" ")));
 		validateInput(strTokens, input);
 
@@ -791,10 +796,11 @@ public class Parser {
 			ID = parseID(strTokens);
 		}
 		end = parseEndDate(strTokens);
-		copy = isEventTaskofAT(copy, strTokens);
+		isKeywordAt = isEventTaskofAT(strTokens);
 		start = parseStartDate(strTokens);
-		if (copy) {
+		if (isKeywordAt) {
 			end = start;
+			//end = setEndDate(start);
 		}
 		recurring = parseRecurring(strTokens);
 		endingDate = parseEndingDate(strTokens);
@@ -808,15 +814,32 @@ public class Parser {
 				endingDate);
 	}
 
+	
+	/**
+	 * Set end time as 2359 for AT event task
+	 */
+	/*
+	private static Date setEndDate(Date start) {
+		Calendar cal = Calendar.getInstance();
+		int lastHourInDay = 23;
+		int lastMinuteInDay = 59;
+		cal.setTime(start);
+		cal.set(Calendar.HOUR_OF_DAY, lastHourInDay);
+		cal.set(Calendar.MINUTE, lastMinuteInDay);
+		return cal.getTime();
+	}*/
+
 	/**
 	 * Set Recurring ending date to last possible date in java.util.Date if not
 	 * stated
 	 */
 	private static Date defaultEndingDate(String recurring, Date endingDate) {
+		String dateFormat = "HHmm dd/MM/yyyy";
+		String defaultEndingDate = "2359 31/12/8089";
 		if (endingDate == null && recurring != null) {
-			SimpleDateFormat format = new SimpleDateFormat("HHmm dd/MM/yyyy");
+			SimpleDateFormat format = new SimpleDateFormat(dateFormat);
 			try {
-				endingDate = format.parse("2359 31/12/8089");
+				endingDate = format.parse(defaultEndingDate);
 			} catch (ParseException e) {
 				// Self set format ignore
 			}
@@ -827,13 +850,13 @@ public class Parser {
 	/**
 	 * Return True if keyword is AT
 	 */
-	private static boolean isEventTaskofAT(boolean copy, ArrayList<String> strTokens) {
+	private static boolean isEventTaskofAT(ArrayList<String> strTokens) {
 		for (String tokens : strTokens) {
 			if (tokens.equalsIgnoreCase("AT")) {
-				copy = true;
+				return true;
 			}
 		}
-		return copy;
+		return false;
 	}
 
 	/**
@@ -927,7 +950,7 @@ public class Parser {
 				|| command == CommandDetails.COMMANDS.FLOATING || command == CommandDetails.COMMANDS.EVENTS
 				|| command == CommandDetails.COMMANDS.DEADLINES || command == CommandDetails.COMMANDS.EXIT
 				|| command == CommandDetails.COMMANDS.RECURRING) {
-			if (description != null || start != null || end != null || ID != -10) {
+			if (description != null || start != null || end != null || ID != NO_ID) {
 				throw new InvalidParametersException(input);
 			}
 		}
