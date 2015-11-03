@@ -164,7 +164,7 @@ public class Parser {
 
 	private final static String[] keyWord = { "BY", "FROM", "TO", "AT", "ON", "DAILY", "MONTHLY", "YEARLY", "WEEKLY",
 			"ENDING" };
-	private final static  int daysInWeek = 7;
+	private final static int daysInWeek = 7;
 	private final static int NO_NEXT_KEYWORD = -2;
 	private final static int NO_ID = -10;
 	private final static int NO_KEYWORD = -1;
@@ -253,17 +253,17 @@ public class Parser {
 	}
 
 	/**
-	 * Returns a string with consecutive white spaces removed 
+	 * Returns a string with consecutive white spaces removed
 	 */
 	private static String formatString(String input) {
 		try {
 			input = input.trim().replaceAll(" +", " ");
 		} catch (NullPointerException e) {
-			//parameters
+			// parameters
 		}
 		return input;
 	}
-	
+
 	/*************************************************************************************************
 	 ************************************* TIME AND DATE PARSING *************************************
 	 *************************************************************************************************/
@@ -343,16 +343,17 @@ public class Parser {
 	}
 
 	/**
-	 * Creates the Date object with the parsed date string Throws InvalidParametersException
-	 * when time/date format is not found Throws InvalidTimeDateInputException
-	 * when time/date format is not supported if method is set to START, default
-	 * time is set as 0000 if method is set to END, default time is set as 2359
+	 * Creates the Date object with the parsed date string Throws
+	 * InvalidParametersException when time/date format is not found Throws
+	 * InvalidTimeDateInputException when time/date format is not supported if
+	 * method is set to START, default time is set as 0000 if method is set to
+	 * END, default time is set as 2359
 	 */
 	private static Date createDate(String input, String method) throws InvalidTimeDateInputException {
 		Date myDate = null;
 		Calendar cal = Calendar.getInstance();
 		input = formatString(input);
-		
+
 		for (String formatParsed : DATE_FORMAT) {
 			try {
 				SimpleDateFormat possibleFormats = new SimpleDateFormat(formatParsed);
@@ -408,8 +409,6 @@ public class Parser {
 		}
 		throw new InvalidTimeDateInputException(input);
 	}
-
-
 
 	/**
 	 * Checks if input contains multiple Time keywords and throw
@@ -495,8 +494,8 @@ public class Parser {
 		int MINUTE = cal.get(Calendar.MINUTE);
 		int NOW_HOUR_OF_DAY = now.get(Calendar.HOUR_OF_DAY);
 		int NOW_MINUTE = now.get(Calendar.MINUTE);
-		boolean isBeforeCurrentTime= checkBeforeCurrentTIme(HOUR_OF_DAY, MINUTE, NOW_HOUR_OF_DAY, NOW_MINUTE);
-		
+		boolean isBeforeCurrentTime = checkBeforeCurrentTIme(HOUR_OF_DAY, MINUTE, NOW_HOUR_OF_DAY, NOW_MINUTE);
+
 		int i;
 		for (i = 0; i < TimekeyWord.length; i++) {
 			if (input.toUpperCase().contains(TimekeyWord[i])) {
@@ -687,6 +686,7 @@ public class Parser {
 	 */
 	private static int parseID(ArrayList<String> input) throws InvalidParametersException {
 		int ID = -10;
+
 		try {
 			ID = Integer.parseInt(input.remove(0));
 		} catch (IndexOutOfBoundsException e) {
@@ -717,7 +717,8 @@ public class Parser {
 
 	/**
 	 * format is not found Throws InvalidTimeDateInputException when time/date
-	 * format is not supported Throws InvalidParametersException when keyword found but no time/date stated
+	 * format is not supported Throws InvalidParametersException when keyword
+	 * found but no time/date stated
 	 */
 	private static Date parseEndingDate(ArrayList<String> input)
 			throws InvalidTimeDateInputException, InvalidParametersException {
@@ -781,9 +782,9 @@ public class Parser {
 		Date endingDate = null;
 		int ID = NO_ID;
 		boolean copy = false;
-
+		input = input.trim().replaceAll(" +", " ");
 		ArrayList<String> strTokens = new ArrayList<String>(Arrays.asList(input.split(" ")));
-		validateInput(strTokens);
+		validateInput(strTokens, input);
 
 		CommandDetails.COMMANDS command = parseCommandType(strTokens);
 		if (requiresTaskID(command)) {
@@ -817,7 +818,7 @@ public class Parser {
 			try {
 				endingDate = format.parse("2359 31/12/8089");
 			} catch (ParseException e) {
-				//Self set format ignore
+				// Self set format ignore
 			}
 		}
 		return endingDate;
@@ -918,7 +919,7 @@ public class Parser {
 		try {
 			checkDescription = checkDescription.replaceAll(" ", "");
 		} catch (NullPointerException e) {
-			//no descriptions
+			// no descriptions
 		}
 
 		if (command == CommandDetails.COMMANDS.HELP || command == CommandDetails.COMMANDS.REDO
@@ -962,16 +963,23 @@ public class Parser {
 		}
 	}
 
-	/** Validates the user string input from control 
-	 * @throws InvalidParametersException */
-	private static void validateInput(ArrayList<String> strTokens) throws InvalidParametersException {
+	/**
+	 * Validates the user string input from control
+	 * 
+	 * @throws InvalidParametersException
+	 */
+	private static void validateInput(ArrayList<String> strTokens, String input) throws InvalidParametersException {
+		validateDates(input);
 		validateStartDate(strTokens);
 		validateEndDate(strTokens);
 		validateRecurring(strTokens);
 
 	}
 
-	/** Validates if there are multiple start time and throws InvalidParametersException */
+	/**
+	 * Validates if there are multiple start time and throws
+	 * InvalidParametersException
+	 */
 	private static void validateStartDate(ArrayList<String> strTokens) throws InvalidParametersException {
 		int count;
 		count = 0;
@@ -986,14 +994,15 @@ public class Parser {
 	}
 
 	/**
-	 * Validates if there are multiple end time/date and throws InvalidParametersException
+	 * Validates if there are multiple end time/date and throws
+	 * InvalidParametersException
 	 */
 	private static void validateEndDate(ArrayList<String> strTokens) throws InvalidParametersException {
 		int count;
 		count = 0;
 
 		for (String tokens : strTokens) {
-			if (tokens.equalsIgnoreCase("BY") || tokens.equalsIgnoreCase("TO")) {
+			if (tokens.equalsIgnoreCase("BY") || tokens.equalsIgnoreCase("TO") || tokens.equalsIgnoreCase("ON")) {
 				count++;
 			}
 		}
@@ -1003,7 +1012,28 @@ public class Parser {
 	}
 
 	/**
-	 * Validates if there are multiple recurring time/date and throws InvalidParametersException
+	 * Validates if there are Start and End that does not match and throws
+	 * InvalidParametersException
+	 */
+	private static void validateDates(String input) throws InvalidParametersException {
+
+		input = input.trim().replaceAll(" +", " ").toUpperCase();
+		ArrayList<String> strTokens = new ArrayList<String>(Arrays.asList(input.split(" ")));
+
+		if (strTokens.contains("FROM") && (strTokens.contains("ON") || strTokens.contains("BY"))) {
+			throw new InvalidParametersException("FROM not TO");
+		}
+
+		if (strTokens.contains("AT")
+				&& (strTokens.contains("ON") || strTokens.contains("BY") || strTokens.contains("TO"))) {
+			throw new InvalidParametersException("AT matched with end date");
+		}
+
+	}
+
+	/**
+	 * Validates if there are multiple recurring time/date and throws
+	 * InvalidParametersException
 	 */
 	private static void validateRecurring(ArrayList<String> strTokens) throws InvalidParametersException {
 		int count = 0;

@@ -1,6 +1,5 @@
 package parser;
 
-
 import static org.junit.Assert.*;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -2370,19 +2369,24 @@ public class ParserTest {
 		assertEquals(date, Parser.parse(input).getDeadline());
 	}
 
-
 	@Test
-	public void testcmd() throws Exception {
+	public void testCmd() throws Exception {
 		String input = "add dinner FROM 12.34 01 january 23";
 		assertEquals(CommandDetails.COMMANDS.ADD, Parser.parse(input).getCommand());
 	}
 
 	@Test
-	public void testcmd2() throws Exception {
+	public void testDefaultCmd() throws Exception {
 		String input = "dinner FROM 12.34 01 january 23";
 		assertEquals(CommandDetails.COMMANDS.ADD, Parser.parse(input).getCommand());
 	}
 
+	@Test
+	public void testCmdWhiteSpace() throws Exception {
+		String input = "dinner FROM 12.34 01 january 23";
+		assertEquals(CommandDetails.COMMANDS.ADD, Parser.parse(input).getCommand());
+	}
+	
 	@Test
 	public void testID() throws Exception {
 		String input = "delete 2";
@@ -2392,12 +2396,34 @@ public class ParserTest {
 	}
 
 	@Test
+	public void testIDWhiteSpace() throws Exception {
+		String input = "delete                  2";
+		int result = 2;
+		assertEquals(result, Parser.parse(input).getID());
+	}
+	
+	@Test
 	public void testDescription() throws Exception {
+		String input = "add dinner ";
+		String result = "dinner";
+		assertEquals(result, Parser.parse(input).getDescription());
+	}
+
+	@Test
+	public void testDescriptionEscapeChar() throws Exception {
 		String input = "add dinner /at gardens /by the bay";
 		String result = "dinner at gardens by the bay";
 		assertEquals(result, Parser.parse(input).getDescription());
 	}
-
+	
+	@Test
+	public void testDescriptionWhiteSpace() throws Exception {
+		String input = "add               dinner                   /at gardens        /by the bay          ";
+		String result = "dinner at gardens by the bay";
+		assertEquals(result, Parser.parse(input).getDescription());
+	}
+	
+	
 	@Test
 	public void testRecurring() throws Exception {
 		String input = "add dinner by today daily";
@@ -2420,13 +2446,62 @@ public class ParserTest {
 		Date date = format.parse("2359 31/12/2015");
 		assertEquals(date, Parser.parse(input).getEndingDate());
 	}
+
+	@Test(expected = InvalidParametersException.class)
+	public void emptyDescription() throws Exception {
+		String input = "add At tomorrow";
+		assertEquals(input, Parser.parse(input).getDescription());
+	}
 	
 	@Test(expected = InvalidTimeDateInputException.class)
-	public void timeExceptionTest1() throws Exception {
+	public void timeNotSupported() throws Exception {
 		SimpleDateFormat sdf = new SimpleDateFormat("HHmm");
 		Date date = sdf.parse("2359");
 		String input = "add dinner At 123456";
 
 		assertEquals(date, Parser.parse(input).getStartDate());
 	}
+
+	@Test(expected = InvalidTimeDateInputException.class)
+	public void endedTask() throws Exception {
+		String input = "add dinner from tomorrow to today";
+		assertEquals(input, Parser.parse(input));
+	}
+	
+	@Test(expected = InvalidTimeDateInputException.class)
+	public void startBeforeEnd() throws Exception {
+		String input = "add dinner from 1 jan to 6 jun";
+		assertEquals(input, Parser.parse(input));
+	}
+	
+	@Test(expected = InvalidTimeDateInputException.class)
+	public void endBeforeEnding() throws Exception {
+		String input = "add dinner from today  to 21 dec 2018 daily ending tomorrow";
+		assertEquals(input, Parser.parse(input));
+	}
+	
+	@Test(expected = InvalidTimeDateInputException.class)
+	public void startAfterEnding() throws Exception {
+		String input = "add dinner from 21 jan 2017  to 21 dec 2018 daily ending today";
+		assertEquals(input, Parser.parse(input));
+	}
+	
+	@Test(expected = InvalidParametersException.class)
+	public void noRecurringInterval() throws Exception {
+		String input = "add dinner by today ending sunday";
+		assertEquals(input, Parser.parse(input));
+	}
+	
+	@Test(expected = NumberFormatException.class)
+	public void taskNumberInvalid() throws Exception {
+		String input = "delete 2grbvwerf";
+		assertEquals("", Parser.parse(input).getStartDate());
+	}
+
+	@Test(expected = InvalidParametersException.class)
+	public void taskNumberMissing() throws Exception {
+		String input = "delete ";
+		assertEquals("", Parser.parse(input).getStartDate());
+	}
+
 }
