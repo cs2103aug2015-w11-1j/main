@@ -2370,14 +2370,6 @@ public class ParserTest {
 		assertEquals(date, Parser.parse(input).getDeadline());
 	}
 
-	@Test(expected = ParseException.class)
-	public void timeExceptionTest1() throws Exception {
-		SimpleDateFormat sdf = new SimpleDateFormat("HHmm");
-		Date date = sdf.parse("2359");
-		String input = "add dinner At 123456";
-
-		assertEquals(date, Parser.parse(input).getStartDate());
-	}
 
 	@Test
 	public void testcmd() throws Exception {
@@ -2428,5 +2420,13 @@ public class ParserTest {
 		Date date = format.parse("2359 31/12/2015");
 		assertEquals(date, Parser.parse(input).getEndingDate());
 	}
+	
+	@Test(expected = InvalidTimeDateInputException.class)
+	public void timeExceptionTest1() throws Exception {
+		SimpleDateFormat sdf = new SimpleDateFormat("HHmm");
+		Date date = sdf.parse("2359");
+		String input = "add dinner At 123456";
 
+		assertEquals(date, Parser.parse(input).getStartDate());
+	}
 }

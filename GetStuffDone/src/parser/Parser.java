@@ -1,5 +1,7 @@
 package parser;
 
+import java.text.ParseException;
+
 /*
 	<------------------------------------------------------->
 	Command keywords demarked by (case insensitive)
@@ -62,7 +64,7 @@ package parser;
 		<Command> <TaskID (if applicable)> <Time, description of task>
 	eg. -U 2 do homework FROM 12.30pm 6/10/15 TO 6pm 6/10/15 
 */
-import java.text.ParseException;
+
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -250,6 +252,18 @@ public class Parser {
 		return indexOfNextKeyWord;
 	}
 
+	/**
+	 * Returns a string with consecutive white spaces removed 
+	 */
+	private static String formatString(String input) {
+		try {
+			input = input.trim().replaceAll(" +", " ");
+		} catch (NullPointerException e) {
+			//parameters
+		}
+		return input;
+	}
+	
 	/*************************************************************************************************
 	 ************************************* TIME AND DATE PARSING *************************************
 	 *************************************************************************************************/
@@ -261,7 +275,7 @@ public class Parser {
 	 * time/date format is not supported
 	 */
 	private static Date parseStartDate(ArrayList<String> input)
-			throws ParseException, InvalidTimeDateInputException, InvalidParametersException {
+			throws InvalidTimeDateInputException, InvalidParametersException {
 		String result = "";
 		int indexOfNextKeyWord = NO_NEXT_KEYWORD;
 		int indexOfKeyWordFROM = indexOfkeyWord(input, "FROM");
@@ -294,7 +308,7 @@ public class Parser {
 	 * time/date format is not supported
 	 */
 	private static Date parseEndDate(ArrayList<String> input)
-			throws ParseException, InvalidTimeDateInputException, InvalidParametersException {
+			throws InvalidTimeDateInputException, InvalidParametersException {
 		String result = "";
 		int indexOfNextKeyWord = NO_NEXT_KEYWORD;
 		int indexOfKeyWordTO = indexOfkeyWord(input, "TO");
@@ -329,15 +343,16 @@ public class Parser {
 	}
 
 	/**
-	 * Creates the Date object with the parsed date string Throws ParseException
+	 * Creates the Date object with the parsed date string Throws InvalidParametersException
 	 * when time/date format is not found Throws InvalidTimeDateInputException
 	 * when time/date format is not supported if method is set to START, default
 	 * time is set as 0000 if method is set to END, default time is set as 2359
 	 */
-	private static Date createDate(String input, String method) throws InvalidTimeDateInputException, ParseException {
+	private static Date createDate(String input, String method) throws InvalidTimeDateInputException {
 		Date myDate = null;
 		Calendar cal = Calendar.getInstance();
-
+		input = formatString(input);
+		
 		for (String formatParsed : DATE_FORMAT) {
 			try {
 				SimpleDateFormat possibleFormats = new SimpleDateFormat(formatParsed);
@@ -379,11 +394,9 @@ public class Parser {
 				SimpleDateFormat format = new SimpleDateFormat("HHmm");
 				try {
 					if (method.equals("START")) {
-						String startOfDay = "0000";
-						endTimeOfDay = startOfDay;
+						endTimeOfDay = "0000";
 					} else {
-						String endOfDay = "2359";
-						endTimeOfDay = endOfDay;
+						endTimeOfDay = "2359";
 					}
 					myDate = format.parse(endTimeOfDay);
 					myDate = addDefaultDate(input, myDate, cal);
@@ -393,8 +406,10 @@ public class Parser {
 				}
 			}
 		}
-		throw new ParseException(input, 0);
+		throw new InvalidTimeDateInputException(input);
 	}
+
+
 
 	/**
 	 * Checks if input contains multiple Time keywords and throw
@@ -480,7 +495,8 @@ public class Parser {
 		int MINUTE = cal.get(Calendar.MINUTE);
 		int NOW_HOUR_OF_DAY = now.get(Calendar.HOUR_OF_DAY);
 		int NOW_MINUTE = now.get(Calendar.MINUTE);
-
+		boolean isBeforeCurrentTime= checkBeforeCurrentTIme(HOUR_OF_DAY, MINUTE, NOW_HOUR_OF_DAY, NOW_MINUTE);
+		
 		int i;
 		for (i = 0; i < TimekeyWord.length; i++) {
 			if (input.toUpperCase().contains(TimekeyWord[i])) {
@@ -496,7 +512,7 @@ public class Parser {
 			if (weekday != Calendar.MONDAY) {
 				int days = (Calendar.MONDAY - weekday) % daysInWeek;
 				incrementDay(cal, days);
-			} else if (HOUR_OF_DAY < NOW_HOUR_OF_DAY || (HOUR_OF_DAY == NOW_HOUR_OF_DAY && MINUTE < NOW_MINUTE)) {
+			} else if (isBeforeCurrentTime) {
 				cal.add(Calendar.DAY_OF_YEAR, daysInWeek);
 			}
 			break;
@@ -505,7 +521,7 @@ public class Parser {
 			if (weekday != Calendar.TUESDAY) {
 				int days = (Calendar.TUESDAY - weekday) % daysInWeek;
 				incrementDay(cal, days);
-			} else if (HOUR_OF_DAY < NOW_HOUR_OF_DAY || (HOUR_OF_DAY == NOW_HOUR_OF_DAY && MINUTE < NOW_MINUTE)) {
+			} else if (isBeforeCurrentTime) {
 				cal.add(Calendar.DAY_OF_YEAR, daysInWeek);
 			}
 			break;
@@ -514,7 +530,7 @@ public class Parser {
 			if (weekday != Calendar.WEDNESDAY) {
 				int days = (Calendar.WEDNESDAY - weekday) % daysInWeek;
 				incrementDay(cal, days);
-			} else if (HOUR_OF_DAY < NOW_HOUR_OF_DAY || (HOUR_OF_DAY == NOW_HOUR_OF_DAY && MINUTE < NOW_MINUTE)) {
+			} else if (isBeforeCurrentTime) {
 				cal.add(Calendar.DAY_OF_YEAR, daysInWeek);
 			}
 			break;
@@ -523,7 +539,7 @@ public class Parser {
 			if (weekday != Calendar.THURSDAY) {
 				int days = (Calendar.THURSDAY - weekday) % daysInWeek;
 				incrementDay(cal, days);
-			} else if (HOUR_OF_DAY < NOW_HOUR_OF_DAY || (HOUR_OF_DAY == NOW_HOUR_OF_DAY && MINUTE < NOW_MINUTE)) {
+			} else if (isBeforeCurrentTime) {
 				cal.add(Calendar.DAY_OF_YEAR, daysInWeek);
 			}
 			break;
@@ -532,7 +548,7 @@ public class Parser {
 			if (weekday != Calendar.FRIDAY) {
 				int days = (Calendar.FRIDAY - weekday) % daysInWeek;
 				incrementDay(cal, days);
-			} else if (HOUR_OF_DAY < NOW_HOUR_OF_DAY || (HOUR_OF_DAY == NOW_HOUR_OF_DAY && MINUTE < NOW_MINUTE)) {
+			} else if (isBeforeCurrentTime) {
 				cal.add(Calendar.DAY_OF_YEAR, daysInWeek);
 			}
 			break;
@@ -541,7 +557,7 @@ public class Parser {
 			if (weekday != Calendar.SATURDAY) {
 				int days = (Calendar.SATURDAY - weekday) % daysInWeek;
 				incrementDay(cal, days);
-			} else if (HOUR_OF_DAY < NOW_HOUR_OF_DAY || (HOUR_OF_DAY == NOW_HOUR_OF_DAY && MINUTE < NOW_MINUTE)) {
+			} else if (isBeforeCurrentTime) {
 				cal.add(Calendar.DAY_OF_YEAR, daysInWeek);
 			}
 			break;
@@ -550,13 +566,16 @@ public class Parser {
 			if (weekday != Calendar.SUNDAY) {
 				int days = (Calendar.SUNDAY - weekday) % daysInWeek;
 				incrementDay(cal, days);
-			} else if (HOUR_OF_DAY < NOW_HOUR_OF_DAY || (HOUR_OF_DAY == NOW_HOUR_OF_DAY && MINUTE < NOW_MINUTE)) {
-				
+			} else if (isBeforeCurrentTime) {
 				cal.add(Calendar.DAY_OF_YEAR, daysInWeek);
 			}
 			break;
 		}
 
+	}
+
+	private static boolean checkBeforeCurrentTIme(int HOUR_OF_DAY, int MINUTE, int NOW_HOUR_OF_DAY, int NOW_MINUTE) {
+		return HOUR_OF_DAY < NOW_HOUR_OF_DAY || (HOUR_OF_DAY == NOW_HOUR_OF_DAY && MINUTE < NOW_MINUTE);
 	}
 
 	/**
@@ -697,13 +716,11 @@ public class Parser {
 	}
 
 	/**
-	 * Parse Recurring task ending date Throws ParseException when time/date
 	 * format is not found Throws InvalidTimeDateInputException when time/date
-	 * format is not supported Throws InvalidParametersException when ending
-	 * time/date is not stated
+	 * format is not supported Throws InvalidParametersException when keyword found but no time/date stated
 	 */
 	private static Date parseEndingDate(ArrayList<String> input)
-			throws ParseException, InvalidTimeDateInputException, InvalidParametersException {
+			throws InvalidTimeDateInputException, InvalidParametersException {
 		String result = "";
 		int indexOfNextKeyWord = NO_NEXT_KEYWORD;
 		int indexOfKeyWordEnding = indexOfkeyWord(input, "ENDING");
@@ -726,6 +743,7 @@ public class Parser {
 	 */
 	static String parseDescription(ArrayList<String> input) {
 		String result = "";
+
 		if (input.isEmpty()) {
 			return null;
 		}
@@ -736,7 +754,8 @@ public class Parser {
 				result = result + " " + input.remove(0);
 			}
 		}
-		return result.substring(1, result.length());
+		result = formatString(result);
+		return result;
 	}
 
 	/*************************************************************************************************
@@ -752,7 +771,7 @@ public class Parser {
 	 * supported
 	 */
 	public static CommandDetails parse(String input)
-			throws ParseException, InvalidCommandException, InvalidParametersException, InvalidTimeDateInputException {
+			throws InvalidCommandException, InvalidParametersException, InvalidTimeDateInputException {
 		String description;
 		String recurring = null;
 		Date start;
@@ -792,10 +811,14 @@ public class Parser {
 	 * Set Recurring ending date to last possible date in java.util.Date if not
 	 * stated
 	 */
-	private static Date defaultEndingDate(String recurring, Date endingDate) throws ParseException {
+	private static Date defaultEndingDate(String recurring, Date endingDate) {
 		if (endingDate == null && recurring != null) {
 			SimpleDateFormat format = new SimpleDateFormat("HHmm dd/MM/yyyy");
-			endingDate = format.parse("2359 31/12/8089");
+			try {
+				endingDate = format.parse("2359 31/12/8089");
+			} catch (ParseException e) {
+				//Self set format ignore
+			}
 		}
 		return endingDate;
 	}
@@ -895,6 +918,7 @@ public class Parser {
 		try {
 			checkDescription = checkDescription.replaceAll(" ", "");
 		} catch (NullPointerException e) {
+			//no descriptions
 		}
 
 		if (command == CommandDetails.COMMANDS.HELP || command == CommandDetails.COMMANDS.REDO
@@ -938,16 +962,17 @@ public class Parser {
 		}
 	}
 
-	/** Validates the user string input from control */
-	private static void validateInput(ArrayList<String> strTokens) throws ParseException {
+	/** Validates the user string input from control 
+	 * @throws InvalidParametersException */
+	private static void validateInput(ArrayList<String> strTokens) throws InvalidParametersException {
 		validateStartDate(strTokens);
 		validateEndDate(strTokens);
 		validateRecurring(strTokens);
 
 	}
 
-	/** Validates if there are multiple start time and throws ParseException */
-	private static void validateStartDate(ArrayList<String> strTokens) throws ParseException {
+	/** Validates if there are multiple start time and throws InvalidParametersException */
+	private static void validateStartDate(ArrayList<String> strTokens) throws InvalidParametersException {
 		int count;
 		count = 0;
 		for (String tokens : strTokens) {
@@ -956,14 +981,14 @@ public class Parser {
 			}
 		}
 		if (count > 1) {
-			throw new ParseException("multiple start date", 0);
+			throw new InvalidParametersException("multiple start date");
 		}
 	}
 
 	/**
-	 * Validates if there are multiple end time/date and throws ParseException
+	 * Validates if there are multiple end time/date and throws InvalidParametersException
 	 */
-	private static void validateEndDate(ArrayList<String> strTokens) throws ParseException {
+	private static void validateEndDate(ArrayList<String> strTokens) throws InvalidParametersException {
 		int count;
 		count = 0;
 
@@ -973,15 +998,14 @@ public class Parser {
 			}
 		}
 		if (count > 1) {
-			throw new ParseException("multiple end date", 0);
+			throw new InvalidParametersException("multiple end date");
 		}
 	}
 
 	/**
-	 * Validates if there are multiple recurring time/date and
-	 * throwsParseException
+	 * Validates if there are multiple recurring time/date and throws InvalidParametersException
 	 */
-	private static void validateRecurring(ArrayList<String> strTokens) throws ParseException {
+	private static void validateRecurring(ArrayList<String> strTokens) throws InvalidParametersException {
 		int count = 0;
 		for (String tokens : strTokens) {
 			if (tokens.equalsIgnoreCase("DAILY") || tokens.equalsIgnoreCase("MONTHLY")
@@ -990,7 +1014,7 @@ public class Parser {
 			}
 		}
 		if (count > 1) {
-			throw new ParseException("multiple end date", 0);
+			throw new InvalidParametersException("multiple end date");
 		}
 	}
 }
