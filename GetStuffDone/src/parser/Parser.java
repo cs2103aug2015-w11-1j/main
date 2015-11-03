@@ -162,7 +162,7 @@ public class Parser {
 
 	private final static String[] keyWord = { "BY", "FROM", "TO", "AT", "ON", "DAILY", "MONTHLY", "YEARLY", "WEEKLY",
 			"ENDING" };
-
+	private final static  int daysInWeek = 7;
 	private final static int NO_NEXT_KEYWORD = -2;
 	private final static int NO_ID = -10;
 	private final static int NO_KEYWORD = -1;
@@ -379,9 +379,11 @@ public class Parser {
 				SimpleDateFormat format = new SimpleDateFormat("HHmm");
 				try {
 					if (method.equals("START")) {
-						endTimeOfDay = "0000";
+						String startOfDay = "0000";
+						endTimeOfDay = startOfDay;
 					} else {
-						endTimeOfDay = "2359";
+						String endOfDay = "2359";
+						endTimeOfDay = endOfDay;
 					}
 					myDate = format.parse(endTimeOfDay);
 					myDate = addDefaultDate(input, myDate, cal);
@@ -460,8 +462,10 @@ public class Parser {
 	private static void addDefaultTime(Calendar cal, String formatParsed) {
 		for (String date : DATE_ONLY_FORMAT) {
 			if (formatParsed.equals(date)) {
-				cal.set(Calendar.HOUR_OF_DAY, 23);
-				cal.set(Calendar.MINUTE, 59);
+				int lastHourInDay = 23;
+				int lastMinuteInDay = 59;
+				cal.set(Calendar.HOUR_OF_DAY, lastHourInDay);
+				cal.set(Calendar.MINUTE, lastMinuteInDay);
 			}
 		}
 	}
@@ -490,64 +494,65 @@ public class Parser {
 			break;
 		case "MONDAY":
 			if (weekday != Calendar.MONDAY) {
-				int days = (Calendar.MONDAY - weekday) % 7;
+				int days = (Calendar.MONDAY - weekday) % daysInWeek;
 				incrementDay(cal, days);
 			} else if (HOUR_OF_DAY < NOW_HOUR_OF_DAY || (HOUR_OF_DAY == NOW_HOUR_OF_DAY && MINUTE < NOW_MINUTE)) {
-				cal.add(Calendar.DAY_OF_YEAR, 7);
+				cal.add(Calendar.DAY_OF_YEAR, daysInWeek);
 			}
 			break;
 		case "TUESDAY":
 			weekday = cal.get(Calendar.DAY_OF_WEEK);
 			if (weekday != Calendar.TUESDAY) {
-				int days = (Calendar.TUESDAY - weekday) % 7;
+				int days = (Calendar.TUESDAY - weekday) % daysInWeek;
 				incrementDay(cal, days);
 			} else if (HOUR_OF_DAY < NOW_HOUR_OF_DAY || (HOUR_OF_DAY == NOW_HOUR_OF_DAY && MINUTE < NOW_MINUTE)) {
-				cal.add(Calendar.DAY_OF_YEAR, 7);
+				cal.add(Calendar.DAY_OF_YEAR, daysInWeek);
 			}
 			break;
 		case "WEDNESDAY":
 			weekday = cal.get(Calendar.DAY_OF_WEEK);
 			if (weekday != Calendar.WEDNESDAY) {
-				int days = (Calendar.WEDNESDAY - weekday) % 7;
+				int days = (Calendar.WEDNESDAY - weekday) % daysInWeek;
 				incrementDay(cal, days);
 			} else if (HOUR_OF_DAY < NOW_HOUR_OF_DAY || (HOUR_OF_DAY == NOW_HOUR_OF_DAY && MINUTE < NOW_MINUTE)) {
-				cal.add(Calendar.DAY_OF_YEAR, 7);
+				cal.add(Calendar.DAY_OF_YEAR, daysInWeek);
 			}
 			break;
 		case "THURSDAY":
 			weekday = cal.get(Calendar.DAY_OF_WEEK);
 			if (weekday != Calendar.THURSDAY) {
-				int days = (Calendar.THURSDAY - weekday) % 7;
+				int days = (Calendar.THURSDAY - weekday) % daysInWeek;
 				incrementDay(cal, days);
 			} else if (HOUR_OF_DAY < NOW_HOUR_OF_DAY || (HOUR_OF_DAY == NOW_HOUR_OF_DAY && MINUTE < NOW_MINUTE)) {
-				cal.add(Calendar.DAY_OF_YEAR, 7);
+				cal.add(Calendar.DAY_OF_YEAR, daysInWeek);
 			}
 			break;
 		case "FRIDAY":
 			weekday = cal.get(Calendar.DAY_OF_WEEK);
 			if (weekday != Calendar.FRIDAY) {
-				int days = (Calendar.FRIDAY - weekday) % 7;
+				int days = (Calendar.FRIDAY - weekday) % daysInWeek;
 				incrementDay(cal, days);
 			} else if (HOUR_OF_DAY < NOW_HOUR_OF_DAY || (HOUR_OF_DAY == NOW_HOUR_OF_DAY && MINUTE < NOW_MINUTE)) {
-				cal.add(Calendar.DAY_OF_YEAR, 7);
+				cal.add(Calendar.DAY_OF_YEAR, daysInWeek);
 			}
 			break;
 		case "SATURDAY":
 			weekday = cal.get(Calendar.DAY_OF_WEEK);
 			if (weekday != Calendar.SATURDAY) {
-				int days = (Calendar.SATURDAY - weekday) % 7;
+				int days = (Calendar.SATURDAY - weekday) % daysInWeek;
 				incrementDay(cal, days);
 			} else if (HOUR_OF_DAY < NOW_HOUR_OF_DAY || (HOUR_OF_DAY == NOW_HOUR_OF_DAY && MINUTE < NOW_MINUTE)) {
-				cal.add(Calendar.DAY_OF_YEAR, 7);
+				cal.add(Calendar.DAY_OF_YEAR, daysInWeek);
 			}
 			break;
 		case "SUNDAY":
 			weekday = cal.get(Calendar.DAY_OF_WEEK);
 			if (weekday != Calendar.SUNDAY) {
-				int days = (Calendar.SUNDAY - weekday) % 7;
+				int days = (Calendar.SUNDAY - weekday) % daysInWeek;
 				incrementDay(cal, days);
 			} else if (HOUR_OF_DAY < NOW_HOUR_OF_DAY || (HOUR_OF_DAY == NOW_HOUR_OF_DAY && MINUTE < NOW_MINUTE)) {
-				cal.add(Calendar.DAY_OF_YEAR, 7);
+				
+				cal.add(Calendar.DAY_OF_YEAR, daysInWeek);
 			}
 			break;
 		}
@@ -559,7 +564,7 @@ public class Parser {
 	 */
 	private static void incrementDay(Calendar cal, int days) {
 		if (days < 0) {
-			days = days + 7;
+			days = days + daysInWeek;
 		}
 		cal.add(Calendar.DAY_OF_YEAR, days);
 	}
