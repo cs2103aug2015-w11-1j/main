@@ -21,6 +21,8 @@ public class UI {
 	private static final String TITLE_MAIN = "GetStuffDone";
 	private static final String TITLE_HELP = "GetStuffDone Help";
 
+	private static final String KEYWORD_ERROR = "ERROR";
+
 	private static final int DISPLAY_BOX_WIDTH = 400;
 	private static final int DISPLAY_BOX_HEIGHT = 420;
 	private static final int FEEDBACK_BOX_WIDTH = 300;
@@ -32,14 +34,14 @@ public class UI {
 	private static final int COMMAND_BOX_WIDTH = 200;
 	private static final int COMMAND_BOX_HEIGHT = 350;
 
-	private static final int NUM_FEEDBACKS = 11;
+	private static final int NUM_MESSAGES = 11;
 
 	private TextView displayBox = new TextView(DISPLAY_BOX_WIDTH, DISPLAY_BOX_HEIGHT);
 	private TextView feedbackBox = new TextView(FEEDBACK_BOX_WIDTH, FEEDBACK_BOX_HEIGHT);
 	private TextView infoBox = new TextView(INFO_BOX_WIDTH, INFO_BOX_HEIGHT);
 	private JTextField commandBar = new JTextField();
 
-	private ArrayList<String> feedbacks = new ArrayList<>(NUM_FEEDBACKS);
+	private ArrayList<String> messages = new ArrayList<>(NUM_MESSAGES);
 
 	public static void main(String[] args) {
 		new UI();
@@ -110,23 +112,32 @@ public class UI {
 
 	private void showInFeedbackBox(String string) {
 
-		if (isValidString(string)) {
-
-			addFeedback(string);
-
-			feedbackBox.clear();
-
-			for (int i = 0; i < feedbacks.size(); i++) {
-
-				if (i % 2 == 0) {
-					feedbackBox.display(feedbacks.get(i), TextView.STYLE_FEEDBACK);
-				} else {
-					feedbackBox.display(feedbacks.get(i), TextView.STYLE_NORMAL);
-				}
-			}
-
-			feedbackBox.scrollToBottom();
+		if (!isValidString(string)) {
+			return;
 		}
+
+		addFeedback(string);
+
+		feedbackBox.clear();
+
+		for (int i = 0; i < messages.size(); i++) {
+
+			String message = messages.get(i);
+
+			if (i % 2 == 0) {
+
+				if (isErrorMessage(message)) {
+					feedbackBox.display(message, TextView.STYLE_ERROR);
+				} else {
+					feedbackBox.display(message, TextView.STYLE_FEEDBACK);
+				}
+
+			} else {
+				feedbackBox.display(message, TextView.STYLE_NORMAL);
+			}
+		}
+
+		feedbackBox.scrollToBottom();
 	}
 
 	private void showInDisplayBox(String string) {
@@ -173,11 +184,15 @@ public class UI {
 
 	private void addFeedback(String feedback) {
 
-		feedbacks.add(feedback);
+		messages.add(feedback);
 
-		if (feedbacks.size() > NUM_FEEDBACKS) {
-			feedbacks.remove(0);
+		if (messages.size() > NUM_MESSAGES) {
+			messages.remove(0);
 		}
+	}
+
+	private boolean isErrorMessage(String string) {
+		return string.contains(KEYWORD_ERROR);
 	}
 
 	private static boolean isValidString(String string) {

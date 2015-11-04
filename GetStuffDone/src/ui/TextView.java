@@ -1,4 +1,5 @@
 package ui;
+
 import java.awt.Color;
 import java.awt.Dimension;
 
@@ -17,12 +18,13 @@ public class TextView extends JScrollPane {
 
 	public static final String STYLE_NORMAL = "normal";
 	public static final String STYLE_FEEDBACK = "feedback";
+	public static final String STYLE_ERROR = "error";
 
 	// Auto-generated code
 	private static final long serialVersionUID = 1L;
 
 	private static final int FONT_SIZE_NORMAL = 12;
-	
+
 	private static final String DEFAULT_FONT = "verdana";
 
 	private JTextPane textPane;
@@ -30,16 +32,17 @@ public class TextView extends JScrollPane {
 
 	private Style styleNormal;
 	private Style styleFeedback;
+	private Style styleError;
 
 	public TextView(int width, int height) {
-		
+
 		super(new JTextPane());
-		
+
 		textPane = (JTextPane) this.getViewport().getView();
 		textPane.setEditable(false);
-		
+
 		document = textPane.getStyledDocument();
-		
+
 		setPreferredSize(new Dimension(width, height));
 
 		initializeStyles();
@@ -61,6 +64,9 @@ public class TextView extends JScrollPane {
 			break;
 		case STYLE_FEEDBACK:
 			style = styleFeedback;
+			break;
+		case STYLE_ERROR:
+			style = styleError;
 			break;
 		default:
 			style = styleNormal;
@@ -85,30 +91,31 @@ public class TextView extends JScrollPane {
 			return;
 		}
 	}
-	
+
 	public void scrollToTop() {
 		textPane.setCaretPosition(0);
 	}
-	
+
 	public void scrollToBottom() {
 		textPane.setCaretPosition(document.getLength());
 	}
-	
-	private void initializeStyles(){
-		
+
+	private void initializeStyles() {
+
 		styleNormal = createStyle(STYLE_NORMAL, Color.BLACK, FONT_SIZE_NORMAL, false);
 		styleFeedback = createStyle(STYLE_FEEDBACK, Color.BLUE, FONT_SIZE_NORMAL, true);
+		styleError = createStyle(STYLE_ERROR, Color.RED, FONT_SIZE_NORMAL, true);
 	}
-	
+
 	private Style createStyle(String name, Color color, int size, boolean isBold) {
-		
+
 		Style style = document.addStyle(name, null);
-		
+
 		StyleConstants.setFontSize(style, size);
 		StyleConstants.setForeground(style, color);
 		StyleConstants.setBold(style, isBold);
 		StyleConstants.setFontFamily(style, DEFAULT_FONT);
-		
+
 		return style;
 	}
 }
