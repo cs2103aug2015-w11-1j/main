@@ -265,23 +265,23 @@ public class Task implements Comparable<Task> {
 
 	@Override
 	public int compareTo(Task o) {
-		if ((getStartDate() == null || o.getStartDate() == null) && getDeadline() == null || o.getDeadline() == null) {
+		if (isFloating() == true && o.isFloating() == true) {
 			return 0;
 		}
-		if (getStartDate() == null || o.getStartDate() == null) {
-			return getDeadline().compareTo(o.getDeadline());
+		if (isFloating() == true && o.isFloating() == false) {
+			return 1;
 		}
-		return getStartDate().compareTo(o.getStartDate());
+		if (isFloating() == false && o.isFloating() == true) {
+			return -1;
+		}
+		return getDeadline().compareTo(o.getDeadline());
 	}
 
-	public boolean matches(Task o)	{
-		return (getDescription() == o.getDescription()
-				&& getStartDate() == o.getStartDate()
-				&& getDeadline() == o.getDeadline()
-				&& getRecurring() == o.getRecurring()
+	public boolean matches(Task o) {
+		return (getDescription() == o.getDescription() && getStartDate() == o.getStartDate()
+				&& getDeadline() == o.getDeadline() && getRecurring() == o.getRecurring()
 				&& getOriginalStartDate() == o.getOriginalStartDate()
-				&& getOriginalDeadline() == o.getOriginalDeadline()
-				&& getEndingDate() == o.getEndingDate()
+				&& getOriginalDeadline() == o.getOriginalDeadline() && getEndingDate() == o.getEndingDate()
 				&& isComplete() == o.isComplete());
 	}
 }

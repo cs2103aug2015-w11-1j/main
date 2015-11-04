@@ -70,11 +70,11 @@ public class GSDControl {
 			+ "undo\n" + "redo\n" + "all\n" + "floating\n" + "events\n" + "deadlines\n" + "recurring\n"
 			+ "set <file path>\n" + "exit\n";
 
-	private static final int SEVEN_DAYS = 7;
-	private static final int ONE_DAY_BEFORE = -1;
-	private static final int ONE_WEEK_BEFORE = -7;
-	private static final int ONE_MONTH_BEFORE = -1;
-	private static final int ONE_YEAR_BEFORE = -1;
+	//private static final int SEVEN_DAYS = 7;
+	//private static final int ONE_DAY_BEFORE = -1;
+	//private static final int ONE_WEEK_BEFORE = -7;
+	//private static final int ONE_MONTH_BEFORE = -1;
+	//private static final int ONE_YEAR_BEFORE = -1;
 
 	private ArrayList<Task> tasks;
 	private CommandDetails commandDetails;
@@ -208,7 +208,7 @@ public class GSDControl {
 		case HELP:
 			return new Feedback(null, FEEDBACK_HELP, generateInfoBox(), HELP_COMMANDS, HELP_SYNTAX);
 		case EXIT:
-			System.exit(0);
+			return null;
 		case SET:
 			try {
 				boolean isValidFilePath = setFilePath();
@@ -238,7 +238,7 @@ public class GSDControl {
 				tasks = new ArrayList<Task>();
 				return new Feedback(DISPLAY_NO_TASKS, FEEDBACK_NO_FILE, generateInfoBox());
 			}
-			refreshRecurringTasks();
+			//refreshRecurringTasks();
 			return new Feedback(displayAllTasks(), FEEDBACK_WELCOME_MESSAGE, generateInfoBox());
 		} catch (IOException e) {
 			tasks = new ArrayList<Task>();
@@ -536,7 +536,7 @@ public class GSDControl {
 
 	/*************************************************************************************************
 	 ******************************************* RECURRING *******************************************
-	 *************************************************************************************************/
+	 *************************************************************************************************
 
 	private void refreshRecurringTasks() {
 
@@ -754,14 +754,14 @@ public class GSDControl {
 	private void endRecurringTask(Task recurringTask) {
 		recurringTask.resetRecurringCount();
 		recurringTask.setIsComplete(true);
-	}
+	}*/
 
 	/*************************************************************************************************
 	 ******************************************* DISPLAY *********************************************
 	 *************************************************************************************************/
 
 	private String displayAllTasks() {
-		refreshRecurringTasks();
+		//refreshRecurringTasks();
 		Collections.sort(tasks);
 		String displayAll = "";
 		String displayIncomplete = "";
@@ -795,7 +795,7 @@ public class GSDControl {
 	}
 
 	private String displayFloatingTasks() {
-		refreshRecurringTasks();
+		//refreshRecurringTasks();
 		Collections.sort(tasks);
 		String floating = "";
 		String floatingIncomplete = "";
@@ -830,7 +830,7 @@ public class GSDControl {
 	}
 
 	private String displayEvents() {
-		refreshRecurringTasks();
+		//refreshRecurringTasks();
 		Collections.sort(tasks);
 		String events = "";
 		String eventsIncomplete = "";
@@ -865,7 +865,7 @@ public class GSDControl {
 	}
 
 	private String displayDeadlines() {
-		refreshRecurringTasks();
+		//refreshRecurringTasks();
 		Collections.sort(tasks);
 		String deadlines = "";
 		String deadlinesIncomplete = "";
@@ -900,7 +900,7 @@ public class GSDControl {
 	}
 
 	private String displayRecurring() {
-		refreshRecurringTasks();
+		//refreshRecurringTasks();
 		Collections.sort(tasks);
 		String recurring = "";
 		String recurringIncomplete = "";
