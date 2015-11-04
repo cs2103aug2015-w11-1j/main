@@ -1,4 +1,5 @@
 package storage;
+
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -15,6 +16,8 @@ import java.util.prefs.Preferences;
 
 import task.Task;
 
+//@@author A0126561J
+
 public class Storage {
 
 	private static final String KEY_PATH = "GetStuffDone.path";
@@ -24,7 +27,12 @@ public class Storage {
 	private static final String DATE_FORMAT = "hh:mma dd/MMM/yyyy";
 
 	private static final String STATUS_COMPLETED = "Completed";
-	private static final String STATUS_NOT_COMPLETED = "Not completed";
+	private static final String STATUS_UNCOMPLETED = "Uncompleted";
+
+	private static final String INTERVAL_DAY = "DAILY";
+	private static final String INTERVAL_WEEK = "WEEKLY";
+	private static final String INTERVAL_MONTH = "MONTHLY";
+	private static final String INTERVAL_YEAR = "YEARLY";
 
 	// Indicate the number of lines required to store a task
 	private static final int LINES_PER_TASK = 9;
@@ -101,9 +109,7 @@ public class Storage {
 
 		String path = preferences.get(KEY_PATH, DEFAULT_PATH);
 
-		File savedFile = new File(path);
-
-		List<String> lines = Files.readAllLines(savedFile.toPath());
+		List<String> lines = Files.readAllLines(Paths.get(path));
 
 		ArrayList<Task> tasks = new ArrayList<Task>();
 
@@ -120,7 +126,7 @@ public class Storage {
 			task.setStartDate(parseDate(lines.get(i + OFFSET_DATE_START)));
 			task.setDeadline(parseDate(lines.get(i + OFFSET_DATE_END)));
 			task.setEndingDate(parseDate(lines.get(i + OFFSET_DATE_LAST)));
-			task.setRecurring(parseString(lines.get(i + OFFSET_INTERVAL)));
+			task.setRecurring(parseInterval(lines.get(i + OFFSET_INTERVAL)));
 			task.setOriginalStartDate(parseDate(lines.get(i + OFFSET_DATE_START_ORIGINAL)));
 			task.setOriginalDeadline(parseDate(lines.get(i + OFFSET_DATE_END_ORIGINAL)));
 			task.setRecurringCount(Integer.parseInt(lines.get(i + OFFSET_COUNT)));
@@ -144,20 +150,14 @@ public class Storage {
 			return false;
 		}
 
-		int lastIndexOfSeparator = string.lastIndexOf(File.separatorChar);
+		String folderPath = getFolderPath(string);
+		String fileName = getFileName(string);
 
-		if (lastIndexOfSeparator == -1) {
+		if (folderPath.isEmpty() || fileName.isEmpty()) {
 			return false;
 		}
 
-		String folderName = string.substring(0, lastIndexOfSeparator + 1);
-		String fileName = string.replace(folderName, "");
-
-		if (folderName.isEmpty() || fileName.isEmpty()) {
-			return false;
-		}
-
-		if (!(new File(folderName)).exists()) {
+		if (!(new File(folderPath)).exists()) {
 			return false;
 		}
 
@@ -195,12 +195,12 @@ public class Storage {
 		if (isCompleted) {
 			writer.println(STATUS_COMPLETED);
 		} else {
-			writer.println(STATUS_NOT_COMPLETED);
+			writer.println(STATUS_UNCOMPLETED);
 		}
 	}
-	
+
 	private void writeInt(PrintWriter writer, int num) {
-		writer.println(Integer.toString(num));
+		writer.println(num);
 	}
 
 	private String parseString(String string) {
@@ -225,8 +225,49 @@ public class Storage {
 
 		if (string.equalsIgnoreCase(STATUS_COMPLETED)) {
 			return true;
+		} else if (string.equalsIgnoreCase(STATUS_UNCOMPLETED)){
+			return false;
 		} else {
+			assert false;
 			return false;
 		}
+	}
+
+	private String parseInterval(String string) {
+
+		if (string.equalsIgnoreCase(INTERVAL_DAY)) {
+			return INTERVAL_DAY;
+		} else if (string.equalsIgnoreCase(INTERVAL_WEEK)) {
+			return INTERVAL_WEEK;
+		} else if (string.equalsIgnoreCase(INTERVAL_MONTH)) {
+			return INTERVAL_MONTH;
+		} else if (string.equalsIgnoreCase(INTERVAL_YEAR)) {
+			return INTERVAL_YEAR;
+		} else {
+			assert false;
+			return null;
+		}
+	}
+
+	private String getFolderPath(String string) {
+
+		int lastIndexOfSeparator = string.lastIndexOf(File.separatorChar);
+
+		if (lastIndexOfSeparator == -1) {
+			return "";
+		}
+
+		return string.substring(0, lastIndexOfSeparator + 1);
+	}
+
+	private String getFileName(String string) {
+
+		int lastIndexOfSeparator = string.lastIndexOf(File.separatorChar);
+
+		if (lastIndexOfSeparator == -1) {
+			return "";
+		}
+
+		return string.substring(lastIndexOfSeparator + 1, string.length());
 	}
 }

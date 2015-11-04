@@ -13,6 +13,8 @@ import org.junit.Test;
 
 import task.Task;
 
+//@@author A0126561J
+
 public class StorageTest {
 
 	private static final String PATH_CURRENT = System.getProperty("user.dir") + File.separatorChar;
@@ -90,11 +92,12 @@ public class StorageTest {
 	}
 
 	@Test
-	public void saveThreeTasks() throws IOException, ParseException {
+	public void saveFourTasks() throws IOException, ParseException {
 
 		tasks.add(taskFloating);
 		tasks.add(taskEvent);
 		tasks.add(taskDeadline);
+		tasks.add(taskRecurring);
 
 		storage.save(tasks);
 		tasks = storage.load();
@@ -102,6 +105,7 @@ public class StorageTest {
 		assertEquals(taskFloating.toString(), tasks.get(0).toString());
 		assertEquals(taskEvent.toString(), tasks.get(1).toString());
 		assertEquals(taskDeadline.toString(), tasks.get(2).toString());
+		assertEquals(taskRecurring.toString(), tasks.get(3).toString());
 	}
 
 	@Test
@@ -132,6 +136,11 @@ public class StorageTest {
 	@Test
 	public void setPathWithOnlyFilename() {
 		assertFalse(storage.setFilePath(FILENAME));
+	}
+	
+	@Test
+	public void setNonAbsolutePath() {
+		assertFalse(storage.setFilePath("randomFolder" + File.separatorChar + "randomFile.txt"));
 	}
 
 	@After
