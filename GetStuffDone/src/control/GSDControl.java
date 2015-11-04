@@ -55,7 +55,6 @@ public class GSDControl {
 	private static final String FEEDBACK_UNDO_ERROR = ">> ERROR : NOTHING TO UNDO\n";
 	private static final String FEEDBACK_REDO_ERROR = ">> ERROR: NOTHING TO REDO\n";
 	private static final String FEEDBACK_LOAD_ERROR = ">> ERROR: FAILED TO LOAD FROM FILE\n";
-	private static final String FEEDBACK_INVALID_DATE_FORMAT = ">> ERROR : INVALID DATE/TIME FORMAT\n";
 	private static final String FEEDBACK_INVALID_TIME_DATE_INPUT = ">> ERROR : INVALID DATE/TIME INPUT\n";
 
 	private static final String HELP_COMMANDS = "Add a floating task\n" + "Add a deadline task\n" + "Add an event\n"
@@ -94,8 +93,6 @@ public class GSDControl {
 		try {
 			this.commandDetails = Parser.parse(input);
 			// this.commandDetails = parser.parse(input);
-		} catch (ParseException e) { // Invalid Date Format
-			return new Feedback(null, FEEDBACK_INVALID_DATE_FORMAT, generateInfoBox());
 		} catch (NumberFormatException f) {
 			return new Feedback(null, FEEDBACK_INVALID_TASK_NUMBER, generateInfoBox());
 		} catch (InvalidTimeDateInputException g) { // Not in the form [Time]
@@ -259,14 +256,16 @@ public class GSDControl {
 
 	private String createTask() {
 		Task task = new Task(this.commandDetails);
-		if (task.isRecurring())	{
+		if (task.isRecurring()) {
 			task.resetRecurringCount();
 			tasks.add(task);
+			this.commandDetails.setOldTask(task);
 			sendToHistory();
 			storage.save(tasks);
 			return displayAllTasks();
 		}
 		tasks.add(task);
+		this.commandDetails.setNewTask(task);
 		sendToHistory();
 		storage.save(tasks);
 		return displayAllTasks();
@@ -274,12 +273,30 @@ public class GSDControl {
 
 	private String searchTask() {
 		String search = "";
+		String searchIncomplete = "";
+		String searchComplete = "";
 
 		for (int i = 0; i < tasks.size(); i++) {
-			if (tasks.get(i).contains(commandDetails)) {
-				search += i + 1 + ". " + tasks.get(i).toString();
+			if (tasks.get(i).contains(commandDetails) && !tasks.get(i).isComplete()) {
+				searchIncomplete += i + 1 + ". " + tasks.get(i).toString() + "\n";
 			}
 		}
+
+		for (int i = 0; i < tasks.size(); i++) {
+			if (tasks.get(i).contains(commandDetails) && tasks.get(i).isComplete()) {
+				searchComplete += i + 1 + ". " + tasks.get(i).toString() + "\n";
+			}
+		}
+
+		if (!searchIncomplete.isEmpty()) {
+			searchIncomplete = "\t\tINCOMPLETED\n\n" + searchIncomplete;
+		}
+
+		if (!searchComplete.isEmpty()) {
+			searchComplete = "\t\tCOMPLETED\n\n" + searchComplete;
+		}
+
+		search = searchIncomplete + searchComplete;
 
 		if (search.isEmpty()) {
 			search = DISPLAY_TASK_NOT_FOUND;
@@ -288,8 +305,15 @@ public class GSDControl {
 	}
 
 	private String updateTask(int ID) {
-		sendToHistory();
+		CommandDetails oldDetails = generateDetails();
+		Task oldTask = new Task(oldDetails);
+		oldDetails.setOldTask(oldTask);
 		tasks.get(ID).updateDetails(commandDetails);
+		Task newTask = new Task(generateDetails());
+		oldDetails.setNewTask(newTask);
+		//System.out.println("old = " + oldDetails.getOldTask().toString());
+		//System.out.println("new = " + oldDetails.getNewTask().toString());
+		this.commandDetails = oldDetails;
 		sendToHistory();
 		storage.save(tasks);
 		return displayAllTasks();
@@ -303,15 +327,17 @@ public class GSDControl {
 	}
 
 	private String completeTask(int ID) {
-		sendToHistory();
 		tasks.get(ID).markAsComplete();
+		this.commandDetails.setNewTask(tasks.get(ID));
+		sendToHistory();
 		storage.save(tasks);
 		return displayAllTasks();
 	}
 
 	private String incompleteTask(int ID) {
-		sendToHistory();
 		tasks.get(ID).markAsIncomplete();
+		this.commandDetails.setNewTask(tasks.get(ID));
+		sendToHistory();
 		storage.save(tasks);
 		return displayAllTasks();
 	}
@@ -335,15 +361,19 @@ public class GSDControl {
 	private String executeHistoryCommand() {
 		switch (this.commandDetails.getCommand()) {
 		case ADD:
-			return undoRedoCreateTask();
+			return undoRedoCreateTask(this.commandDetails.getID(), this.commandDetails.getNewTask());
 		case DELETE:
-			return undoRedoDeleteTask();
+			searchForID();
+			return undoRedoDeleteTask(this.commandDetails.getID());
 		case UPDATE:
-			return undoRedoUpdateTask(this.commandDetails.getID());
+			searchRedoID();
+			return redoUpdateTask(this.commandDetails.getID(), this.commandDetails.getNewTask());
 		case COMPLETE:
-			return completeTask(commandDetails.getID() - 1);
+			searchForID();
+			return undoRedoCompleteTask(commandDetails.getID());
 		case INCOMPLETE:
-			return incompleteTask(commandDetails.getID() - 1);
+			searchForID();
+			return undoRedoIncompleteTask(commandDetails.getID());
 		default:
 			return null;
 		}
@@ -353,39 +383,45 @@ public class GSDControl {
 		switch (this.commandDetails.getCommand()) {
 		case ADD:
 			this.commandDetails = reverseAdd();
-			return undoRedoDeleteTask();
+			return undoRedoDeleteTask(this.commandDetails.getID());
 		case DELETE:
-			this.commandDetails = reverseDelete(ID);
-			return undoRedoCreateTask();
+			this.commandDetails = reverseDelete();
+			return undoRedoCreateTask(this.commandDetails.getID(), this.commandDetails.getNewTask());
 		case UPDATE:
-			return undoRedoUpdateTask(ID);
+			searchForID();
+			return undoUpdateTask(this.commandDetails.getID(), this.commandDetails.getOldTask());
 		case COMPLETE:
-			this.commandDetails = reverseComplete(ID);
-			return undoRedoIncompleteTask(commandDetails.getID() - 1);
+			this.commandDetails = reverseComplete();
+			return undoRedoIncompleteTask(this.commandDetails.getID());
 		case INCOMPLETE:
-			this.commandDetails = reverseIncomplete(ID);
-			return undoRedoCompleteTask(commandDetails.getID() - 1);
+			this.commandDetails = reverseIncomplete();
+			return undoRedoCompleteTask(this.commandDetails.getID());
 		default:
 			return null;
 
 		}
 	}
 
-	private String undoRedoCreateTask() {
-		Task task = new Task(this.commandDetails);
-		tasks.add(this.commandDetails.getID(), task);
+	private String undoRedoCreateTask(int ID, Task task) {
+		tasks.add(ID, task);
 		storage.save(tasks);
 		return displayAllTasks();
 	}
 
-	private String undoRedoDeleteTask() {
-		tasks.remove(this.commandDetails.getID());
+	private String undoRedoDeleteTask(int ID) {
+		tasks.remove(ID);
 		storage.save(tasks);
 		return displayAllTasks();
 	}
 
-	private String undoRedoUpdateTask(int ID) {
-		tasks.get(ID).updateDetails(commandDetails);
+	private String undoUpdateTask(int ID, Task oldTask) {
+		tasks.get(ID).setAs(oldTask);
+		storage.save(tasks);
+		return displayAllTasks();
+	}
+
+	private String redoUpdateTask(int ID, Task newTask) {
+		tasks.get(ID).setAs(newTask);
 		storage.save(tasks);
 		return displayAllTasks();
 	}
@@ -409,22 +445,93 @@ public class GSDControl {
 	}
 
 	private CommandDetails reverseAdd() {
-		return new CommandDetails(CommandDetails.COMMANDS.DELETE, tasks.size() - 1);
+		searchForID();
+		return new CommandDetails(CommandDetails.COMMANDS.DELETE, this.commandDetails.getID());
 	}
 
-	private CommandDetails reverseDelete(int ID) {
+	private CommandDetails reverseDelete() {
 		return new CommandDetails(CommandDetails.COMMANDS.ADD, this.commandDetails.getDescription(),
 				this.commandDetails.getStartDate(), this.commandDetails.getDeadline(), this.commandDetails.getID(),
 				this.commandDetails.getRecurring(), this.commandDetails.getOriginalStartDate(),
-				this.commandDetails.getOriginalDeadline(), this.commandDetails.getEndingDate());
+				this.commandDetails.getOriginalDeadline(), this.commandDetails.getEndingDate(),
+				this.commandDetails.getNewTask());
 	}
 
-	private CommandDetails reverseComplete(int ID) {
-		return new CommandDetails(CommandDetails.COMMANDS.INCOMPLETE, ID);
+	private CommandDetails reverseComplete() {
+		searchForID();
+		return new CommandDetails(CommandDetails.COMMANDS.INCOMPLETE, this.commandDetails.getID());
 	}
 
-	private CommandDetails reverseIncomplete(int ID) {
-		return new CommandDetails(CommandDetails.COMMANDS.COMPLETE, ID);
+	private CommandDetails reverseIncomplete() {
+		searchForID();
+		return new CommandDetails(CommandDetails.COMMANDS.COMPLETE, this.commandDetails.getID());
+	}
+
+	private void searchForID() {
+		for (int i = 0; i < tasks.size(); i++) {
+			if (this.commandDetails.getNewTask().matches(tasks.get(i))) {
+				this.commandDetails.setID(i);
+				//System.out.println("searchforid" + this.commandDetails.getID());
+			}
+		}
+	}
+
+	private void searchRedoID() {
+		for (int i = 0; i < tasks.size(); i++) {
+			if (this.commandDetails.getOldTask().matches(tasks.get(i))) {
+				this.commandDetails.setID(i);
+				//System.out.println("searchforid" + this.commandDetails.getID());
+			}
+		}
+	}
+
+	/*************************************************************************************************
+	 ******************************************* HISTORY *********************************************
+	 *************************************************************************************************/
+
+	private void sendToHistory() {
+		switch (this.commandDetails.getCommand()) {
+		case ADD:
+			history.insert(this.commandDetails);
+			break;
+		case DELETE:
+			history.insert(generateDetails());
+			break;
+		case UPDATE:
+			history.insert(this.commandDetails);
+			break;
+		case COMPLETE:
+			history.insert(this.commandDetails);
+			break;
+		case INCOMPLETE:
+			history.insert(this.commandDetails);
+			break;
+		default:
+			break;
+		}
+	}
+
+	/*
+	 * Creates a CommandDetails object that matches the current CommandDetails
+	 * object in GSDControl. This method is only used for DELETE and UPDATE
+	 * Commands due to the nature of the Commands i.e. Requires history of both
+	 * old and new versions of Tasks.
+	 */
+	private CommandDetails generateDetails() {
+		Task task = tasks.get(this.commandDetails.getID() - 1);
+		//System.out.println("generatedetails = " + task);
+		switch (this.commandDetails.getCommand()) {
+		case DELETE:
+			return new CommandDetails(CommandDetails.COMMANDS.DELETE, task.getDescription(), task.getStartDate(),
+					task.getDeadline(), this.commandDetails.getID() - 1, task.getRecurring(),
+					task.getOriginalStartDate(), task.getOriginalDeadline(), task.getEndingDate(), task);
+		case UPDATE:
+			return new CommandDetails(CommandDetails.COMMANDS.UPDATE, task.getDescription(), task.getStartDate(),
+					task.getDeadline(), this.commandDetails.getID() - 1, task.getRecurring(),
+					task.getOriginalStartDate(), task.getOriginalDeadline(), task.getEndingDate());
+		default:
+			return null;
+		}
 	}
 
 	/*************************************************************************************************
@@ -650,60 +757,12 @@ public class GSDControl {
 	}
 
 	/*************************************************************************************************
-	 ******************************************* HISTORY *********************************************
-	 *************************************************************************************************/
-
-	private void sendToHistory() {
-		switch (this.commandDetails.getCommand()) {
-		case ADD:
-			history.insert(this.commandDetails);
-			break;
-		case DELETE:
-			history.insert(generateDetails());
-			break;
-		case UPDATE:
-			history.insert(generateDetails());
-			break;
-		case COMPLETE:
-			history.insert(this.commandDetails);
-			break;
-		case INCOMPLETE:
-			history.insert(this.commandDetails);
-			break;
-		default:
-			break;
-		}
-	}
-
-	/*
-	 * Creates a CommandDetails object that matches the current CommandDetails
-	 * object in GSDControl. This method is only used for DELETE and UPDATE
-	 * Commands due to the nature of the Commands i.e. Requires history of both
-	 * old and new versions of Tasks.
-	 */
-	private CommandDetails generateDetails() {
-		Task task = tasks.get(this.commandDetails.getID() - 1);
-		System.out.println(task);
-		switch (this.commandDetails.getCommand()) {
-		case DELETE:
-			return new CommandDetails(CommandDetails.COMMANDS.DELETE, task.getDescription(), task.getStartDate(),
-					task.getDeadline(), this.commandDetails.getID() - 1, task.getRecurring(),
-					task.getOriginalStartDate(), task.getOriginalDeadline(), task.getEndingDate());
-		case UPDATE:
-			return new CommandDetails(CommandDetails.COMMANDS.UPDATE, task.getDescription(), task.getStartDate(),
-					task.getDeadline(), this.commandDetails.getID() - 1, task.getRecurring(),
-					task.getOriginalStartDate(), task.getOriginalDeadline(), task.getEndingDate());
-		default:
-			return null;
-		}
-	}
-
-	/*************************************************************************************************
 	 ******************************************* DISPLAY *********************************************
 	 *************************************************************************************************/
 
 	private String displayAllTasks() {
 		refreshRecurringTasks();
+		Collections.sort(tasks);
 		String displayAll = "";
 		String displayIncomplete = "";
 		String displayComplete = "";
@@ -737,6 +796,7 @@ public class GSDControl {
 
 	private String displayFloatingTasks() {
 		refreshRecurringTasks();
+		Collections.sort(tasks);
 		String floating = "";
 		String floatingIncomplete = "";
 		String floatingComplete = "";
@@ -771,6 +831,7 @@ public class GSDControl {
 
 	private String displayEvents() {
 		refreshRecurringTasks();
+		Collections.sort(tasks);
 		String events = "";
 		String eventsIncomplete = "";
 		String eventsComplete = "";
@@ -805,6 +866,7 @@ public class GSDControl {
 
 	private String displayDeadlines() {
 		refreshRecurringTasks();
+		Collections.sort(tasks);
 		String deadlines = "";
 		String deadlinesIncomplete = "";
 		String deadlinesComplete = "";
@@ -839,6 +901,7 @@ public class GSDControl {
 
 	private String displayRecurring() {
 		refreshRecurringTasks();
+		Collections.sort(tasks);
 		String recurring = "";
 		String recurringIncomplete = "";
 		String recurringComplete = "";

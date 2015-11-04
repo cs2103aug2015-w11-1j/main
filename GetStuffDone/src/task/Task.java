@@ -1,4 +1,5 @@
 package task;
+
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -12,7 +13,7 @@ import commandDetail.CommandDetails;
  * Task knows the existence of commandDetails object
  */
 
-public class Task {
+public class Task implements Comparable<Task> {
 
 	private String description;
 	private Date startDate;
@@ -162,7 +163,17 @@ public class Task {
 		this.originalStartDate = details.getOriginalStartDate();
 		this.originalDeadline = details.getOriginalDeadline();
 		this.endingDate = details.getEndingDate();
+	}
 
+	public void setAs(Task task) {
+
+		this.description = task.getDescription();
+		this.startDate = task.getStartDate();
+		this.deadline = task.getDeadline();
+		this.recurring = task.getRecurring();
+		this.originalStartDate = task.getOriginalStartDate();
+		this.originalDeadline = task.getOriginalDeadline();
+		this.endingDate = task.getEndingDate();
 	}
 
 	public void markAsComplete() {
@@ -195,7 +206,7 @@ public class Task {
 		if (details.getDeadline() != null) {
 			taskDeadlineCal.setTime(details.getDeadline());
 		}
-		
+
 		System.out.println("Start: " + taskStartDateCal.getTime() + "\nDeadline: " + taskDeadlineCal.getTime());
 		System.out.println("Details : " + details.getStartDate() + "\n" + details.getDeadline());
 
@@ -245,10 +256,32 @@ public class Task {
 			return (description + "\nStart Date: " + start + "\nDeadline: " + end + "\n");
 		} else if (isDeadline()) {
 			return description + "\nStart Date: -\nDeadline: " + end + "\n";
-		} else if (isRecurring()){
+		} else if (isRecurring()) {
 			return (description + "\nStart Date: " + start + "\nDeadline: " + end + "\n" + "Recurring " + recurring
 					+ "\nEnding Date: " + ending + "\n");
 		}
 		return null;
+	}
+
+	@Override
+	public int compareTo(Task o) {
+		if ((getStartDate() == null || o.getStartDate() == null) && getDeadline() == null || o.getDeadline() == null) {
+			return 0;
+		}
+		if (getStartDate() == null || o.getStartDate() == null) {
+			return getDeadline().compareTo(o.getDeadline());
+		}
+		return getStartDate().compareTo(o.getStartDate());
+	}
+
+	public boolean matches(Task o)	{
+		return (getDescription() == o.getDescription()
+				&& getStartDate() == o.getStartDate()
+				&& getDeadline() == o.getDeadline()
+				&& getRecurring() == o.getRecurring()
+				&& getOriginalStartDate() == o.getOriginalStartDate()
+				&& getOriginalDeadline() == o.getOriginalDeadline()
+				&& getEndingDate() == o.getEndingDate()
+				&& isComplete() == o.isComplete());
 	}
 }

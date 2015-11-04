@@ -1,4 +1,5 @@
 package history;
+
 import java.util.Stack;
 
 import commandDetail.CommandDetails;
@@ -9,8 +10,8 @@ public class History {
 	private Stack<CommandDetails> redoStack = new Stack<CommandDetails>();
 
 	/**
-	 *	history returns first CommandDetails object when undo or redo is called
-	 *	logic works on these CommandDetails objects accordingly
+	 * history returns first CommandDetails object when undo or redo is called
+	 * logic works on these CommandDetails objects accordingly
 	 **/
 
 	// constructor
@@ -20,9 +21,9 @@ public class History {
 	}
 
 	/**
-	 *	this method inserts a CommandDetails object into the undoStack and clears
-	 *	redo stack of obsolete commands returns 1 if successful, 0 if
-	 *	unsuccessful
+	 * this method inserts a CommandDetails object into the undoStack and clears
+	 * redo stack of obsolete commands returns 1 if successful, 0 if
+	 * unsuccessful
 	 **/
 	public int insert(CommandDetails cmdDetObj) {
 		try {
@@ -51,17 +52,8 @@ public class History {
 		} else {
 			CommandDetails latest = undoStack.pop();
 			System.out.println(latest.toString());
-			switch (latest.getCommand()) {
-			case UPDATE:
-				CommandDetails old = undoStack.pop();
-				redoStack.push(latest);
-				redoStack.push(old);
-				return old;
-
-			default:
-				redoStack.push(latest);
-				return latest;
-			}
+			redoStack.push(latest);
+			return latest;
 		}
 	}
 
@@ -70,23 +62,9 @@ public class History {
 			return null;
 		} else {
 			CommandDetails old = redoStack.pop();
-			if (!redoStack.isEmpty()) {
-				System.out.println(old.toString());
-				switch (old.getCommand()) {
-				case UPDATE:
-					CommandDetails latest = redoStack.pop();
-					undoStack.push(old);
-					undoStack.push(latest);
-					return latest;
-
-				default:
-					undoStack.push(old);
-					return old;
-				}
-			} else {
-				undoStack.push(old);
-				return old;
-			}
+			undoStack.push(old);
+			System.out.println(old.toString());
+			return old;
 		}
 	}
 

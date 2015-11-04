@@ -2,6 +2,8 @@ package commandDetail;
 
 import java.util.Date;
 
+import task.Task;
+
 public class CommandDetails {
 	private Date deadline;
 	private Date startDate;
@@ -12,6 +14,8 @@ public class CommandDetails {
 	private Date originalStartDate;
 	private Date originalDeadline;
 	private Date endingDate;
+	private Task oldTask;
+	private Task newTask;
 
 	public enum COMMANDS {
 		ADD, DELETE, SEARCH, UPDATE, COMPLETE, INCOMPLETE, UNDO, REDO, HELP, ALL, FLOATING, EVENTS, DEADLINES, RECURRING, EXIT, INVALID, SET,
@@ -29,6 +33,35 @@ public class CommandDetails {
 		this.originalStartDate = originalStartDate;
 		this.originalDeadline = originalDeadline;
 		this.endingDate = endingDate;
+	}
+	
+	public CommandDetails(COMMANDS command, String description, Date startDate, Date deadline, int ID, String recurring,
+			Date originalStartDate, Date originalDeadline, Date endingDate, Task newTask) {
+		this.deadline = deadline;
+		this.startDate = startDate;
+		this.description = description;
+		this.command = command;
+		this.ID = ID;
+		this.recurring = recurring;
+		this.originalStartDate = originalStartDate;
+		this.originalDeadline = originalDeadline;
+		this.endingDate = endingDate;
+		this.newTask = newTask;
+	}
+	
+	public CommandDetails(COMMANDS command, String description, Date startDate, Date deadline, int ID, String recurring,
+			Date originalStartDate, Date originalDeadline, Date endingDate, Task oldTask, Task newTask) {
+		this.deadline = deadline;
+		this.startDate = startDate;
+		this.description = description;
+		this.command = command;
+		this.ID = ID;
+		this.recurring = recurring;
+		this.originalStartDate = originalStartDate;
+		this.originalDeadline = originalDeadline;
+		this.endingDate = endingDate;
+		this.oldTask = oldTask;
+		this.newTask = newTask;
 	}
 
 	public CommandDetails(COMMANDS command, int ID) {
@@ -77,6 +110,14 @@ public class CommandDetails {
 	public Date getEndingDate() {
 		return this.endingDate;
 	}
+	
+	public Task getOldTask() {
+		return this.oldTask;
+	}
+	
+	public Task getNewTask() {
+		return this.newTask;
+	}
 
 	// Mutators
 
@@ -110,6 +151,14 @@ public class CommandDetails {
 
 	public void setEndingDate(Date endingDate) {
 		this.endingDate = endingDate;
+	}
+	
+	public void setNewTask(Task newTask) {
+		this.newTask = newTask;
+	}
+	
+	public void setOldTask(Task oldTask)	{
+		this.oldTask = oldTask;
 	}
 
 	// Overriding methods
