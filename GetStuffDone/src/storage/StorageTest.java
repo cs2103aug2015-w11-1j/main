@@ -77,6 +77,7 @@ public class StorageTest {
 		storage.save(new ArrayList<Task>());
 		tasks = storage.load();
 
+		assertNotNull(tasks);
 		assertEquals(tasks.size(), 0);
 	}
 
@@ -88,6 +89,7 @@ public class StorageTest {
 		storage.save(tasks);
 		tasks = storage.load();
 
+		assertNotNull(tasks);
 		assertEquals(tasks.remove(0).toString(), (new Task()).toString());
 	}
 
@@ -102,6 +104,7 @@ public class StorageTest {
 		storage.save(tasks);
 		tasks = storage.load();
 
+		assertNotNull(tasks);
 		assertEquals(taskFloating.toString(), tasks.get(0).toString());
 		assertEquals(taskEvent.toString(), tasks.get(1).toString());
 		assertEquals(taskDeadline.toString(), tasks.get(2).toString());

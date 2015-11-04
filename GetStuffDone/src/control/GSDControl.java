@@ -1,9 +1,6 @@
 package control;
 
-import java.io.IOException;
 import parser.Parser;
-import java.nio.file.InvalidPathException;
-import java.text.ParseException;
 import java.util.*;
 import commandDetail.CommandDetails;
 import history.History;
@@ -46,8 +43,6 @@ public class GSDControl {
 	private static final String FEEDBACK_RECURRING = ">> Recurring Tasks displayed\n";
 	private static final String FEEDBACK_HELP = ">> Called for help!\n";
 	private static final String FEEDBACK_SET = ">> File path set to ";
-	private static final String FEEDBACK_SET_ERROR = ">> ERROR : FILE PATH CAN'T BE SET";
-	private static final String FEEDBACK_NO_FILE = ">> NO FILE WAS LOADED\n";
 	private static final String FEEDBACK_INVALID_FILE_PATH = ">> ERROR : INVALID FILE PATH\n";
 	private static final String FEEDBACK_INVALID_COMMAND = ">> ERROR : INVALID COMMAND\n";
 	private static final String FEEDBACK_INVALID_COMMAND_FORMAT = ">> ERROR : INVALID COMMAND FORMAT\n";
@@ -210,15 +205,10 @@ public class GSDControl {
 		case EXIT:
 			return null;
 		case SET:
-			try {
-				boolean isValidFilePath = setFilePath();
-				if (isValidFilePath) {
-					return new Feedback(null, FEEDBACK_SET + this.commandDetails.getDescription() + "\n",
-							generateInfoBox());
-				} else {
-					return new Feedback(null, FEEDBACK_SET_ERROR, generateInfoBox());
-				}
-			} catch (InvalidPathException q) {
+			boolean isValidFilePath = setFilePath();
+			if (isValidFilePath) {
+				return new Feedback(null, FEEDBACK_SET + commandDetails.getDescription() + "\n", generateInfoBox());
+			} else {
 				return new Feedback(null, FEEDBACK_INVALID_FILE_PATH, generateInfoBox());
 			}
 		default:
@@ -232,22 +222,15 @@ public class GSDControl {
 	 *************************************************************************************************/
 
 	public Feedback loadFromFile() {
-		try {
+		
 			tasks = storage.load();
+			
 			if (tasks == null) {
 				tasks = new ArrayList<Task>();
-				return new Feedback(DISPLAY_NO_TASKS, FEEDBACK_NO_FILE, generateInfoBox());
+				return new Feedback(DISPLAY_NO_TASKS, FEEDBACK_LOAD_ERROR, generateInfoBox());
 			}
 			//refreshRecurringTasks();
 			return new Feedback(displayAllTasks(), FEEDBACK_WELCOME_MESSAGE, generateInfoBox());
-		} catch (IOException e) {
-			tasks = new ArrayList<Task>();
-			return new Feedback(DISPLAY_NO_TASKS, FEEDBACK_WELCOME_MESSAGE, generateInfoBox());
-		} catch (ParseException f) {
-			tasks = new ArrayList<Task>();
-			return new Feedback(DISPLAY_NO_TASKS, FEEDBACK_LOAD_ERROR, generateInfoBox());
-		}
-
 	}
 
 	/*************************************************************************************************

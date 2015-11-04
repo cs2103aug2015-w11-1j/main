@@ -95,43 +95,49 @@ public class Storage {
 	}
 
 	/**
-	 * Parse the saved file into an ArrayList of Task(s)
+	 * Parse the save file into an ArrayList of Task(s)
 	 * 
-	 * @return an ArrayList of Task(s). If the saved file is empty, return an
-	 *         empty ArrayList of size 0. If the saved file is incorrect in
-	 *         format, return null.
-	 * @throws IOException
-	 *             if the saved file cannot be read
-	 * @throws ParseException
-	 *             if the date format is incorrect
+	 * @return an ArrayList of Task(s). If the save file is empty, return an
+	 *         empty ArrayList of size 0. If there is an error reading the save
+	 *         file, return null.
 	 */
-	public ArrayList<Task> load() throws IOException, ParseException {
+	public ArrayList<Task> load() {
 
 		String path = preferences.get(KEY_PATH, DEFAULT_PATH);
 
-		List<String> lines = Files.readAllLines(Paths.get(path));
-
 		ArrayList<Task> tasks = new ArrayList<Task>();
+		List<String> lines = null;
+
+		try {
+			lines = Files.readAllLines(Paths.get(path));
+		} catch (IOException e) {
+			return null;
+		}
 
 		if (lines.size() % LINES_PER_TASK != 0) {
 			return null;
 		}
 
-		for (int i = 0; i < lines.size(); i += LINES_PER_TASK) {
+		try {
+			for (int i = 0; i < lines.size(); i += LINES_PER_TASK) {
 
-			Task task = new Task();
+				Task task = new Task();
 
-			task.setDescription(parseString(lines.get(i + OFFSET_DESCRIPTION)));
-			task.setIsComplete(parseStatus(lines.get(i + OFFSET_STATUS)));
-			task.setStartDate(parseDate(lines.get(i + OFFSET_DATE_START)));
-			task.setDeadline(parseDate(lines.get(i + OFFSET_DATE_END)));
-			task.setEndingDate(parseDate(lines.get(i + OFFSET_DATE_LAST)));
-			task.setRecurring(parseInterval(lines.get(i + OFFSET_INTERVAL)));
-			task.setOriginalStartDate(parseDate(lines.get(i + OFFSET_DATE_START_ORIGINAL)));
-			task.setOriginalDeadline(parseDate(lines.get(i + OFFSET_DATE_END_ORIGINAL)));
-			task.setRecurringCount(Integer.parseInt(lines.get(i + OFFSET_COUNT)));
+				task.setDescription(parseString(lines.get(i + OFFSET_DESCRIPTION)));
+				task.setIsComplete(parseStatus(lines.get(i + OFFSET_STATUS)));
+				task.setStartDate(parseDate(lines.get(i + OFFSET_DATE_START)));
+				task.setDeadline(parseDate(lines.get(i + OFFSET_DATE_END)));
+				task.setEndingDate(parseDate(lines.get(i + OFFSET_DATE_LAST)));
+				task.setRecurring(parseInterval(lines.get(i + OFFSET_INTERVAL)));
+				task.setOriginalStartDate(parseDate(lines.get(i + OFFSET_DATE_START_ORIGINAL)));
+				task.setOriginalDeadline(parseDate(lines.get(i + OFFSET_DATE_END_ORIGINAL)));
+				task.setRecurringCount(Integer.parseInt(lines.get(i + OFFSET_COUNT)));
 
-			tasks.add(task);
+				tasks.add(task);
+			}
+			
+		} catch (ParseException e) {
+			return null;
 		}
 
 		return tasks;
@@ -225,7 +231,7 @@ public class Storage {
 
 		if (string.equalsIgnoreCase(STATUS_COMPLETED)) {
 			return true;
-		} else if (string.equalsIgnoreCase(STATUS_UNCOMPLETED)){
+		} else if (string.equalsIgnoreCase(STATUS_UNCOMPLETED)) {
 			return false;
 		} else {
 			assert false;
