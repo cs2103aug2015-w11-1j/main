@@ -72,6 +72,7 @@ import java.util.Calendar;
 import java.util.Date;
 import commandDetail.CommandDetails;
 
+//@@author A0124472L
 public class Parser {
 	private final static String[] DATE_FORMAT = { "HHmm dd MMMM yy", "HH.mm dd MMMM yy", "HH:mm dd MMMM yy",
 			"hhmma dd MMMM yy", "hha dd MMMM yy", "hmma dd MMMM yy", "hh.mma dd MMMM yy", "hh:mma dd MMMM yy",
