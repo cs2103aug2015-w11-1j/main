@@ -261,7 +261,7 @@ public class Parser {
 		try {
 			input = input.trim().replaceAll(" +", " ");
 		} catch (NullPointerException e) {
-			//No parameters
+			// No parameters
 		}
 		return input;
 	}
@@ -354,7 +354,7 @@ public class Parser {
 	private static Date createDate(String input, String method) throws InvalidTimeDateInputException {
 		Date myDate = null;
 		Calendar cal = Calendar.getInstance();
-		//input = formatString(input);
+		// input = formatString(input);
 
 		for (String formatParsed : DATE_FORMAT) {
 			try {
@@ -390,18 +390,18 @@ public class Parser {
 			}
 		}
 
-		String endTimeOfDay = null;
+		String defaultTime = null;
 
 		for (int i = 0; i < TimekeyWord.length; i++) {
 			if (input.toUpperCase().equals(TimekeyWord[i])) {
 				SimpleDateFormat format = new SimpleDateFormat("HHmm");
 				try {
 					if (method.equals("START")) {
-						endTimeOfDay = "0000";
+						defaultTime = "0000";
 					} else {
-						endTimeOfDay = "2359";
+						defaultTime = "2359";
 					}
-					myDate = format.parse(endTimeOfDay);
+					myDate = format.parse(defaultTime);
 					myDate = addDefaultDate(input, myDate, cal);
 					return myDate;
 				} catch (ParseException e) {
@@ -611,19 +611,31 @@ public class Parser {
 			case "ADD":
 				input.remove(FIRST_IN_ARRAYLIST);
 				return CommandDetails.COMMANDS.ADD;
-			case "a":
+			case "-A":
 				input.remove(FIRST_IN_ARRAYLIST);
 				return CommandDetails.COMMANDS.ADD;
 			case "DELETE":
 				input.remove(FIRST_IN_ARRAYLIST);
 				return CommandDetails.COMMANDS.DELETE;
-			case "d":
+			case "DEL":
+				input.remove(FIRST_IN_ARRAYLIST);
+				return CommandDetails.COMMANDS.DELETE;
+			case "REMOVE":
+				input.remove(FIRST_IN_ARRAYLIST);
+				return CommandDetails.COMMANDS.DELETE;
+			case "=D":
 				input.remove(FIRST_IN_ARRAYLIST);
 				return CommandDetails.COMMANDS.DELETE;
 			case "COMPLETE":
 				input.remove(FIRST_IN_ARRAYLIST);
 				return CommandDetails.COMMANDS.COMPLETE;
+			case "DONE":
+				input.remove(FIRST_IN_ARRAYLIST);
+				return CommandDetails.COMMANDS.COMPLETE;
 			case "INCOMPLETE":
+				input.remove(FIRST_IN_ARRAYLIST);
+				return CommandDetails.COMMANDS.INCOMPLETE;
+			case "UNDONE":
 				input.remove(FIRST_IN_ARRAYLIST);
 				return CommandDetails.COMMANDS.INCOMPLETE;
 			case "HELP":
@@ -635,7 +647,10 @@ public class Parser {
 			case "SEARCH":
 				input.remove(FIRST_IN_ARRAYLIST);
 				return CommandDetails.COMMANDS.SEARCH;
-			case "s":
+			case "-S":
+				input.remove(FIRST_IN_ARRAYLIST);
+				return CommandDetails.COMMANDS.SEARCH;
+			case "FIND":
 				input.remove(FIRST_IN_ARRAYLIST);
 				return CommandDetails.COMMANDS.SEARCH;
 			case "UNDO":
@@ -647,7 +662,10 @@ public class Parser {
 			case "UPDATE":
 				input.remove(FIRST_IN_ARRAYLIST);
 				return CommandDetails.COMMANDS.UPDATE;
-			case "u":
+			case "EDIT":
+				input.remove(FIRST_IN_ARRAYLIST);
+				return CommandDetails.COMMANDS.UPDATE;
+			case "-U":
 				input.remove(FIRST_IN_ARRAYLIST);
 				return CommandDetails.COMMANDS.UPDATE;
 			case "SET":
@@ -656,10 +674,22 @@ public class Parser {
 			case "FLOATING":
 				input.remove(FIRST_IN_ARRAYLIST);
 				return CommandDetails.COMMANDS.FLOATING;
+			case "FLOAT":
+				input.remove(FIRST_IN_ARRAYLIST);
+				return CommandDetails.COMMANDS.FLOATING;
 			case "EVENTS":
 				input.remove(FIRST_IN_ARRAYLIST);
 				return CommandDetails.COMMANDS.EVENTS;
+			case "EVENT":
+				input.remove(FIRST_IN_ARRAYLIST);
+				return CommandDetails.COMMANDS.EVENTS;
 			case "DEADLINES":
+				input.remove(FIRST_IN_ARRAYLIST);
+				return CommandDetails.COMMANDS.DEADLINES;
+			case "DEADLINE":
+				input.remove(FIRST_IN_ARRAYLIST);
+				return CommandDetails.COMMANDS.DEADLINES;
+			case "DUE":
 				input.remove(FIRST_IN_ARRAYLIST);
 				return CommandDetails.COMMANDS.DEADLINES;
 			case "RECURRING":
@@ -753,13 +783,14 @@ public class Parser {
 			return null;
 		}
 		while (!input.isEmpty()) {
-			if (input.get(FIRST_IN_ARRAYLIST).contains("/")) {
-				//Removes escape character
+			if (input.get(FIRST_IN_ARRAYLIST).charAt(0) == '/') {
+				// Removes escape character
 				result = result + " " + input.remove(FIRST_IN_ARRAYLIST).substring(1);
 			} else {
 				result = result + " " + input.remove(FIRST_IN_ARRAYLIST);
 			}
 		}
+
 		result = formatString(result);
 		return result;
 	}
@@ -787,7 +818,7 @@ public class Parser {
 		Date endingDate = null;
 		int ID = NO_ID;
 		boolean isKeywordAt = false;
-		
+
 		input = formatString(input);
 		ArrayList<String> strTokens = new ArrayList<String>(Arrays.asList(input.split(" ")));
 		validateInput(strTokens, input);
@@ -801,7 +832,7 @@ public class Parser {
 		start = parseStartDate(strTokens);
 		if (isKeywordAt) {
 			end = start;
-			//end = setEndDate(start);
+			// end = setEndDate(start);
 		}
 		recurring = parseRecurring(strTokens);
 		endingDate = parseEndingDate(strTokens);
@@ -815,20 +846,15 @@ public class Parser {
 				endingDate);
 	}
 
-	
 	/**
 	 * Set end time as 2359 for AT event task
 	 */
 	/*
-	private static Date setEndDate(Date start) {
-		Calendar cal = Calendar.getInstance();
-		int lastHourInDay = 23;
-		int lastMinuteInDay = 59;
-		cal.setTime(start);
-		cal.set(Calendar.HOUR_OF_DAY, lastHourInDay);
-		cal.set(Calendar.MINUTE, lastMinuteInDay);
-		return cal.getTime();
-	}*/
+	 * private static Date setEndDate(Date start) { Calendar cal =
+	 * Calendar.getInstance(); int lastHourInDay = 23; int lastMinuteInDay = 59;
+	 * cal.setTime(start); cal.set(Calendar.HOUR_OF_DAY, lastHourInDay);
+	 * cal.set(Calendar.MINUTE, lastMinuteInDay); return cal.getTime(); }
+	 */
 
 	/**
 	 * Set Recurring ending date to last possible date in java.util.Date if not

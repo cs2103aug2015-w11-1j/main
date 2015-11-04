@@ -10,6 +10,10 @@ import commandDetail.CommandDetails;
 
 public class ParserTest {
 
+	/*************************************************************************************************
+	 ************************************* START DATE FORMAT TEST ************************************
+	 *************************************************************************************************/
+	
 	@Test
 	public void startTest1() throws Exception {
 		String input = "add dinner FROM 1234 01 january 23";
@@ -1190,7 +1194,10 @@ public class ParserTest {
 		assertEquals(date, Parser.parse(input).getStartDate());
 	}
 
-	//////////////////////////////////////////////////////////////////////////////////// @Test
+	/*************************************************************************************************
+	 ************************************* END DATE FORMAT TEST **************************************
+	 *************************************************************************************************/
+	
 	public void endTest1() throws Exception {
 		String input = "add dinner on 1234 01 december 23";
 
@@ -2369,6 +2376,10 @@ public class ParserTest {
 		assertEquals(date, Parser.parse(input).getDeadline());
 	}
 
+	/*************************************************************************************************
+	 **************************************** COMMAND TEST *******************************************
+	 *************************************************************************************************/
+	
 	@Test
 	public void testCmd() throws Exception {
 		String input = "add dinner FROM 12.34 01 january 23";
@@ -2387,6 +2398,10 @@ public class ParserTest {
 		assertEquals(CommandDetails.COMMANDS.ADD, Parser.parse(input).getCommand());
 	}
 	
+	/*************************************************************************************************
+	 **************************************** ID TEST ************************************************
+	 *************************************************************************************************/
+	
 	@Test
 	public void testID() throws Exception {
 		String input = "delete 2";
@@ -2401,6 +2416,10 @@ public class ParserTest {
 		int result = 2;
 		assertEquals(result, Parser.parse(input).getID());
 	}
+	
+	/*************************************************************************************************
+	 **************************************** DESCRIPTION TEST ***************************************
+	 *************************************************************************************************/
 	
 	@Test
 	public void testDescription() throws Exception {
@@ -2423,6 +2442,9 @@ public class ParserTest {
 		assertEquals(result, Parser.parse(input).getDescription());
 	}
 	
+	/*************************************************************************************************
+	 **************************************** RECURRING TEST *****************************************
+	 *************************************************************************************************/
 	
 	@Test
 	public void testRecurring() throws Exception {
@@ -2447,6 +2469,10 @@ public class ParserTest {
 		assertEquals(date, Parser.parse(input).getEndingDate());
 	}
 
+	/*************************************************************************************************
+	 **************************************** EXCEPTION TEST *****************************************
+	 *************************************************************************************************/
+	
 	@Test(expected = InvalidParametersException.class)
 	public void emptyDescription() throws Exception {
 		String input = "add At tomorrow";
