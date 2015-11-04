@@ -8,8 +8,10 @@ public class History {
 	private Stack<CommandDetails> undoStack = new Stack<CommandDetails>();
 	private Stack<CommandDetails> redoStack = new Stack<CommandDetails>();
 
-	// history returns first CommandDetails object when undo or redo is called
-	// logic works on these CommandDetails objects accordingly
+	/**
+	 *	history returns first CommandDetails object when undo or redo is called
+	 *	logic works on these CommandDetails objects accordingly
+	 **/
 
 	// constructor
 	public History() {
@@ -18,9 +20,9 @@ public class History {
 	}
 
 	/**
-	 * this method inserts a CommandDetails object into the undoStack and clears
-	 * redo stack of obsolete commands returns 1 if successful, 0 if
-	 * unsuccessful
+	 *	this method inserts a CommandDetails object into the undoStack and clears
+	 *	redo stack of obsolete commands returns 1 if successful, 0 if
+	 *	unsuccessful
 	 **/
 	public int insert(CommandDetails cmdDetObj) {
 		try {
@@ -42,7 +44,7 @@ public class History {
 		}
 	}
 
-	// this method returns the last action, returns null of undoStack is empty
+	// this method returns the last action, returns null if undoStack is empty
 	public CommandDetails undo() {
 		if (undoStack.isEmpty()) {
 			return null;
@@ -59,7 +61,6 @@ public class History {
 			default:
 				redoStack.push(latest);
 				return latest;
-
 			}
 		}
 	}

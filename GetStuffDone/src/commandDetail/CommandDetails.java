@@ -17,8 +17,7 @@ public class CommandDetails {
 		ADD, DELETE, SEARCH, UPDATE, COMPLETE, INCOMPLETE, UNDO, REDO, HELP, ALL, FLOATING, EVENTS, DEADLINES, RECURRING, EXIT, INVALID, SET,
 	}
 
-	// constructor
-
+	// constructors
 	public CommandDetails(COMMANDS command, String description, Date startDate, Date deadline, int ID, String recurring,
 			Date originalStartDate, Date originalDeadline, Date endingDate) {
 		this.deadline = deadline;
