@@ -11,8 +11,10 @@ import javax.swing.JTextField;
 
 import control.GSDControl;
 
+//@@author A0126561J
+
 /**
- * User interface for GetStuffDone. Only interacts with the Logic component.
+ * UI provides the graphical user interface for GetStuffDone.
  */
 public class UI {
 
@@ -78,7 +80,11 @@ public class UI {
 
 				Feedback feedback = gsd.processInput(input);
 
-				show(feedback);
+				if (feedback == null) {
+					frame.dispose();
+				} else {
+					show(feedback);
+				}
 			}
 		});
 
@@ -86,16 +92,15 @@ public class UI {
 		show(feedback);
 
 		frame.pack();
-
-		// Set the window to be center on the screen
 		frame.setLocationRelativeTo(null);
+		frame.setVisible(true);
 
 		commandBar.requestFocusInWindow();
-
-		frame.setVisible(true);
 	}
 
 	private void show(Feedback feedback) {
+
+		assert(feedback != null);
 
 		showInFeedbackBox(feedback.getFeedbackString());
 		showInDisplayBox(feedback.getDisplayString());
