@@ -1,26 +1,37 @@
+//@@author A0124472L
 package parser;
 
-import java.text.ParseException;
-
 /*
-	<------------------------------------------------------->
-	Command keywords demarked by (case insensitive)
-	Adding of task				add			-a
-	Deleting of task			delete		-d
-	Displaying of task			all
-	Marking task as complete	complete
-	Displaying help manual		help
-	Redo last action			redo
-	Search task					search		-s
-	Undo last action			undo
-	Editing an existing task	update		-u
+ 	All keywords are case insensitive
+	<----------------------------------------------------------------------->
+	Command keywords demarked by
+	Adding of task(default command)				add			-a
+	Deleting of task							delete		-d
+	Marking task as complete					complete	done
+	Marking task as incomplete					incomplete	undone
+	Displaying help manual						help
+	Redo last action							redo
+	Search task									search		find		-s
+	Undo last action							undo
+	Editing an existing task					update		update		-u
+	Displaying of task							all
+	Displaying floating task					floatings	floating	float
+	Displaying deadline task					deadlines	deadline	due
+	Displaying event task						events		event
+	Set file path								set
 	
-	<------------------------------------------------------->
-	Time keywords demarked by (case sensitive):
-	Start date and time - FROM
-	End date and time - BY/TO
+	<----------------------------------------------------------------------->
+	Event task 				<From> <To> 
+							<At>
 	
-	Date and time format - <time><date>
+	Floating task			No time specified
+	
+	Deadline task			<By>/<On>
+	
+	Date and time format  	<time><date>
+	
+	
+	If description contains time keyword, use '/' as escape character
 	
 	Supported time format 
 	
@@ -55,16 +66,24 @@ import java.text.ParseException;
 				- dd/MMMM		01/April		01/Apr
 				- dd/MM			01/04
 	
-	Supported NLI date	
+	Supported date keywords	
 	
-				- today			today			<time> today
-				- tomorrow		tomorrow		<time> tomorrow
+				- today			today		tdy
+				- tomorrow		tomorrow	tmr	
+				- monday		monday		mon
+				- tuesday		tuesday		tue
+				- wednesday		wednesday	wed
+				- thursday		thursday	thur
+				- friday		friday		fri
+				- saturday		saturday	sat
+				- sunday		sunday		sun
 				
 				
-		<Command> <TaskID (if applicable)> <Time, description of task>
-	eg. -U 2 do homework FROM 12.30pm 6/10/15 TO 6pm 6/10/15 
+		<Command> <Description> <TaskID (if applicable)> <Time task>
+	eg. -U 2 dinner /at gardens /by the bay FROM 12.30pm 6/10/15 TO 6pm 6/10/15 
 */
 
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -72,7 +91,6 @@ import java.util.Calendar;
 import java.util.Date;
 import commandDetail.CommandDetails;
 
-//@@author A0124472L
 public class Parser {
 	private final static String[] DATE_FORMAT = { "HHmm dd MMMM yy", "HH.mm dd MMMM yy", "HH:mm dd MMMM yy",
 			"hhmma dd MMMM yy", "hha dd MMMM yy", "hmma dd MMMM yy", "hh.mma dd MMMM yy", "hh:mma dd MMMM yy",
@@ -224,6 +242,9 @@ public class Parser {
 	/**
 	 * Takes in 2 index of a arrayList Remove the Strings in between the index
 	 * and append them as a string Returns the result String
+	 * 
+	 * @throws InvalidParametersException
+	 *             when required parameters are missing
 	 */
 	private static String getInputBetweenArrayList(ArrayList<String> input, int indexOfKeyWord, int indexOfNextKeyWord)
 			throws InvalidParametersException {
@@ -268,13 +289,15 @@ public class Parser {
 	 *************************************************************************************************/
 
 	/**
-	 * Parse user input determines the start date Throws invalidCommandException
-	 * when command is invalid Throws InvalidParametersException when command
-	 * details parameters are missing Throws InvalidTimeDateInputException when
-	 * time/date format is not supported
+	 * Parse user input determines the start date
+	 * 
+	 * @throws InvalidParametersException
+	 *             when required parameters are missing
+	 * @throws InvalidTimeDateInputException
+	 *             when time/date format is not supported
 	 */
 	private static Date parseStartDate(ArrayList<String> input)
-			throws InvalidTimeDateInputException, InvalidParametersException {
+			throws InvalidParametersException, InvalidTimeDateInputException {
 		String result = "";
 		int indexOfNextKeyWord = NO_NEXT_KEYWORD;
 		int indexOfKeyWordFROM = indexOfkeyWord(input, "FROM");
@@ -301,11 +324,15 @@ public class Parser {
 	}
 
 	/**
-	 * Parse user input determines the end date Throws invalidCommandException
-	 * when command is invalid Throws InvalidParametersException when command
-	 * details parameters are missing Throws InvalidTimeDateInputException when
-	 * time/date format is not supported
+	 * Parse user input determines the end date
+	 * 
+	 * @throws InvalidParametersException
+	 *             when required parameters are missing
+	 * 
+	 * @throws InvalidTimeDateInputException
+	 *             when time/date format is not supported
 	 */
+
 	private static Date parseEndDate(ArrayList<String> input)
 			throws InvalidTimeDateInputException, InvalidParametersException {
 		String result = "";
@@ -342,16 +369,16 @@ public class Parser {
 	}
 
 	/**
-	 * Creates the Date object with the parsed date string Throws
-	 * InvalidParametersException when time/date format is not found Throws
-	 * InvalidTimeDateInputException when time/date format is not supported if
-	 * method is set to START, default time is set as 0000 if method is set to
-	 * END, default time is set as 2359
+	 * Creates the Date object with the parsed date string if method is set to
+	 * START, default time is set as 0000 if method is set to END, default time
+	 * is set as 2359
+	 * 
+	 * @throws InvalidTimeDateInputException
+	 *             when time/date format is not supported
 	 */
 	private static Date createDate(String input, String method) throws InvalidTimeDateInputException {
 		Date myDate = null;
 		Calendar cal = Calendar.getInstance();
-		// input = formatString(input);
 
 		for (String formatParsed : DATE_FORMAT) {
 			try {
@@ -410,8 +437,10 @@ public class Parser {
 	}
 
 	/**
-	 * Checks if input contains multiple Time keywords and throw
-	 * InvalidTimeDateInputException
+	 * Checks if input contains multiple Time keywords
+	 * 
+	 * @throws InvalidTimeDateInputException
+	 *             when time/date format is not supported
 	 */
 	private static void checkKeywords(String input, String formatParsed) throws InvalidTimeDateInputException {
 		int count = 0;
@@ -602,14 +631,14 @@ public class Parser {
 	 *************************************************************************************************/
 
 	/**
-	 * Parse Type of command throws invalidCommandException when command is not
-	 * supported returns as CommandDetails.COMMANDS returns as an ADD command
-	 * type if not stated
+	 * Parse Type of command returns as CommandDetails.COMMANDS returns as an
+	 * ADD command type if not stated
 	 * 
 	 * @throws InvalidParametersException
+	 *             when required parameters are missing
+	 * 
 	 */
-	private static CommandDetails.COMMANDS parseCommandType(ArrayList<String> input)
-			throws InvalidCommandException, InvalidParametersException {
+	private static CommandDetails.COMMANDS parseCommandType(ArrayList<String> input) throws InvalidParametersException {
 
 		try {
 			switch (input.get(FIRST_IN_ARRAYLIST).toUpperCase()) {
@@ -701,9 +730,6 @@ public class Parser {
 				input.remove(FIRST_IN_ARRAYLIST);
 				return CommandDetails.COMMANDS.EXIT;
 			default:
-				// System.out.print("Invalid Command");
-				// throw new invalidCommand(input.remove(FIRST_IN_ARRAYLIST));
-				// return CommandDetails.COMMANDS.INVALID;
 				return CommandDetails.COMMANDS.ADD;
 			}
 		} catch (IndexOutOfBoundsException e) {
@@ -719,6 +745,9 @@ public class Parser {
 	/**
 	 * Parse Task ID throws InvalidParametersException when ID is missing
 	 * returns as integer
+	 * 
+	 * @throws InvalidParametersException
+	 *             When ID is not a integer
 	 */
 	private static int parseID(ArrayList<String> input) throws InvalidParametersException {
 		int ID = NO_ID;
@@ -766,14 +795,14 @@ public class Parser {
 
 	/**
 	 * Parse user input from control and validates the input before returning a
-	 * Command Detail object to control with each parameter parsed Throws
-	 * invalidCommandException when command is invalid Throws
-	 * InvalidParametersException when command details parameters are missing
-	 * Throws InvalidTimeDateInputException when time/date format is not
-	 * supported
+	 * Command Detail object to control with each parameter parsed
+	 * 
+	 * @throws InvalidParametersException
+	 *             when required parameters are missing
+	 * @throws InvalidTimeDateInputException
+	 *             when time/date format is not supported
 	 */
-	public static CommandDetails parse(String input)
-			throws InvalidCommandException, InvalidParametersException, InvalidTimeDateInputException {
+	public static CommandDetails parse(String input) throws InvalidParametersException, InvalidTimeDateInputException {
 		String description;
 		Date start;
 		Date end;
@@ -792,7 +821,7 @@ public class Parser {
 		isKeywordAt = isEventTaskofAT(strTokens);
 		start = parseStartDate(strTokens);
 		if (isKeywordAt) {
-			//end = start;
+			// end = start;
 			end = setEndDate(start);
 		}
 		description = parseDescription(strTokens);
@@ -852,7 +881,8 @@ public class Parser {
 	 * Validates if start and end time/date are correct start date is before end
 	 * date start date have not yet past end date have not yet past
 	 * 
-	 * Throws InvalidTimeDateInputException
+	 * @throws InvalidTimeDateInputException
+	 *             when time/date format is not supported
 	 */
 	private static void validateDateTime(Date start, Date end) throws InvalidTimeDateInputException {
 		Calendar today = Calendar.getInstance();
@@ -873,6 +903,9 @@ public class Parser {
 
 	/**
 	 * Validates if parameters are correct given its corresponding Command Type
+	 *
+	 * @throws InvalidParametersException
+	 *             when required parameters are missing
 	 */
 	private static void validateCommand(CommandDetails.COMMANDS command, int ID, String description, Date start,
 			Date end, String input) throws InvalidParametersException {
@@ -927,6 +960,7 @@ public class Parser {
 	 * Validates the user string input from control
 	 * 
 	 * @throws InvalidParametersException
+	 *             when required parameters are missing
 	 */
 	private static void validateInput(ArrayList<String> strTokens, String input) throws InvalidParametersException {
 		validateDates(input);
@@ -936,8 +970,10 @@ public class Parser {
 	}
 
 	/**
-	 * Validates if there are multiple start time and throws
-	 * InvalidParametersException
+	 * Validates if there are multiple start time
+	 * 
+	 * @throws InvalidParametersException
+	 *             when required parameters are missing
 	 */
 	private static void validateStartDate(ArrayList<String> strTokens) throws InvalidParametersException {
 		int count;
@@ -953,8 +989,10 @@ public class Parser {
 	}
 
 	/**
-	 * Validates if there are multiple end time/date and throws
-	 * InvalidParametersException
+	 * Validates if there are multiple end time/date
+	 * 
+	 * @throws InvalidParametersException
+	 *             when required parameters are missing
 	 */
 	private static void validateEndDate(ArrayList<String> strTokens) throws InvalidParametersException {
 		int count;
@@ -971,8 +1009,10 @@ public class Parser {
 	}
 
 	/**
-	 * Validates if there are Start and End that does not match and throws
-	 * InvalidParametersException
+	 * Validates if there are Start and End that does not match
+	 * 
+	 * @throws InvalidParametersException
+	 *             when required parameters are missing
 	 */
 	private static void validateDates(String input) throws InvalidParametersException {
 
