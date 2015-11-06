@@ -2362,6 +2362,38 @@ public class ParserTest {
 	@Test
 	public void endTest120() throws Exception {
 		SimpleDateFormat sdf = new SimpleDateFormat("HHmm");
+		Date date = sdf.parse("1200pm");
+		String input = "add dinner By 1200 fri";
+
+		Calendar cal = Calendar.getInstance();
+		cal.setTime(date);
+
+		cal.set(Calendar.YEAR, Calendar.getInstance().get(Calendar.YEAR));
+		cal.set(Calendar.DAY_OF_YEAR, Calendar.getInstance().get(Calendar.DAY_OF_YEAR));
+
+		Calendar now = Calendar.getInstance();
+		int weekday = cal.get(Calendar.DAY_OF_WEEK);
+		int HOUR_OF_DAY = cal.get(Calendar.HOUR_OF_DAY);
+		int MINUTE = cal.get(Calendar.MINUTE);
+		int NOW_HOUR_OF_DAY = now.get(Calendar.HOUR_OF_DAY);
+		int NOW_MINUTE = now.get(Calendar.MINUTE);
+
+		if (weekday != Calendar.FRIDAY) {
+			int days = (Calendar.FRIDAY - weekday) % 7;
+			if (days < 0) {
+				days = days + 7;
+			}
+			cal.add(Calendar.DAY_OF_YEAR, days);
+		} else if (HOUR_OF_DAY < NOW_HOUR_OF_DAY || (HOUR_OF_DAY == NOW_HOUR_OF_DAY && MINUTE < NOW_MINUTE)) {
+			cal.add(Calendar.DAY_OF_YEAR, 7);
+		}
+		date = cal.getTime();
+		assertEquals(date, Parser.parse(input).getDeadline());
+	}
+	
+	@Test
+	public void endTest121() throws Exception {
+		SimpleDateFormat sdf = new SimpleDateFormat("HHmm");
 		Date date = sdf.parse("2359");
 		String input = "add dinner TO TOMORROW";
 
@@ -2441,33 +2473,7 @@ public class ParserTest {
 		assertEquals(result, Parser.parse(input).getDescription());
 	}
 	
-	/*************************************************************************************************
-	 **************************************** RECURRING TEST *****************************************
-	 *************************************************************************************************/
 	
-	@Test
-	public void testRecurring() throws Exception {
-		String input = "add dinner by today daily";
-		String result = "DAILY";
-		assertEquals(result, Parser.parse(input).getRecurring());
-	}
-
-	@Test
-	public void testRecurringEnd() throws Exception {
-		String input = "add dinner by today daily";
-		SimpleDateFormat format = new SimpleDateFormat("HHmm dd/MM/yyyy");
-		Date date = format.parse("2359 31/12/8089");
-		assertEquals(date, Parser.parse(input).getEndingDate());
-	}
-
-	@Test
-	public void testRecurringEnd2() throws Exception {
-		String input = "add dinner by today daily ending 31/12";
-		SimpleDateFormat format = new SimpleDateFormat("HHmm dd/MM/yyyy");
-		Date date = format.parse("2359 31/12/2015");
-		assertEquals(date, Parser.parse(input).getEndingDate());
-	}
-
 	/*************************************************************************************************
 	 **************************************** EXCEPTION TEST *****************************************
 	 *************************************************************************************************/
@@ -2498,24 +2504,7 @@ public class ParserTest {
 		String input = "add dinner from 1 jan to 6 jun";
 		assertEquals(input, Parser.parse(input));
 	}
-	
-	@Test(expected = InvalidTimeDateInputException.class)
-	public void endBeforeEnding() throws Exception {
-		String input = "add dinner from today  to 21 dec 2018 daily ending tomorrow";
-		assertEquals(input, Parser.parse(input));
-	}
-	
-	@Test(expected = InvalidTimeDateInputException.class)
-	public void startAfterEnding() throws Exception {
-		String input = "add dinner from 21 jan 2017  to 21 dec 2018 daily ending today";
-		assertEquals(input, Parser.parse(input));
-	}
-	
-	@Test(expected = InvalidParametersException.class)
-	public void noRecurringInterval() throws Exception {
-		String input = "add dinner by today ending sunday";
-		assertEquals(input, Parser.parse(input));
-	}
+
 	
 	@Test(expected = NumberFormatException.class)
 	public void taskNumberInvalid() throws Exception {

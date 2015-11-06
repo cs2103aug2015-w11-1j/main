@@ -792,8 +792,8 @@ public class Parser {
 		isKeywordAt = isEventTaskofAT(strTokens);
 		start = parseStartDate(strTokens);
 		if (isKeywordAt) {
-			end = start;
-			// end = setEndDate(start);
+			//end = start;
+			end = setEndDate(start);
 		}
 		description = parseDescription(strTokens);
 		validateCommandDetails(command, ID, description, start, end, input);
@@ -803,12 +803,16 @@ public class Parser {
 	/**
 	 * Set end time as 2359 for AT event task
 	 */
-	/*
-	 * private static Date setEndDate(Date start) { Calendar cal =
-	 * Calendar.getInstance(); int lastHourInDay = 23; int lastMinuteInDay = 59;
-	 * cal.setTime(start); cal.set(Calendar.HOUR_OF_DAY, lastHourInDay);
-	 * cal.set(Calendar.MINUTE, lastMinuteInDay); return cal.getTime(); }
-	 */
+
+	private static Date setEndDate(Date start) {
+		Calendar cal = Calendar.getInstance();
+		int lastHourInDay = 23;
+		int lastMinuteInDay = 59;
+		cal.setTime(start);
+		cal.set(Calendar.HOUR_OF_DAY, lastHourInDay);
+		cal.set(Calendar.MINUTE, lastMinuteInDay);
+		return cal.getTime();
+	}
 
 	/**
 	 * Return True if keyword is AT
