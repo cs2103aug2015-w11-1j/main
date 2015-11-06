@@ -58,8 +58,10 @@ public class History {
 			return latest;
 		}
 	}
-
-	// this method returns the last undo action, returns null if redoStack is empty
+	
+	/** 
+	 * Returns the last undo action, returns null if redoStack is empty
+	 */
 	public CommandDetails redo() {
 		if (redoStack.isEmpty()) {
 			return null;
