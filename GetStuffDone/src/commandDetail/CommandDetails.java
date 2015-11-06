@@ -10,42 +10,29 @@ public class CommandDetails {
 	private String description;
 	private COMMANDS command;
 	private int ID;
-	private String recurring;
-	private Date originalStartDate;
-	private Date originalDeadline;
-	private Date endingDate;
 	private Task oldTask;
 	private Task newTask;
 
 	public enum COMMANDS {
-		ADD, DELETE, SEARCH, UPDATE, COMPLETE, INCOMPLETE, UNDO, REDO, HELP, ALL, FLOATING, EVENTS, DEADLINES, RECURRING, EXIT, INVALID, SET,
+		ADD, DELETE, SEARCH, UPDATE, COMPLETE, INCOMPLETE, UNDO, REDO, HELP, ALL, FLOATING, EVENTS, DEADLINES, EXIT, INVALID, SET,
 	}
 
 	// constructors
-	public CommandDetails(COMMANDS command, String description, Date startDate, Date deadline, int ID, String recurring,
-			Date originalStartDate, Date originalDeadline, Date endingDate) {
+	public CommandDetails(COMMANDS command, String description, Date startDate, Date deadline, int ID) {
 		this.deadline = deadline;
 		this.startDate = startDate;
 		this.description = description;
 		this.command = command;
 		this.ID = ID;
-		this.recurring = recurring;
-		this.originalStartDate = originalStartDate;
-		this.originalDeadline = originalDeadline;
-		this.endingDate = endingDate;
+
 	}
 	
-	public CommandDetails(COMMANDS command, String description, Date startDate, Date deadline, int ID, String recurring,
-			Date originalStartDate, Date originalDeadline, Date endingDate, Task newTask) {
+	public CommandDetails(COMMANDS command, String description, Date startDate, Date deadline, int ID, Task newTask) {
 		this.deadline = deadline;
 		this.startDate = startDate;
 		this.description = description;
 		this.command = command;
 		this.ID = ID;
-		this.recurring = recurring;
-		this.originalStartDate = originalStartDate;
-		this.originalDeadline = originalDeadline;
-		this.endingDate = endingDate;
 		this.newTask = newTask;
 	}
 	
@@ -56,10 +43,6 @@ public class CommandDetails {
 		this.description = description;
 		this.command = command;
 		this.ID = ID;
-		this.recurring = recurring;
-		this.originalStartDate = originalStartDate;
-		this.originalDeadline = originalDeadline;
-		this.endingDate = endingDate;
 		this.oldTask = oldTask;
 		this.newTask = newTask;
 	}
@@ -70,8 +53,6 @@ public class CommandDetails {
 		this.description = null;
 		this.command = command;
 		this.ID = ID;
-		this.recurring = null;
-		this.endingDate = null;
 	}
 
 	// Accessors
@@ -93,22 +74,6 @@ public class CommandDetails {
 
 	public int getID() {
 		return this.ID;
-	}
-
-	public String getRecurring() {
-		return this.recurring;
-	}
-
-	public Date getOriginalStartDate() {
-		return this.originalStartDate;
-	}
-
-	public Date getOriginalDeadline() {
-		return this.originalDeadline;
-	}
-
-	public Date getEndingDate() {
-		return this.endingDate;
 	}
 	
 	public Task getOldTask() {
@@ -140,18 +105,6 @@ public class CommandDetails {
 	public void setDescription(String description) {
 		this.description = description;
 	}
-
-	public void setOriginalStartDate(Date originalStartDate) {
-		this.originalStartDate = originalStartDate;
-	}
-
-	public void setOriginalDeadline(Date originalDeadline) {
-		this.originalDeadline = originalDeadline;
-	}
-
-	public void setEndingDate(Date endingDate) {
-		this.endingDate = endingDate;
-	}
 	
 	public void setNewTask(Task newTask) {
 		this.newTask = newTask;
@@ -166,9 +119,7 @@ public class CommandDetails {
 	public String toString() {
 		String result = "";
 		result = "command = " + command + "\nID = " + ID + "\ndescription = " + description + "\nstartDate = "
-				+ startDate + "\ndeadline = " + deadline + "\nRecurring = " + recurring + "\noriginalStartDate = "
-				+ originalStartDate + "\noriginalDeadline = " + originalDeadline + "\nEnding Date = " + endingDate
-				+ "\n";
+				+ startDate + "\ndeadline = " + deadline + "\n";
 		return result;
 	}
 }

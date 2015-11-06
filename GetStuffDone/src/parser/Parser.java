@@ -158,13 +158,10 @@ public class Parser {
 	private final static String[] TIME_ONLY_FORMAT = { "hhmma", "hha", "hmma", "hh.mma", "hh:mma", "HH.mm", "HH:mm",
 			"HHmm" };
 
-	private final static String[] TimekeyWord = { "MONDAY", "TUESDAY", "WEDNESDAY", "THURSDAY", "FRIDAY", "SATURDAY",
-			"SUNDAY", "TODAY", "TOMORROW" };
+	private final static String[] TIME_KEYWORDS = { "MONDAY", "MON", "TUESDAY", "TUE", "WEDNESDAY", "WED", "THURSDAY",
+			"THUR", "FRIDAY", "FRI", "SATURDAY", "SAT", "SUNDAY", "SUN", "TODAY", "TDY", "TOMORROW", "TMR" };
 
-	private final static String[] RECURRING_KEY_WORD = { "DAILY", "MONTHLY", "YEARLY", "WEEKLY" };
-
-	private final static String[] keyWord = { "BY", "FROM", "TO", "AT", "ON", "DAILY", "MONTHLY", "YEARLY", "WEEKLY",
-			"ENDING" };
+	private final static String[] KEYWORD = { "BY", "FROM", "TO", "AT", "ON" };
 	private final static int DAYS_IN_A_WEEK = 7;
 	private final static int NO_NEXT_KEYWORD = -2;
 	private final static int NO_ID = -10;
@@ -216,8 +213,8 @@ public class Parser {
 	 * Return true if string is a keyword
 	 */
 	private static boolean isKeyWord(String input) {
-		for (int i = 0; i < keyWord.length; i++) {
-			if (keyWord[i].equalsIgnoreCase(input)) {
+		for (int i = 0; i < KEYWORD.length; i++) {
+			if (KEYWORD[i].equalsIgnoreCase(input)) {
 				return true;
 			}
 		}
@@ -365,7 +362,7 @@ public class Parser {
 
 				checkKeywords(input, formatParsed);
 
-				for (String days : TimekeyWord) {
+				for (String days : TIME_KEYWORDS) {
 					if (input.toUpperCase().contains(days)) {
 						myDate = addDefaultDate(input, myDate, cal);
 						break;
@@ -392,8 +389,8 @@ public class Parser {
 
 		String defaultTime = null;
 
-		for (int i = 0; i < TimekeyWord.length; i++) {
-			if (input.toUpperCase().equals(TimekeyWord[i])) {
+		for (int i = 0; i < TIME_KEYWORDS.length; i++) {
+			if (input.toUpperCase().equals(TIME_KEYWORDS[i])) {
 				SimpleDateFormat format = new SimpleDateFormat("HHmm");
 				try {
 					if (method.equals("START")) {
@@ -418,8 +415,8 @@ public class Parser {
 	 */
 	private static void checkKeywords(String input, String formatParsed) throws InvalidTimeDateInputException {
 		int count = 0;
-		for (int i = 0; i < TimekeyWord.length; i++) {
-			if (input.toUpperCase().contains(TimekeyWord[i])) {
+		for (int i = 0; i < TIME_KEYWORDS.length; i++) {
+			if (input.toUpperCase().equals(TIME_KEYWORDS[i])) {
 				count++;
 			}
 			if (count > 1) {
@@ -428,8 +425,8 @@ public class Parser {
 		}
 
 		for (String format : NOT_TIME_ONLY_FORMAT) {
-			for (int i = 0; i < TimekeyWord.length; i++) {
-				if (input.toUpperCase().contains(TimekeyWord[i]) && formatParsed.equals(format)) {
+			for (int i = 0; i < TIME_KEYWORDS.length; i++) {
+				if (input.toUpperCase().contains(TIME_KEYWORDS[i]) && formatParsed.equals(format)) {
 					throw new InvalidTimeDateInputException(input);
 				}
 			}
@@ -499,17 +496,19 @@ public class Parser {
 		boolean isBeforeCurrentTime = checkBeforeCurrentTIme(HOUR_OF_DAY, MINUTE, NOW_HOUR_OF_DAY, NOW_MINUTE);
 
 		int i;
-		for (i = 0; i < TimekeyWord.length; i++) {
-			if (input.toUpperCase().contains(TimekeyWord[i])) {
+		for (i = 0; i < TIME_KEYWORDS.length; i++) {
+			if (input.toUpperCase().contains(TIME_KEYWORDS[i])) {
 				break;
 			}
 		}
 
-		switch (TimekeyWord[i]) {
+		switch (TIME_KEYWORDS[i]) {
 		case "TOMORROW":
+		case "TMR":
 			cal.add(Calendar.DAY_OF_YEAR, 1);
 			break;
 		case "MONDAY":
+		case "MON":
 			if (weekday != Calendar.MONDAY) {
 				int days = (Calendar.MONDAY - weekday) % DAYS_IN_A_WEEK;
 				incrementDay(cal, days);
@@ -518,6 +517,7 @@ public class Parser {
 			}
 			break;
 		case "TUESDAY":
+		case "TUE":
 			weekday = cal.get(Calendar.DAY_OF_WEEK);
 			if (weekday != Calendar.TUESDAY) {
 				int days = (Calendar.TUESDAY - weekday) % DAYS_IN_A_WEEK;
@@ -527,6 +527,7 @@ public class Parser {
 			}
 			break;
 		case "WEDNESDAY":
+		case "WED":
 			weekday = cal.get(Calendar.DAY_OF_WEEK);
 			if (weekday != Calendar.WEDNESDAY) {
 				int days = (Calendar.WEDNESDAY - weekday) % DAYS_IN_A_WEEK;
@@ -536,6 +537,7 @@ public class Parser {
 			}
 			break;
 		case "THURSDAY":
+		case "THUR":
 			weekday = cal.get(Calendar.DAY_OF_WEEK);
 			if (weekday != Calendar.THURSDAY) {
 				int days = (Calendar.THURSDAY - weekday) % DAYS_IN_A_WEEK;
@@ -545,6 +547,7 @@ public class Parser {
 			}
 			break;
 		case "FRIDAY":
+		case "FRI":
 			weekday = cal.get(Calendar.DAY_OF_WEEK);
 			if (weekday != Calendar.FRIDAY) {
 				int days = (Calendar.FRIDAY - weekday) % DAYS_IN_A_WEEK;
@@ -554,6 +557,7 @@ public class Parser {
 			}
 			break;
 		case "SATURDAY":
+		case "SAT":
 			weekday = cal.get(Calendar.DAY_OF_WEEK);
 			if (weekday != Calendar.SATURDAY) {
 				int days = (Calendar.SATURDAY - weekday) % DAYS_IN_A_WEEK;
@@ -563,6 +567,7 @@ public class Parser {
 			}
 			break;
 		case "SUNDAY":
+		case "SUN":
 			weekday = cal.get(Calendar.DAY_OF_WEEK);
 			if (weekday != Calendar.SUNDAY) {
 				int days = (Calendar.SUNDAY - weekday) % DAYS_IN_A_WEEK;
@@ -692,9 +697,6 @@ public class Parser {
 			case "DUE":
 				input.remove(FIRST_IN_ARRAYLIST);
 				return CommandDetails.COMMANDS.DEADLINES;
-			case "RECURRING":
-				input.remove(FIRST_IN_ARRAYLIST);
-				return CommandDetails.COMMANDS.RECURRING;
 			case "EXIT":
 				input.remove(FIRST_IN_ARRAYLIST);
 				return CommandDetails.COMMANDS.EXIT;
@@ -730,46 +732,6 @@ public class Parser {
 	}
 
 	/*************************************************************************************************
-	 ************************************* RECURRING PARSING *****************************************
-	 *************************************************************************************************/
-
-	/**
-	 * Parse Recurring task interval returns as a String
-	 */
-	private static String parseRecurring(ArrayList<String> strTokens) {
-		int arrayListIndex = 0;
-		for (String tokens : strTokens) {
-			for (int i = 0; i < RECURRING_KEY_WORD.length; i++) {
-				if (tokens.equalsIgnoreCase(RECURRING_KEY_WORD[i])) {
-					return strTokens.remove(arrayListIndex).toUpperCase();
-				}
-			}
-			arrayListIndex++;
-		}
-		return null;
-	}
-
-	/**
-	 * format is not found Throws InvalidTimeDateInputException when time/date
-	 * format is not supported Throws InvalidParametersException when keyword
-	 * found but no time/date stated
-	 */
-	private static Date parseEndingDate(ArrayList<String> input)
-			throws InvalidTimeDateInputException, InvalidParametersException {
-		String result = "";
-		int indexOfNextKeyWord = NO_NEXT_KEYWORD;
-		int indexOfKeyWordEnding = indexOfkeyWord(input, "ENDING");
-		if (!containsKeyword(indexOfKeyWordEnding)) {
-			return null;
-		} else {
-			indexOfNextKeyWord = findNextKeyword(input, indexOfKeyWordEnding);
-		}
-		indexOfNextKeyWord = checkLastIndex(input, indexOfNextKeyWord);
-		result = getInputBetweenArrayList(input, indexOfKeyWordEnding, indexOfNextKeyWord);
-		return createDate(result, "END");
-	}
-
-	/*************************************************************************************************
 	 ************************************* DESCRIPTION PARSING ***************************************
 	 *************************************************************************************************/
 
@@ -782,15 +744,18 @@ public class Parser {
 		if (input.isEmpty()) {
 			return null;
 		}
-		while (!input.isEmpty()) {
-			if (input.get(FIRST_IN_ARRAYLIST).charAt(0) == '/') {
-				// Removes escape character
-				result = result + " " + input.remove(FIRST_IN_ARRAYLIST).substring(1);
-			} else {
-				result = result + " " + input.remove(FIRST_IN_ARRAYLIST);
+		try {
+			while (!input.isEmpty()) {
+				if (input.get(FIRST_IN_ARRAYLIST).charAt(0) == '/') {
+					// Removes escape character
+					result = result + " " + input.remove(FIRST_IN_ARRAYLIST).substring(1);
+				} else {
+					result = result + " " + input.remove(FIRST_IN_ARRAYLIST);
+				}
 			}
+		} catch (StringIndexOutOfBoundsException e) {
+			// empty description
 		}
-
 		result = formatString(result);
 		return result;
 	}
@@ -810,12 +775,8 @@ public class Parser {
 	public static CommandDetails parse(String input)
 			throws InvalidCommandException, InvalidParametersException, InvalidTimeDateInputException {
 		String description;
-		String recurring = null;
 		Date start;
 		Date end;
-		Date originalStart;
-		Date originalEnd;
-		Date endingDate = null;
 		int ID = NO_ID;
 		boolean isKeywordAt = false;
 
@@ -834,16 +795,9 @@ public class Parser {
 			end = start;
 			// end = setEndDate(start);
 		}
-		recurring = parseRecurring(strTokens);
-		endingDate = parseEndingDate(strTokens);
-		endingDate = defaultEndingDate(recurring, endingDate);
 		description = parseDescription(strTokens);
-		originalStart = start;
-		originalEnd = end;
-		validateCommandDetails(command, ID, description, start, end, input, recurring, originalStart, originalEnd,
-				endingDate);
-		return new CommandDetails(command, description, start, end, ID, recurring, originalStart, originalEnd,
-				endingDate);
+		validateCommandDetails(command, ID, description, start, end, input);
+		return new CommandDetails(command, description, start, end, ID);
 	}
 
 	/**
@@ -855,24 +809,6 @@ public class Parser {
 	 * cal.setTime(start); cal.set(Calendar.HOUR_OF_DAY, lastHourInDay);
 	 * cal.set(Calendar.MINUTE, lastMinuteInDay); return cal.getTime(); }
 	 */
-
-	/**
-	 * Set Recurring ending date to last possible date in java.util.Date if not
-	 * stated
-	 */
-	private static Date defaultEndingDate(String recurring, Date endingDate) {
-		String dateFormat = "HHmm dd/MM/yyyy";
-		String defaultEndingDate = "2359 31/12/8089";
-		if (endingDate == null && recurring != null) {
-			SimpleDateFormat format = new SimpleDateFormat(dateFormat);
-			try {
-				endingDate = format.parse(defaultEndingDate);
-			} catch (ParseException e) {
-				// Self set format ignore
-			}
-		}
-		return endingDate;
-	}
 
 	/**
 	 * Return True if keyword is AT
@@ -903,13 +839,9 @@ public class Parser {
 	 * return to Control
 	 */
 	private static void validateCommandDetails(CommandDetails.COMMANDS command, int ID, String description, Date start,
-			Date end, String input, String recurring, Date originalStart, Date originalEnd, Date endingDate)
-					throws InvalidParametersException, InvalidTimeDateInputException {
+			Date end, String input) throws InvalidParametersException, InvalidTimeDateInputException {
 		validateCommand(command, ID, description, start, end, input);
-		validateDateTime(start, end, recurring, endingDate);
-		if (recurring != null || endingDate != null) {
-			validateRecurringDate(start, end, recurring, endingDate);
-		}
+		validateDateTime(start, end);
 	}
 
 	/**
@@ -918,8 +850,7 @@ public class Parser {
 	 * 
 	 * Throws InvalidTimeDateInputException
 	 */
-	private static void validateDateTime(Date start, Date end, String recurring, Date endingDate)
-			throws InvalidTimeDateInputException {
+	private static void validateDateTime(Date start, Date end) throws InvalidTimeDateInputException {
 		Calendar today = Calendar.getInstance();
 		Date todayDate = today.getTime();
 
@@ -933,30 +864,6 @@ public class Parser {
 			if (end.before(todayDate)) {
 				throw new InvalidTimeDateInputException("event already ended");
 			}
-		}
-	}
-
-	/**
-	 * Validates if recurring task date/time input are correct Recurring task
-	 * have a recurring interval stated Task recurring end date is after task
-	 * start date Task recurring end date is after task end date
-	 */
-	private static void validateRecurringDate(Date start, Date end, String recurring, Date endingDate)
-			throws InvalidParametersException, InvalidTimeDateInputException {
-
-		if (endingDate != null && recurring == null) {
-			throw new InvalidParametersException("Recurring interval");
-		}
-		if (endingDate.before(end)) {
-			throw new InvalidTimeDateInputException("Recurring end Date before end Date");
-		}
-		if (start != null) {
-			if (endingDate.before(start)) {
-				throw new InvalidTimeDateInputException("Recurring end Date before Start Date");
-			}
-		}
-		if (end == null) {
-			throw new InvalidParametersException("Date missing");
 		}
 	}
 
@@ -975,8 +882,7 @@ public class Parser {
 		if (command == CommandDetails.COMMANDS.HELP || command == CommandDetails.COMMANDS.REDO
 				|| command == CommandDetails.COMMANDS.UNDO || command == CommandDetails.COMMANDS.ALL
 				|| command == CommandDetails.COMMANDS.FLOATING || command == CommandDetails.COMMANDS.EVENTS
-				|| command == CommandDetails.COMMANDS.DEADLINES || command == CommandDetails.COMMANDS.EXIT
-				|| command == CommandDetails.COMMANDS.RECURRING) {
+				|| command == CommandDetails.COMMANDS.DEADLINES || command == CommandDetails.COMMANDS.EXIT) {
 			if (description != null || start != null || end != null || ID != NO_ID) {
 				throw new InvalidParametersException(input);
 			}
@@ -1022,7 +928,6 @@ public class Parser {
 		validateDates(input);
 		validateStartDate(strTokens);
 		validateEndDate(strTokens);
-		validateRecurring(strTokens);
 
 	}
 
@@ -1081,20 +986,4 @@ public class Parser {
 
 	}
 
-	/**
-	 * Validates if there are multiple recurring time/date and throws
-	 * InvalidParametersException
-	 */
-	private static void validateRecurring(ArrayList<String> strTokens) throws InvalidParametersException {
-		int count = 0;
-		for (String tokens : strTokens) {
-			if (tokens.equalsIgnoreCase("DAILY") || tokens.equalsIgnoreCase("MONTHLY")
-					|| tokens.equalsIgnoreCase("YEARLY") || tokens.equalsIgnoreCase("WEEKLY")) {
-				count++;
-			}
-		}
-		if (count > 1) {
-			throw new InvalidParametersException("multiple end date");
-		}
-	}
 }
