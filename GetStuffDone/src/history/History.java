@@ -4,27 +4,27 @@ import java.util.Stack;
 
 import commandDetail.CommandDetails;
 
+/**
+ * History returns first CommandDetails object when undo or redo is called
+ * GSDControl works on the returned CommandDetails objects accordingly
+ */
+
+
 public class History {
 
 	private Stack<CommandDetails> undoStack = new Stack<CommandDetails>();
 	private Stack<CommandDetails> redoStack = new Stack<CommandDetails>();
 
-	/**
-	 * history returns first CommandDetails object when undo or redo is called
-	 * logic works on these CommandDetails objects accordingly
-	 **/
-
-	// constructor
+	// Constructor
 	public History() {
 		this.undoStack = new Stack<CommandDetails>();
 		this.redoStack = new Stack<CommandDetails>();
 	}
 
 	/**
-	 * this method inserts a CommandDetails object into the undoStack and clears
-	 * redo stack of obsolete commands returns 1 if successful, 0 if
-	 * unsuccessful
-	 **/
+	 * Inserts a CommandDetails object into the undoStack and clears Redo stack
+	 * of obsolete commands. Returns 1 if successful, 0 if unsuccessful
+	 */
 	public int insert(CommandDetails cmdDetObj) {
 		try {
 			undoStack.push(cmdDetObj);
@@ -45,7 +45,9 @@ public class History {
 		}
 	}
 
-	// this method returns the last action, returns null if undoStack is empty
+	/** 
+	 * Returns the last action, returns null if undoStack is empty
+	 */
 	public CommandDetails undo() {
 		if (undoStack.isEmpty()) {
 			return null;
