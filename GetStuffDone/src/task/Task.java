@@ -1,5 +1,7 @@
 package task;
 
+//@@author A0110616W
+
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -7,10 +9,16 @@ import java.util.Date;
 
 import commandDetail.CommandDetails;
 
-/*
- * Task is an object used in GetStuffDone
+/**
+ * Task is a stand-alone object used in GetStuffDone
  * Task does not know the existence of UI, GSDControl, Parser, History and Storage
- * Task knows the existence of commandDetails object
+ * Task knows the existence of CommandDetails
+ * 
+ * INTERACTIONS OF Task WITH OTHER CLASSES:
+ * 
+ * GSDControl: An ArrayList of Tasks are stored in GSDControl
+ * Storage: The ArrayList of Tasks from GSDControl is passed to Storage for saving and loading purposes
+ * CommandDetails: A Task is created from a CommandDetails object
  */
 
 public class Task implements Comparable<Task> {
@@ -109,50 +117,57 @@ public class Task implements Comparable<Task> {
 	public void markAsIncomplete() {
 		isComplete = Boolean.FALSE;
 	}
-	// Overriding methods
+
+	public boolean matches(Task o) {
+		return (getDescription() == o.getDescription() && getStartDate() == o.getStartDate()
+				&& getDeadline() == o.getDeadline() && isComplete() == o.isComplete());
+	}
 
 	public boolean contains(CommandDetails details) {
 
-		Calendar startDateCal = Calendar.getInstance();
+		Calendar taskStartDateCal = null;
 		if (this.startDate != null) {
-			startDateCal.setTime(this.startDate);
+			taskStartDateCal = Calendar.getInstance();
+			taskStartDateCal.setTime(this.startDate);
 		}
 
-		Calendar deadlineCal = Calendar.getInstance();
+		Calendar taskDeadlineCal = null;
 		if (this.deadline != null) {
-			deadlineCal.setTime(this.deadline);
+			taskDeadlineCal = Calendar.getInstance();
+			taskDeadlineCal.setTime(this.deadline);
 		}
 
-		Calendar taskStartDateCal = Calendar.getInstance();
+		Calendar detailsStartDateCal = null;
 		if (details.getStartDate() != null) {
-			taskStartDateCal.setTime(details.getStartDate());
+			detailsStartDateCal = Calendar.getInstance();
+			detailsStartDateCal.setTime(details.getStartDate());
 		}
 
-		Calendar taskDeadlineCal = Calendar.getInstance();
+		Calendar detailsDeadlineCal = null;
 		if (details.getDeadline() != null) {
-			taskDeadlineCal.setTime(details.getDeadline());
+			detailsDeadlineCal = Calendar.getInstance();
+			detailsDeadlineCal.setTime(details.getDeadline());
 		}
-
-		System.out.println("Start: " + taskStartDateCal.getTime() + "\nDeadline: " + taskDeadlineCal.getTime());
-		System.out.println("Details : " + details.getStartDate() + "\n" + details.getDeadline());
 
 		if (details.getDescription() != null && this.description.contains(details.getDescription())) {
 			return true;
 		}
 
-		if (details.getStartDate() != null) {
-			if (taskStartDateCal.get(Calendar.DAY_OF_YEAR) == (startDateCal.get(Calendar.DAY_OF_YEAR))) {
+		if (details.getStartDate() != null && taskStartDateCal != null) {
+			if (taskStartDateCal.get(Calendar.DAY_OF_YEAR) == (detailsStartDateCal.get(Calendar.DAY_OF_YEAR))) {
 				return true;
 			}
 		}
 
-		if (details.getDeadline() != null) {
-			if (taskDeadlineCal.get(Calendar.DAY_OF_YEAR) == (deadlineCal.get(Calendar.DAY_OF_YEAR))) {
+		if (details.getDeadline() != null && taskDeadlineCal != null) {
+			if (taskDeadlineCal.get(Calendar.DAY_OF_YEAR) == (detailsDeadlineCal.get(Calendar.DAY_OF_YEAR))) {
 				return true;
 			}
 		}
 		return false;
 	}
+
+	// Overriding methods
 
 	@Override
 	public String toString() {
@@ -193,10 +208,5 @@ public class Task implements Comparable<Task> {
 			return -1;
 		}
 		return getDeadline().compareTo(o.getDeadline());
-	}
-
-	public boolean matches(Task o) {
-		return (getDescription() == o.getDescription() && getStartDate() == o.getStartDate()
-				&& getDeadline() == o.getDeadline() && isComplete() == o.isComplete());
 	}
 }

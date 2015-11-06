@@ -1,5 +1,17 @@
 package ui;
 
+//@@author A0110616W
+
+/**
+ * Feedback is a stand-alone object used in GetStuffDone
+ * Feedback does not know the existence of any class
+ * 
+ * INTERACTIONS OF Feedback WITH OTHER CLASSES:
+ * 
+ * GSDControl: Created by GSDControl and returned to UI for display of relevant information
+ * UI: Received by UI from GSDControl for display of relevant information
+ */
+
 public class Feedback {
 	private String displayString = null;
 	private String feedbackString = null;

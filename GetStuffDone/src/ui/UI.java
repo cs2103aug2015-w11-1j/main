@@ -1,5 +1,7 @@
 package ui;
 
+//@@author A0126561J
+
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -8,14 +10,12 @@ import javax.swing.BoxLayout;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
-
 import control.GSDControl;
-
-//@@author A0126561J
 
 /**
  * UI provides the graphical user interface for GetStuffDone.
  */
+
 public class UI {
 
 	private static final String TITLE_MAIN = "GetStuffDone";

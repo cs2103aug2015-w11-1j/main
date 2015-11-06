@@ -1,21 +1,34 @@
 package control;
 
+//@@author A0110616W
+
 import parser.Parser;
+import parser.InvalidParametersException;
+import parser.InvalidTimeDateInputException;
 import java.util.*;
 import commandDetail.CommandDetails;
 import history.History;
 import storage.Storage;
 import task.Task;
 import ui.Feedback;
-import parser.InvalidParametersException;
-/*
+
+/**
  * GSDControl deals with handling of input commands, CRUD of tasks, update of History and update of Storage
  * GSDControl knows the existence of the main components Parser, Task, History and Storage
  * GSDControl knows the existence of stand-alone classes CommandDetails, Task and Feedback 
  * GSDControl does not know the existence of UI
  * GSDControl returns a Feedback Object to UI for displaying
+ * 
+ * INTERACTIONS OF GSDControl WITH OTHER CLASSES:
+ * 
+ * Task: Stores an ArrayList of Tasks in GSDControl
+ * Parser: Passes input from UI to Parser for parsing into a CommandDetails object which is returned to GSDControl
+ * CommandDetails: GSDControl receives CommandDetails objects from Parser. GSDControl sends CommandDetails objects to History
+ * History: GSDControl sends and receives CommandDetails objects to and from History respectively
+ * Storage: GSDControl sends and receives an ArrayList of Tasks to and from Storage respectively
+ * UI: GSDControl returns Feedback objects to UI for displaying 
+ * Feedback: GSDControl creates Feedback objects for UI's usage
  */
-import parser.InvalidTimeDateInputException;
 
 public class GSDControl {
 
@@ -55,9 +68,9 @@ public class GSDControl {
 			+ "Display floating tasks\n" + "Display events\n" + "Display deadlines\n" + "Set file path\n"
 			+ "Exit GSD\n";
 
-	private static final String HELP_SYNTAX = "add <description>\n" + "add <description> BY <time> <date>\n"
-			+ "add <description> FROM <start time> <start date> TO <end time> <end date>\n"
-			+ "search <keyword/day/date>\n" + "update <ID> [floating/event/deadline]\n" + "delete <ID>\n"
+	private static final String HELP_SYNTAX = "add <description>\n" + "add <description> by <time AND/OR date>\n"
+			+ "add <description> from <start time AND/OR start date> to <end time AND/OR end date>\n"
+			+ "search <keyword/day/date>\n" + "update <ID> [Details of floating/event/deadline]\n" + "delete <ID>\n"
 			+ "complete <ID>\n" + "incomplete <ID>\n" + "undo\n" + "redo\n" + "all\n" + "floating\n" + "events\n"
 			+ "deadlines\n" + "set <file path>\n" + "exit\n";
 
@@ -77,17 +90,28 @@ public class GSDControl {
 	public Feedback processInput(String input) {
 		try {
 			this.commandDetails = Parser.parse(input);
-			// this.commandDetails = parser.parse(input);
 		} catch (NumberFormatException f) {
+			//Task Number Invalid or not found
 			return new Feedback(null, FEEDBACK_INVALID_TASK_NUMBER, generateInfoBox());
-		} catch (InvalidTimeDateInputException g) { // Not in the form [Time]
-													// [Date]
+		} catch (InvalidTimeDateInputException g) {
+			// Not in the form [Time][Date]
 			return new Feedback(null, FEEDBACK_INVALID_TIME_DATE_INPUT, generateInfoBox());
 		} catch (InvalidParametersException i) {
 			return new Feedback(null, FEEDBACK_INVALID_COMMAND_FORMAT, generateInfoBox());
-			// Invalid parameters
-			// eg delete 1 screw this up
-			// eg All banananaanananananaa
+			/*
+			 *	EXAMPLES
+			 *	delete 1 potato
+			 *  complete 1 potato
+			 *	incomplete 1 potato
+			 *	undo potato	
+			 *	redo potato
+			 *	help potato
+			 *	all potato
+			 *	floating potato
+			 *	events potato
+			 *	deadlines potato
+			 *	exit potato
+			 */
 		}
 		return executeCommand(input);
 	}
@@ -271,8 +295,6 @@ public class GSDControl {
 		tasks.get(ID).updateDetails(commandDetails);
 		Task newTask = new Task(generateDetails());
 		oldDetails.setNewTask(newTask);
-		// System.out.println("old = " + oldDetails.getOldTask().toString());
-		// System.out.println("new = " + oldDetails.getNewTask().toString());
 		this.commandDetails = oldDetails;
 		sendToHistory();
 		storage.save(tasks);
@@ -461,7 +483,7 @@ public class GSDControl {
 		}
 	}
 
-	/*
+	/**
 	 * Creates a CommandDetails object that matches the current CommandDetails
 	 * object in GSDControl. This method is only used for DELETE and UPDATE
 	 * Commands due to the nature of the Commands i.e. Requires history of both
@@ -638,5 +660,4 @@ public class GSDControl {
 		return "Floating Tasks = " + floating + "\nEvents = " + events + "\nDeadlines = " + deadlines
 				+ "\nTotal No. of Tasks = " + totalTasks + "\n";
 	}
-
 }

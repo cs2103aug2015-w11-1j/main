@@ -1,5 +1,6 @@
-//@@author A0124472L
 package parser;
+
+//@@author A0124472L
 
 /*
  	All keywords are case insensitive

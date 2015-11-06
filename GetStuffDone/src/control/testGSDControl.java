@@ -1,5 +1,7 @@
 package control;
 
+//@@author A0124472L
+
 import static org.junit.Assert.*;
 
 import java.io.File;
@@ -16,15 +18,6 @@ public class testGSDControl {
 	private static final String DISPLAY_NO_FLOATING_TASKS = ">> No Floating Tasks";
 	private static final String DISPLAY_NO_EVENTS = ">> No Events";
 	private static final String DISPLAY_NO_DEADLINES = ">> No Deadlines";
-	private static final String HELP = "Add a floating task - add <description> \n"
-			+ "Add a deadline task - add <description> BY <time> <date>\n"
-			+ "Add an event - add <description> FROM <start time> <start date> TO <end time> <end date>\n"
-			+ "Search for task - search <keyword/day/date>\n"
-			+ "Update a task - update <ID> <description> FROM <start time> <start date> TO <end time> <end date>\n"
-			+ "Delete a task - delete <ID>\n" + "Mark a task as complete - complete <ID>\n"
-			+ "Mark a task as incomplete - incomplete <ID>\n" + "Undo last action - undo\n"
-			+ "Display all tasks - all\n" + "Display floating tasks - floating\n" + "Display events - events\n"
-			+ "Display deadlines - deadlines\n" + "Set file path - set <file path>\n" + "Exit GSD - exit\n";
 
 	private static final String FEEDBACK_WELCOME_MESSAGE = "WELCOME TO GSD!\n";
 	private static final String FEEDBACK_ADD = ">> ADDED ";
@@ -41,12 +34,26 @@ public class testGSDControl {
 	private static final String FEEDBACK_DEADLINES = ">> Deadlines displayed\n";
 	private static final String FEEDBACK_HELP = ">> Called for help!\n";
 	private static final String FEEDBACK_SET = ">> File path set to ";
-	private static final String FEEDBACK_SET_ERROR = ">> ERROR : FILE PATH CAN'T BE SET";
+	private static final String FEEDBACK_INVALID_FILE_PATH = ">> ERROR : INVALID FILE PATH\n";
 	private static final String FEEDBACK_INVALID_COMMAND = ">> ERROR : INVALID COMMAND\n";
 	private static final String FEEDBACK_INVALID_COMMAND_FORMAT = ">> ERROR : INVALID COMMAND FORMAT\n";
 	private static final String FEEDBACK_INVALID_TASK_NUMBER = ">> ERROR : INVALID TASK NUMBER\n";
 	private static final String FEEDBACK_UNDO_ERROR = ">> ERROR : NOTHING TO UNDO\n";
 	private static final String FEEDBACK_REDO_ERROR = ">> ERROR: NOTHING TO REDO\n";
+	private static final String FEEDBACK_LOAD_ERROR = ">> ERROR: FAILED TO LOAD FROM FILE\n";
+	private static final String FEEDBACK_INVALID_TIME_DATE_INPUT = ">> ERROR : INVALID DATE/TIME INPUT\n";
+
+	private static final String HELP_COMMANDS = "Add a floating task\n" + "Add a deadline task\n" + "Add an event\n"
+			+ "Search for task\n" + "Update a task\n" + "Delete a task\n" + "Mark a task as complete\n"
+			+ "Mark a task as incomplete\n" + "Undo last action\n" + "Redo last action\n" + "Display all tasks\n"
+			+ "Display floating tasks\n" + "Display events\n" + "Display deadlines\n" + "Set file path\n"
+			+ "Exit GSD\n";
+
+	private static final String HELP_SYNTAX = "add <description>\n" + "add <description> by <time AND/OR date>\n"
+			+ "add <description> from <start time AND/OR start date> to <end time AND/OR end date>\n"
+			+ "search <keyword/day/date>\n" + "update <ID> [Details of floating/event/deadline]\n" + "delete <ID>\n"
+			+ "complete <ID>\n" + "incomplete <ID>\n" + "undo\n" + "redo\n" + "all\n" + "floating\n" + "events\n"
+			+ "deadlines\n" + "set <file path>\n" + "exit\n";
 
 	private static final String PATH_CURRENT = System.getProperty("user.dir") + File.separatorChar;
 	private static final String FILENAME = "saveFile.txt";

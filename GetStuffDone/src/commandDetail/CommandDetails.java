@@ -1,8 +1,24 @@
 package commandDetail;
 
-import java.util.Date;
+//@@author A0110616W
 
+import java.util.Date;
 import task.Task;
+
+/**
+ * CommandDetails is a stand-alone object used in GetStuffDone
+ * CommandDetails does not know the existence of GSDControl, Parser, History, Storage and UI
+ * CommandDetails knows the existence of Task
+ * 
+ * INTERACTIONS OF CommandDetails WITH OTHER CLASSES:
+ * 
+ * GSDControl: Used by GSDControl to construct a Task object. Sent and received by GSDControl to and from History respectively
+ * Task: Task is created by a CommandDetails object
+ * Parser: Parses input commands into a CommandDetails object which is returned to GSDControl
+ * History: Stores CommandDetails objects in its undoStack and redoStack
+ */
+
+
 
 public class CommandDetails {
 	private Date deadline;
@@ -17,7 +33,7 @@ public class CommandDetails {
 		ADD, DELETE, SEARCH, UPDATE, COMPLETE, INCOMPLETE, UNDO, REDO, HELP, ALL, FLOATING, EVENTS, DEADLINES, EXIT, INVALID, SET,
 	}
 
-	// constructors
+	// Constructors
 	public CommandDetails(COMMANDS command, String description, Date startDate, Date deadline, int ID) {
 		this.deadline = deadline;
 		this.startDate = startDate;
@@ -26,7 +42,7 @@ public class CommandDetails {
 		this.ID = ID;
 
 	}
-	
+
 	public CommandDetails(COMMANDS command, String description, Date startDate, Date deadline, int ID, Task newTask) {
 		this.deadline = deadline;
 		this.startDate = startDate;
@@ -35,7 +51,7 @@ public class CommandDetails {
 		this.ID = ID;
 		this.newTask = newTask;
 	}
-	
+
 	public CommandDetails(COMMANDS command, String description, Date startDate, Date deadline, int ID, String recurring,
 			Date originalStartDate, Date originalDeadline, Date endingDate, Task oldTask, Task newTask) {
 		this.deadline = deadline;
@@ -75,11 +91,11 @@ public class CommandDetails {
 	public int getID() {
 		return this.ID;
 	}
-	
+
 	public Task getOldTask() {
 		return this.oldTask;
 	}
-	
+
 	public Task getNewTask() {
 		return this.newTask;
 	}
@@ -105,12 +121,12 @@ public class CommandDetails {
 	public void setDescription(String description) {
 		this.description = description;
 	}
-	
+
 	public void setNewTask(Task newTask) {
 		this.newTask = newTask;
 	}
-	
-	public void setOldTask(Task oldTask)	{
+
+	public void setOldTask(Task oldTask) {
 		this.oldTask = oldTask;
 	}
 
