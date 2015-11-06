@@ -18,11 +18,6 @@ public class Task implements Comparable<Task> {
 	private String description;
 	private Date startDate;
 	private Date deadline;
-	private String recurring;
-	private Date originalStartDate;
-	private Date originalDeadline;
-	private Date endingDate;
-	private int recurringCount;
 	private Boolean isComplete;
 
 	// Constructors
@@ -32,11 +27,6 @@ public class Task implements Comparable<Task> {
 		description = null;
 		startDate = null;
 		deadline = null;
-		recurring = null;
-		originalStartDate = null;
-		originalDeadline = null;
-		endingDate = null;
-		recurringCount = 1;
 		isComplete = new Boolean(false);
 
 	}
@@ -45,10 +35,6 @@ public class Task implements Comparable<Task> {
 		this.description = details.getDescription();
 		this.startDate = details.getStartDate();
 		this.deadline = details.getDeadline();
-		this.recurring = details.getRecurring();
-		this.originalStartDate = details.getOriginalStartDate();
-		this.originalDeadline = details.getOriginalDeadline();
-		this.endingDate = details.getEndingDate();
 		this.isComplete = false;
 	}
 
@@ -64,34 +50,6 @@ public class Task implements Comparable<Task> {
 
 	public void setDeadline(Date deadline) {
 		this.deadline = deadline;
-	}
-
-	public void setRecurring(String recurring) {
-		this.recurring = recurring;
-	}
-
-	public void setOriginalStartDate(Date originalStartDate) {
-		this.originalStartDate = originalStartDate;
-	}
-
-	public void setOriginalDeadline(Date originalDeadline) {
-		this.originalDeadline = originalDeadline;
-	}
-
-	public void setEndingDate(Date endingDate) {
-		this.endingDate = endingDate;
-	}
-
-	public void incrementRecurringCount() {
-		this.recurringCount++;
-	}
-
-	public void resetRecurringCount() {
-		this.recurringCount = 1;
-	}
-
-	public void setRecurringCount(int recurringCount) {
-		this.recurringCount = recurringCount;
 	}
 
 	public void setIsComplete(boolean isComplete) {
@@ -112,44 +70,20 @@ public class Task implements Comparable<Task> {
 		return this.deadline;
 	}
 
-	public String getRecurring() {
-		return this.recurring;
-	}
-
-	public Date getOriginalStartDate() {
-		return this.originalStartDate;
-	}
-
-	public Date getOriginalDeadline() {
-		return this.originalDeadline;
-	}
-
-	public Date getEndingDate() {
-		return this.endingDate;
-	}
-
-	public int getRecurringCount() {
-		return this.recurringCount;
-	}
-
 	public Boolean isComplete() {
 		return this.isComplete;
 	}
 
 	public boolean isEvent() {
-		return (this.startDate != null && this.deadline != null && this.endingDate == null);
+		return (this.startDate != null && this.deadline != null);
 	}
 
 	public boolean isDeadline() {
-		return (this.startDate == null && this.deadline != null && this.endingDate == null);
+		return (this.startDate == null && this.deadline != null);
 	}
 
 	public boolean isFloating() {
 		return (this.startDate == null && this.deadline == null);
-	}
-
-	public boolean isRecurring() {
-		return (this.recurring != null && this.endingDate != null);
 	}
 
 	// Behavioural methods
@@ -159,10 +93,6 @@ public class Task implements Comparable<Task> {
 		this.description = details.getDescription();
 		this.startDate = details.getStartDate();
 		this.deadline = details.getDeadline();
-		this.recurring = details.getRecurring();
-		this.originalStartDate = details.getOriginalStartDate();
-		this.originalDeadline = details.getOriginalDeadline();
-		this.endingDate = details.getEndingDate();
 	}
 
 	public void setAs(Task task) {
@@ -170,10 +100,6 @@ public class Task implements Comparable<Task> {
 		this.description = task.getDescription();
 		this.startDate = task.getStartDate();
 		this.deadline = task.getDeadline();
-		this.recurring = task.getRecurring();
-		this.originalStartDate = task.getOriginalStartDate();
-		this.originalDeadline = task.getOriginalDeadline();
-		this.endingDate = task.getEndingDate();
 	}
 
 	public void markAsComplete() {
@@ -232,7 +158,7 @@ public class Task implements Comparable<Task> {
 	public String toString() {
 		DateFormat df = new SimpleDateFormat("hh:mma dd/MMM/yyyy ");
 
-		String start, end, ending;
+		String start, end;
 
 		if (startDate == null) {
 			start = "";
@@ -245,20 +171,12 @@ public class Task implements Comparable<Task> {
 		} else {
 			end = df.format(deadline);
 		}
-		if (endingDate == null) {
-			ending = "";
-		} else {
-			ending = df.format(endingDate);
-		}
 		if (isFloating()) {
 			return (description + "\nStart Date: -\nDeadline: -\n");
 		} else if (isEvent()) {
 			return (description + "\nStart Date: " + start + "\nDeadline: " + end + "\n");
 		} else if (isDeadline()) {
 			return description + "\nStart Date: -\nDeadline: " + end + "\n";
-		} else if (isRecurring()) {
-			return (description + "\nStart Date: " + start + "\nDeadline: " + end + "\n" + "Recurring " + recurring
-					+ "\nEnding Date: " + ending + "\n");
 		}
 		return null;
 	}
@@ -279,9 +197,6 @@ public class Task implements Comparable<Task> {
 
 	public boolean matches(Task o) {
 		return (getDescription() == o.getDescription() && getStartDate() == o.getStartDate()
-				&& getDeadline() == o.getDeadline() && getRecurring() == o.getRecurring()
-				&& getOriginalStartDate() == o.getOriginalStartDate()
-				&& getOriginalDeadline() == o.getOriginalDeadline() && getEndingDate() == o.getEndingDate()
-				&& isComplete() == o.isComplete());
+				&& getDeadline() == o.getDeadline() && isComplete() == o.isComplete());
 	}
 }
