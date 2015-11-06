@@ -36,7 +36,7 @@ public class CommandDetails {
 		this.newTask = newTask;
 	}
 	
-	public CommandDetails(COMMANDS command, String description, Date startDate, Date deadline, int ID, String recurring,
+	public CommandDetails(COMMANDS command, String description, Date startDate, Date deadline, int ID,
 			Date originalStartDate, Date originalDeadline, Date endingDate, Task oldTask, Task newTask) {
 		this.deadline = deadline;
 		this.startDate = startDate;
@@ -56,6 +56,7 @@ public class CommandDetails {
 	}
 
 	// Accessors
+	
 	public COMMANDS getCommand() {
 		return this.command;
 	}
