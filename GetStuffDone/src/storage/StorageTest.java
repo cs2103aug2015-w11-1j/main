@@ -26,7 +26,6 @@ public class StorageTest {
 	private Task taskFloating = null;
 	private Task taskEvent = null;
 	private Task taskDeadline = null;
-	private Task taskRecurring = null;
 
 	Date dateStart = new Date(0);
 	Date dateEnd = new Date();
@@ -53,14 +52,6 @@ public class StorageTest {
 		taskDeadline.setDescription("Deadline Task");
 		taskDeadline.setDeadline(dateEnd);
 		taskDeadline.setIsComplete(false);
-		
-		taskRecurring = new Task();
-		taskRecurring.setDescription("Recurring Task");
-		taskRecurring.setEndingDate(dateStart);
-		taskRecurring.setOriginalStartDate(dateStart);
-		taskRecurring.setOriginalDeadline(dateEnd);
-		taskRecurring.setRecurring("WEEKLY");
-		taskRecurring.setRecurringCount(5);
 	}
 
 	@Test
@@ -99,7 +90,6 @@ public class StorageTest {
 		tasks.add(taskFloating);
 		tasks.add(taskEvent);
 		tasks.add(taskDeadline);
-		tasks.add(taskRecurring);
 
 		storage.save(tasks);
 		tasks = storage.load();
@@ -108,7 +98,6 @@ public class StorageTest {
 		assertEquals(taskFloating.toString(), tasks.get(0).toString());
 		assertEquals(taskEvent.toString(), tasks.get(1).toString());
 		assertEquals(taskDeadline.toString(), tasks.get(2).toString());
-		assertEquals(taskRecurring.toString(), tasks.get(3).toString());
 	}
 
 	@Test
@@ -144,6 +133,11 @@ public class StorageTest {
 	@Test
 	public void setNonAbsolutePath() {
 		assertFalse(storage.setFilePath("randomFolder" + File.separatorChar + "randomFile.txt"));
+	}
+	
+	@Test
+	public void setPathWithNonExistentFolder() {
+		assertFalse(storage.setFilePath(PATH_CURRENT + "random" + File.separatorChar + FILENAME));
 	}
 
 	@After

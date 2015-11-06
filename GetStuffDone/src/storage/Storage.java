@@ -29,26 +29,16 @@ public class Storage {
 	private static final String STATUS_COMPLETED = "Completed";
 	private static final String STATUS_UNCOMPLETED = "Uncompleted";
 
-	private static final String INTERVAL_DAY = "DAILY";
-	private static final String INTERVAL_WEEK = "WEEKLY";
-	private static final String INTERVAL_MONTH = "MONTHLY";
-	private static final String INTERVAL_YEAR = "YEARLY";
-
 	// Indicate the number of lines required to store a task
-	private static final int LINES_PER_TASK = 9;
+	private static final int LINES_PER_TASK = 4;
 
 	// Indicate the relative positions of the attributes of a Task
 	private static final int OFFSET_DESCRIPTION = 0;
 	private static final int OFFSET_STATUS = 1;
 	private static final int OFFSET_DATE_START = 2;
 	private static final int OFFSET_DATE_END = 3;
-	private static final int OFFSET_DATE_LAST = 4;
-	private static final int OFFSET_INTERVAL = 5;
-	private static final int OFFSET_DATE_START_ORIGINAL = 6;
-	private static final int OFFSET_DATE_END_ORIGINAL = 7;
-	private static final int OFFSET_COUNT = 8;
 
-	private SimpleDateFormat formatter = new SimpleDateFormat(DATE_FORMAT);
+	private SimpleDateFormat dateFormat = new SimpleDateFormat(DATE_FORMAT);
 
 	private Preferences preferences;
 
@@ -57,11 +47,11 @@ public class Storage {
 	}
 
 	/**
-	 * Save the ArrayList of Task(s) into a file. If the ArrayList is null, do
-	 * nothing. If the ArrayList is empty, create an empty file.
+	 * Save the ArrayList of Tasks into a file. If the ArrayList is null, return
+	 * immediately. If the ArrayList is empty, create an empty file.
 	 * 
 	 * @param tasks
-	 *            is the ArrayList of Task(s)
+	 *            is the ArrayList of Tasks
 	 */
 	public void save(ArrayList<Task> tasks) {
 
@@ -80,11 +70,6 @@ public class Storage {
 				writeStatus(writer, task.isComplete());
 				writeDate(writer, task.getStartDate());
 				writeDate(writer, task.getDeadline());
-				writeDate(writer, task.getEndingDate());
-				writeString(writer, task.getRecurring());
-				writeDate(writer, task.getOriginalStartDate());
-				writeDate(writer, task.getOriginalDeadline());
-				writeInt(writer, task.getRecurringCount());
 			}
 
 			writer.close();
@@ -95,7 +80,7 @@ public class Storage {
 	}
 
 	/**
-	 * Parse the save file into an ArrayList of Task(s)
+	 * Parse the save file into an ArrayList of Tasks
 	 * 
 	 * @return an ArrayList of Task(s). If the save file is empty, return an
 	 *         empty ArrayList of size 0. If there is an error reading the save
@@ -127,15 +112,10 @@ public class Storage {
 				task.setIsComplete(parseStatus(lines.get(i + OFFSET_STATUS)));
 				task.setStartDate(parseDate(lines.get(i + OFFSET_DATE_START)));
 				task.setDeadline(parseDate(lines.get(i + OFFSET_DATE_END)));
-				task.setEndingDate(parseDate(lines.get(i + OFFSET_DATE_LAST)));
-				task.setRecurring(parseInterval(lines.get(i + OFFSET_INTERVAL)));
-				task.setOriginalStartDate(parseDate(lines.get(i + OFFSET_DATE_START_ORIGINAL)));
-				task.setOriginalDeadline(parseDate(lines.get(i + OFFSET_DATE_END_ORIGINAL)));
-				task.setRecurringCount(Integer.parseInt(lines.get(i + OFFSET_COUNT)));
 
 				tasks.add(task);
 			}
-			
+
 		} catch (ParseException e) {
 			return null;
 		}
@@ -192,7 +172,7 @@ public class Storage {
 		if (date == null) {
 			writer.println();
 		} else {
-			writer.println(formatter.format(date));
+			writer.println(dateFormat.format(date));
 		}
 	}
 
@@ -205,11 +185,9 @@ public class Storage {
 		}
 	}
 
-	private void writeInt(PrintWriter writer, int num) {
-		writer.println(num);
-	}
-
 	private String parseString(String string) {
+		
+		assert(string != null);
 
 		if (string.isEmpty()) {
 			return null;
@@ -220,60 +198,49 @@ public class Storage {
 
 	private Date parseDate(String string) throws ParseException {
 
+		assert(string != null);
+		
 		if (string.isEmpty()) {
 			return null;
 		} else {
-			return formatter.parse(string);
+			return dateFormat.parse(string);
 		}
 	}
 
 	private boolean parseStatus(String string) {
+		
+		assert(string != null);
 
 		if (string.equalsIgnoreCase(STATUS_COMPLETED)) {
 			return true;
-		} else if (string.equalsIgnoreCase(STATUS_UNCOMPLETED)) {
-			return false;
 		} else {
-			assert false;
 			return false;
-		}
-	}
-
-	private String parseInterval(String string) {
-
-		if (string.equalsIgnoreCase(INTERVAL_DAY)) {
-			return INTERVAL_DAY;
-		} else if (string.equalsIgnoreCase(INTERVAL_WEEK)) {
-			return INTERVAL_WEEK;
-		} else if (string.equalsIgnoreCase(INTERVAL_MONTH)) {
-			return INTERVAL_MONTH;
-		} else if (string.equalsIgnoreCase(INTERVAL_YEAR)) {
-			return INTERVAL_YEAR;
-		} else {
-			assert false;
-			return null;
 		}
 	}
 
 	private String getFolderPath(String string) {
+		
+		assert(string != null);
 
 		int lastIndexOfSeparator = string.lastIndexOf(File.separatorChar);
 
-		if (lastIndexOfSeparator == -1) {
+		if (lastIndexOfSeparator >= 0) {
+			return string.substring(0, lastIndexOfSeparator + 1);
+		} else {
 			return "";
 		}
-
-		return string.substring(0, lastIndexOfSeparator + 1);
 	}
 
 	private String getFileName(String string) {
+		
+		assert(string != null);
 
 		int lastIndexOfSeparator = string.lastIndexOf(File.separatorChar);
 
-		if (lastIndexOfSeparator == -1) {
+		if (lastIndexOfSeparator >= 0) {
+			return string.substring(lastIndexOfSeparator + 1, string.length());
+		} else {
 			return "";
 		}
-
-		return string.substring(lastIndexOfSeparator + 1, string.length());
 	}
 }
