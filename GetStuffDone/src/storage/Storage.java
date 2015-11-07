@@ -83,22 +83,16 @@ public class Storage {
 	 * Parse the save file into an ArrayList of Tasks
 	 * 
 	 * @return an ArrayList of Task(s). If the save file is empty, return an
-	 *         empty ArrayList of size 0. If there is an error reading the save
-	 *         file, return null.
-	 * @throws IOException 
+	 *         empty ArrayList of size 0. If the save file is incorrect in format, return null.
+	 * @throws IOException if there is an error reading the save file.
 	 */
 	public ArrayList<Task> load() throws IOException {
 
 		String path = preferences.get(KEY_PATH, DEFAULT_PATH);
 
 		ArrayList<Task> tasks = new ArrayList<Task>();
-		List<String> lines = null;
-
-		try {
-			lines = Files.readAllLines(Paths.get(path));
-		} catch (IOException e) {
-			throw new IOException();
-		}
+		
+		List<String> lines = Files.readAllLines(Paths.get(path));
 
 		if (lines.size() % LINES_PER_TASK != 0) {
 			return null;

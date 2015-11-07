@@ -6,7 +6,6 @@ import static org.junit.Assert.*;
 
 import java.io.File;
 import java.io.IOException;
-import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Date;
 
@@ -15,8 +14,6 @@ import org.junit.Before;
 import org.junit.Test;
 
 import task.Task;
-
-
 
 public class StorageTest {
 
@@ -30,8 +27,8 @@ public class StorageTest {
 	private Task taskEvent = null;
 	private Task taskDeadline = null;
 
-	Date dateStart = new Date(0);
-	Date dateEnd = new Date();
+	private Date dateStart = new Date(0);
+	private Date dateEnd = new Date();
 
 	@Before
 	public void setUp() {
@@ -58,7 +55,7 @@ public class StorageTest {
 	}
 
 	@Test
-	public void saveNull() throws IOException, ParseException {
+	public void saveNull() {
 
 		storage.save(null);
 
@@ -66,7 +63,7 @@ public class StorageTest {
 	}
 
 	@Test
-	public void saveEmptyArrayList() throws ParseException, IOException {
+	public void saveEmptyArrayList() throws IOException {
 
 		storage.save(new ArrayList<Task>());
 		tasks = storage.load();
@@ -76,7 +73,7 @@ public class StorageTest {
 	}
 
 	@Test
-	public void saveNullAttributes() throws IOException, ParseException {
+	public void saveNullAttributes() throws IOException {
 
 		tasks.add(new Task());
 
@@ -88,7 +85,7 @@ public class StorageTest {
 	}
 
 	@Test
-	public void saveFourTasks() throws IOException, ParseException {
+	public void saveThreeTasks() throws IOException {
 
 		tasks.add(taskFloating);
 		tasks.add(taskEvent);
@@ -134,10 +131,15 @@ public class StorageTest {
 	}
 	
 	@Test
+	public void setAbsolutePath() {
+		assertTrue(storage.setFilePath(PATH_CURRENT + FILENAME));
+	}
+
+	@Test
 	public void setNonAbsolutePath() {
 		assertFalse(storage.setFilePath("randomFolder" + File.separatorChar + "randomFile.txt"));
 	}
-	
+
 	@Test
 	public void setPathWithNonExistentFolder() {
 		assertFalse(storage.setFilePath(PATH_CURRENT + "random" + File.separatorChar + FILENAME));
