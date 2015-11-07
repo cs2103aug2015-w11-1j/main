@@ -40,7 +40,7 @@ public class testGSDControl {
 	private static final String FEEDBACK_UNDO_ERROR = ">> ERROR : NOTHING TO UNDO\n";
 	private static final String FEEDBACK_REDO_ERROR = ">> ERROR: NOTHING TO REDO\n";
 	private static final String FEEDBACK_FILE_NOT_FOUND = ">> ERROR: FILE TO LOAD DOES NOT EXIST\n";
-	private static final String FEEDBACK_INVALID_TIME_DATE_INPUT = ">> ERROR : INVALID DATE/TIME INPUT\n";
+	private static final String FEEDBACK_INVALID_TIME_DATE_INPUT = ">> ERROR : INVALID DATE/TIME INPUT\nlol";
 
 	private static final String HELP_COMMANDS = "Add a floating task\n" + "Add a deadline task\n" + "Add an event\n"
 			+ "Search for task\n" + "Update a task\n" + "Delete a task\n" + "Mark a task as complete\n"
