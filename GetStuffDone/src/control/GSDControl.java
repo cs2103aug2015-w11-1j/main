@@ -242,12 +242,12 @@ public class GSDControl {
 	public Feedback loadFromFile() {
 		try	{
 		tasks = storage.load();
-		} catch (IOException e)	{
+		} catch (IOException e)	{	//File does not exist
 			tasks = new ArrayList<Task>();
 			return new Feedback(DISPLAY_NO_TASKS, FEEDBACK_FILE_NOT_FOUND, generateInfoBox());
 		}
 
-		if (tasks == null) {
+		if (tasks == null) {	//File contains corrupted info
 			tasks = new ArrayList<Task>();
 			return new Feedback(DISPLAY_NO_TASKS, FEEDBACK_LOAD_ERROR, generateInfoBox());
 		}
