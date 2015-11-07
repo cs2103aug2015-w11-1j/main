@@ -440,7 +440,7 @@ public class Parser {
 
 	
 	/**
-	 * Checks if input contains multiple Time keywords
+	 * Checks if input have extra parameters eg. time is specific after date
 	 * 
 	 * @throws InvalidTimeDateInputException
 	 *             when time/date format is not supported
