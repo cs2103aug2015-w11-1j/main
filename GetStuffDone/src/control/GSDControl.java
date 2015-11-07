@@ -5,6 +5,8 @@ package control;
 import parser.Parser;
 import parser.InvalidParametersException;
 import parser.InvalidTimeDateInputException;
+
+import java.io.IOException;
 import java.util.*;
 import commandDetail.CommandDetails;
 import history.History;
@@ -59,7 +61,8 @@ public class GSDControl {
 	private static final String FEEDBACK_INVALID_TASK_NUMBER = ">> ERROR : INVALID TASK NUMBER\n";
 	private static final String FEEDBACK_UNDO_ERROR = ">> ERROR : NOTHING TO UNDO\n";
 	private static final String FEEDBACK_REDO_ERROR = ">> ERROR: NOTHING TO REDO\n";
-	private static final String FEEDBACK_LOAD_ERROR = ">> ERROR: FAILED TO LOAD FROM FILE\n";
+	private static final String FEEDBACK_LOAD_ERROR = ">> ERROR: FAILED TO LOAD FROM CORRUPTED FILE\n";
+	private static final String FEEDBACK_FILE_NOT_FOUND = ">> ERROR: FILE TO LOAD DOES NOT EXIST\n";
 	private static final String FEEDBACK_INVALID_TIME_DATE_INPUT = ">> ERROR : INVALID DATE/TIME INPUT\n";
 
 	private static final String HELP_COMMANDS = "Add a floating task\n" + "Add a deadline task\n" + "Add an event\n"
@@ -139,19 +142,24 @@ public class GSDControl {
 			String[] temp = input.split(" ");
 			String feedbackString = "";
 			for (int i = 1; i < temp.length; i++) {
-				feedbackString += temp[i] + " ";
+				if(i == temp.length - 1)	{
+					feedbackString += temp[i];
+				}
+				else	{
+					feedbackString += temp[i] + " ";
+				}
 			}
 			return new Feedback(searchTask(), FEEDBACK_SEARCH + feedbackString + "\n", generateInfoBox());
 		case UPDATE:
 			try {
 				String taskDescription = tasks.get(commandDetails.getID() - 1).getDescription();
-				if (this.commandDetails.getDescription() == null || this.commandDetails.getDescription()
-						.equals(tasks.get(commandDetails.getID() - 1).getDescription())) {
+				String commandDetailsDescription = this.commandDetails.getDescription();
+				if (this.commandDetails.getDescription() == null || commandDetailsDescription.equals(taskDescription)) {
 					return new Feedback(updateTask(commandDetails.getID() - 1),
 							FEEDBACK_UPDATE + taskDescription + "\n", generateInfoBox());
 				}
 				return new Feedback(updateTask(commandDetails.getID() - 1),
-						FEEDBACK_UPDATE + taskDescription + " to " + this.commandDetails.getDescription() + "\n",
+						FEEDBACK_UPDATE + taskDescription + " to " + commandDetailsDescription + "\n",
 						generateInfoBox());
 			} catch (IndexOutOfBoundsException e) {
 				isValidTaskNo = false;
@@ -232,8 +240,12 @@ public class GSDControl {
 	 *************************************************************************************************/
 
 	public Feedback loadFromFile() {
-
+		try	{
 		tasks = storage.load();
+		} catch (IOException e)	{
+			tasks = new ArrayList<Task>();
+			return new Feedback(DISPLAY_NO_TASKS, FEEDBACK_FILE_NOT_FOUND, generateInfoBox());
+		}
 
 		if (tasks == null) {
 			tasks = new ArrayList<Task>();

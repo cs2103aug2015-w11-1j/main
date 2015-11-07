@@ -1,6 +1,6 @@
 package control;
 
-//@@author A0124472L
+//@@author A0110616W
 
 import static org.junit.Assert.*;
 
@@ -35,12 +35,11 @@ public class testGSDControl {
 	private static final String FEEDBACK_HELP = ">> Called for help!\n";
 	private static final String FEEDBACK_SET = ">> File path set to ";
 	private static final String FEEDBACK_INVALID_FILE_PATH = ">> ERROR : INVALID FILE PATH\n";
-	private static final String FEEDBACK_INVALID_COMMAND = ">> ERROR : INVALID COMMAND\n";
 	private static final String FEEDBACK_INVALID_COMMAND_FORMAT = ">> ERROR : INVALID COMMAND FORMAT\n";
 	private static final String FEEDBACK_INVALID_TASK_NUMBER = ">> ERROR : INVALID TASK NUMBER\n";
 	private static final String FEEDBACK_UNDO_ERROR = ">> ERROR : NOTHING TO UNDO\n";
 	private static final String FEEDBACK_REDO_ERROR = ">> ERROR: NOTHING TO REDO\n";
-	private static final String FEEDBACK_LOAD_ERROR = ">> ERROR: FAILED TO LOAD FROM FILE\n";
+	private static final String FEEDBACK_FILE_NOT_FOUND = ">> ERROR: FILE TO LOAD DOES NOT EXIST\n";
 	private static final String FEEDBACK_INVALID_TIME_DATE_INPUT = ">> ERROR : INVALID DATE/TIME INPUT\n";
 
 	private static final String HELP_COMMANDS = "Add a floating task\n" + "Add a deadline task\n" + "Add an event\n"
@@ -58,8 +57,10 @@ public class testGSDControl {
 	private static final String PATH_CURRENT = System.getProperty("user.dir") + File.separatorChar;
 	private static final String FILENAME = "saveFile.txt";
 
-	private static final String DEFAULT_TASK = "1. TASK" + "\nStart Date: " + "\nDeadline: " + "\n";
-	private static final String UPDATED_TASK = "1. NOTHING" + "\nStart Date: " + "\nDeadline: " + "\n";
+	private static final String DEFAULT_TASK = "\t\tINCOMPLETED\n\n1. TASK" + "\nStart Date: -" + "\nDeadline: -" + "\n\n";
+	private static final String DEFAULT_TASK_COMPLETED = "\t\tCOMPLETED\n\n1. TASK" + "\nStart Date: -" + "\nDeadline: -" + "\n\n";
+	private static final String DEFAULT_TASK_DESCRIPTION = "TASK\n";
+	private static final String UPDATED_TASK = "\t\tINCOMPLETED\n\n1. NOTHING" + "\nStart Date: -" + "\nDeadline: -" + "\n\n";
 	private static final String INFO_BOX = "Floating Tasks = 1" + "\nEvents = 0" + "\nDeadlines = 0"
 			+ "\nTotal No. of Tasks = 1" + "\n";
 	private static final String INFO_BOX_EVENTS = "Floating Tasks = 0" + "\nEvents = 1" + "\nDeadlines = 0"
@@ -74,6 +75,7 @@ public class testGSDControl {
 
 	@Before
 	public void setUp() {
+		gsd.loadFromFile();
 		input = "set " + PATH_CURRENT + FILENAME;
 		gsd.processInput(input);
 
@@ -82,7 +84,7 @@ public class testGSDControl {
 	@Test
 	public void testCreateTask() {
 		input = "add TASK";
-		check = new Feedback(DEFAULT_TASK, FEEDBACK_ADD + "TASK\n", INFO_BOX);
+		check = new Feedback(DEFAULT_TASK, FEEDBACK_ADD + DEFAULT_TASK_DESCRIPTION, INFO_BOX);
 		feedback = gsd.processInput(input);
 		assertEquals(feedback.getDisplayString(), check.getDisplayString());
 		assertEquals(feedback.getFeedbackString(), check.getFeedbackString());
@@ -94,7 +96,7 @@ public class testGSDControl {
 		input = "add TASK";
 		gsd.processInput(input);
 		input = "search TASK";
-		check = new Feedback(DEFAULT_TASK, FEEDBACK_SEARCH + "TASK\n", INFO_BOX);
+		check = new Feedback(DEFAULT_TASK, FEEDBACK_SEARCH + DEFAULT_TASK_DESCRIPTION, INFO_BOX);
 		feedback = gsd.processInput(input);
 		assertEquals(feedback.getDisplayString(), check.getDisplayString());
 		assertEquals(feedback.getFeedbackString(), check.getFeedbackString());
@@ -162,7 +164,7 @@ public class testGSDControl {
 		input = "add TASK";
 		gsd.processInput(input);
 		input = "complete 1";
-		check = new Feedback(DEFAULT_TASK, FEEDBACK_COMPLETE + "TASK\n", INFO_BOX);
+		check = new Feedback(DEFAULT_TASK_COMPLETED, FEEDBACK_COMPLETE + "TASK\n", INFO_BOX);
 		feedback = gsd.processInput(input);
 		assertEquals(feedback.getDisplayString(), check.getDisplayString());
 		assertEquals(feedback.getFeedbackString(), check.getFeedbackString());
@@ -338,10 +340,12 @@ public class testGSDControl {
 	@Test
 	public void testHelp() {
 		input = "help";
-		check = new Feedback(HELP, FEEDBACK_HELP, INFO_BOX);
+		check = new Feedback(null, FEEDBACK_HELP, INFO_BOX, HELP_COMMANDS, HELP_SYNTAX);
 		feedback = gsd.processInput(input);
 		assertEquals(feedback.getDisplayString(), check.getDisplayString());
 		assertEquals(feedback.getFeedbackString(), check.getFeedbackString());
+		assertEquals(feedback.getHelpCommandString(), check.getHelpCommandString());
+		assertEquals(feedback.getHelpSyntaxString(), check.getHelpSyntaxString());
 		assertNotEquals(feedback.getInfoString(), check.getInfoString());
 	}
 
@@ -358,17 +362,7 @@ public class testGSDControl {
 	@Test
 	public void testSetFail() {
 		input = "set LOLKAPPAPRIDE";
-		check = new Feedback(null, FEEDBACK_SET_ERROR, INFO_BOX);
-		feedback = gsd.processInput(input);
-		assertEquals(feedback.getDisplayString(), check.getDisplayString());
-		assertEquals(feedback.getFeedbackString(), check.getFeedbackString());
-		assertNotEquals(feedback.getInfoString(), check.getInfoString());
-	}
-
-	@Test
-	public void testInvalid() {
-		input = "LOLKAPPAPRIDE";
-		check = new Feedback(null, FEEDBACK_INVALID_COMMAND, INFO_BOX);
+		check = new Feedback(null, FEEDBACK_INVALID_FILE_PATH, INFO_BOX);
 		feedback = gsd.processInput(input);
 		assertEquals(feedback.getDisplayString(), check.getDisplayString());
 		assertEquals(feedback.getFeedbackString(), check.getFeedbackString());
@@ -377,11 +371,49 @@ public class testGSDControl {
 
 	@Test
 	public void testLoadFromFile() {
-		check = new Feedback(DISPLAY_NO_TASKS, FEEDBACK_WELCOME_MESSAGE, INFO_BOX);
+		input = "add TASK";
+		gsd.processInput(input);
+		check = new Feedback(DEFAULT_TASK, FEEDBACK_WELCOME_MESSAGE, INFO_BOX);
+		feedback = gsd.loadFromFile();
+		assertEquals(feedback.getDisplayString(), check.getDisplayString());
+		assertEquals(feedback.getFeedbackString(), check.getFeedbackString());
+		assertEquals(feedback.getInfoString(), check.getInfoString());
+	}
+	
+	@Test
+	public void testLoadFromFileNothing() {
+		check = new Feedback(DISPLAY_NO_TASKS, FEEDBACK_FILE_NOT_FOUND, INFO_BOX);
 		feedback = gsd.loadFromFile();
 		assertEquals(feedback.getDisplayString(), check.getDisplayString());
 		assertEquals(feedback.getFeedbackString(), check.getFeedbackString());
 		assertNotEquals(feedback.getInfoString(), check.getInfoString());
+	}
+	
+	@Test
+	public void testInvalidTimeDateInput()	{
+		input = "add TASK by today 7pm";
+		check = new Feedback(null, FEEDBACK_INVALID_TIME_DATE_INPUT, INFO_BOX);
+		feedback = gsd.processInput(input);
+		assertEquals(feedback.getDisplayString(), check.getDisplayString());
+		assertEquals(feedback.getFeedbackString(), check.getFeedbackString());
+		assertNotEquals(feedback.getInfoString(), check.getInfoString());
+		input = "add TASK";
+		gsd.processInput(input);
+		input = "update 1 TASK by today 7pm";
+		check = new Feedback(null, FEEDBACK_INVALID_TIME_DATE_INPUT, INFO_BOX);
+		feedback = gsd.processInput(input);
+		assertEquals(feedback.getDisplayString(), check.getDisplayString());
+		assertEquals(feedback.getFeedbackString(), check.getFeedbackString());
+		assertEquals(feedback.getInfoString(), check.getInfoString());
+		input = "delete 1";
+		gsd.processInput(input);
+		input = "search TASK by today 7pm";
+		check = new Feedback(null, FEEDBACK_INVALID_TIME_DATE_INPUT, INFO_BOX);
+		feedback = gsd.processInput(input);
+		assertEquals(feedback.getDisplayString(), check.getDisplayString());
+		assertEquals(feedback.getFeedbackString(), check.getFeedbackString());
+		assertNotEquals(feedback.getInfoString(), check.getInfoString());
+		
 	}
 
 	@Test

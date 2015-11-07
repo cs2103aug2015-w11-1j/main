@@ -85,8 +85,9 @@ public class Storage {
 	 * @return an ArrayList of Task(s). If the save file is empty, return an
 	 *         empty ArrayList of size 0. If there is an error reading the save
 	 *         file, return null.
+	 * @throws IOException 
 	 */
-	public ArrayList<Task> load() {
+	public ArrayList<Task> load() throws IOException {
 
 		String path = preferences.get(KEY_PATH, DEFAULT_PATH);
 
@@ -96,7 +97,7 @@ public class Storage {
 		try {
 			lines = Files.readAllLines(Paths.get(path));
 		} catch (IOException e) {
-			return null;
+			throw new IOException();
 		}
 
 		if (lines.size() % LINES_PER_TASK != 0) {
