@@ -387,6 +387,8 @@ public class Parser {
 				myDate = possibleFormats.parse(input);
 				cal.setTime(myDate);
 
+				checkInput(input, formatParsed);
+
 				checkKeywords(input, formatParsed);
 
 				for (String days : TIME_KEYWORDS) {
@@ -434,6 +436,27 @@ public class Parser {
 			}
 		}
 		throw new InvalidTimeDateInputException(input);
+	}
+
+	
+	/**
+	 * Checks if input contains multiple Time keywords
+	 * 
+	 * @throws InvalidTimeDateInputException
+	 *             when time/date format is not supported
+	 */
+	private static void checkInput(String input, String formatParsed) throws InvalidTimeDateInputException {
+		int numOfTokInput = new ArrayList<String>(Arrays.asList(input.split(" "))).size();
+		int numOfTokformat;
+
+		for (String format : DATE_ONLY_FORMAT) {
+			if (format.equals(formatParsed)) {
+				numOfTokformat = new ArrayList<String>(Arrays.asList(input.split(" "))).size();
+				if (numOfTokInput != numOfTokformat) {
+					throw new InvalidTimeDateInputException(input);
+				}
+			}
+		}
 	}
 
 	/**
