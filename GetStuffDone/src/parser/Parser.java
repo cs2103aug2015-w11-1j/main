@@ -389,7 +389,7 @@ public class Parser {
 				cal.setTime(myDate);
 
 				checkKeywords(input, formatParsed);
-
+				checkInput(input, formatParsed);
 				for (String days : TIME_KEYWORDS) {
 					if (input.toUpperCase().contains(days)) {
 						myDate = addDefaultDate(input, myDate, cal);
@@ -435,6 +435,26 @@ public class Parser {
 			}
 		}
 		throw new InvalidTimeDateInputException(input);
+	}
+
+	/**
+	 * Checks if input have extra parameters eg. time is specific after date
+	 * 
+	 * @throws InvalidTimeDateInputException
+	 *             when time/date format is not supported
+	 */
+	private static void checkInput(String input, String formatParsed) throws InvalidTimeDateInputException {
+		int numOfTokInput = new ArrayList<String>(Arrays.asList(input.split(" "))).size();
+		int numOfTokformat;
+
+		for (String format : DATE_ONLY_FORMAT) {
+			if (format.equals(formatParsed)) {
+				numOfTokformat = new ArrayList<String>(Arrays.asList(formatParsed.split(" "))).size();
+				if (numOfTokInput != numOfTokformat) {
+					throw new InvalidTimeDateInputException(input);
+				}
+			}
+		}
 	}
 
 	/**
