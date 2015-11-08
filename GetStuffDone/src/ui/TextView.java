@@ -12,7 +12,7 @@ import javax.swing.text.Style;
 import javax.swing.text.StyleConstants;
 import javax.swing.text.StyledDocument;
 
-/*
+/**
  * TextView is an UI component for displaying text in different styles e.g.
  * font, size, text colour, background colour etc.
  */
@@ -51,8 +51,8 @@ public class TextView extends JScrollPane {
 		initializeStyles();
 	}
 
-	/*
-	 * Display the specified text with normal style
+	/**
+	 * Display the specified text with the specified style
 	 * 
 	 * @param text
 	 *            is the text to be displayed
@@ -83,7 +83,7 @@ public class TextView extends JScrollPane {
 		}
 	}
 
-	/*
+	/**
 	 * Clear all the displayed text in TextView
 	 */
 	public void clear() {

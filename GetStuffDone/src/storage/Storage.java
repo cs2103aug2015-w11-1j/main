@@ -83,15 +83,17 @@ public class Storage {
 	 * Parse the save file into an ArrayList of Tasks
 	 * 
 	 * @return an ArrayList of Task(s). If the save file is empty, return an
-	 *         empty ArrayList of size 0. If the save file is incorrect in format, return null.
-	 * @throws IOException if there is an error reading the save file.
+	 *         empty ArrayList of size 0. If the save file is incorrect in
+	 *         format, return null.
+	 * @throws IOException
+	 *             if there is an error reading the save file.
 	 */
 	public ArrayList<Task> load() throws IOException {
 
 		String path = preferences.get(KEY_PATH, DEFAULT_PATH);
 
 		ArrayList<Task> tasks = new ArrayList<Task>();
-		
+
 		List<String> lines = Files.readAllLines(Paths.get(path));
 
 		if (lines.size() % LINES_PER_TASK != 0) {
@@ -181,7 +183,7 @@ public class Storage {
 	}
 
 	private String parseString(String string) {
-		
+
 		assert(string != null);
 
 		if (string.isEmpty()) {
@@ -194,7 +196,7 @@ public class Storage {
 	private Date parseDate(String string) throws ParseException {
 
 		assert(string != null);
-		
+
 		if (string.isEmpty()) {
 			return null;
 		} else {
@@ -203,7 +205,7 @@ public class Storage {
 	}
 
 	private boolean parseStatus(String string) {
-		
+
 		assert(string != null);
 
 		if (string.equalsIgnoreCase(STATUS_COMPLETED)) {
@@ -214,7 +216,7 @@ public class Storage {
 	}
 
 	private String getFolderPath(String string) {
-		
+
 		assert(string != null);
 
 		int lastIndexOfSeparator = string.lastIndexOf(File.separatorChar);
@@ -227,7 +229,7 @@ public class Storage {
 	}
 
 	private String getFileName(String string) {
-		
+
 		assert(string != null);
 
 		int lastIndexOfSeparator = string.lastIndexOf(File.separatorChar);
