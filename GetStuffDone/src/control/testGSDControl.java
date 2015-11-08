@@ -496,5 +496,4 @@ public class testGSDControl {
 		File file = new File(PATH_CURRENT + FILENAME);
 		file.delete();
 	}
-
 }
