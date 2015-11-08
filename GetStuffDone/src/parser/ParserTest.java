@@ -15,6 +15,10 @@ public class ParserTest {
 	 ************************************* START DATE FORMAT TEST ************************************
 	 *************************************************************************************************/
 	
+	
+	/** following tests all different Date format when parsed as start time
+	*/
+	
 	@Test
 	public void startTest1() throws Exception {
 		String input = "add dinner FROM 1234 01 january 23";
@@ -1199,6 +1203,8 @@ public class ParserTest {
 	 ************************************* END DATE FORMAT TEST **************************************
 	 *************************************************************************************************/
 	
+	/** following tests all different Date format when parsed as end time
+	*/
 	public void endTest1() throws Exception {
 		String input = "add dinner on 1234 01 december 23";
 
@@ -2520,4 +2526,10 @@ public class ParserTest {
 		assertEquals("", Parser.parse(input).getStartDate());
 	}
 	
+	@Test(expected = InvalidTimeDateInputException.class)
+	public void timeBeforeDate() throws Exception {
+		String input = "add dinner at 7/12 8pm";
+		assertEquals(input, Parser.parse(input));
+	
+	}
 }
