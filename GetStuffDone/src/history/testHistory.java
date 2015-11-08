@@ -1,5 +1,7 @@
 package history;
 
+//@@author A0121834M
+
 import org.junit.Test;
 
 import commandDetail.CommandDetails;
@@ -44,14 +46,10 @@ public class testHistory {
 
 	@Test
 	public void testUndo() {
-		CommandDetails.COMMANDS commandUpdate = CommandDetails.COMMANDS.UPDATE;
-		CommandDetails cmdDetUpdateNew = new CommandDetails(commandUpdate, "new test", testDate, testDeadline, testID);
-		CommandDetails cmdDetUpdateOld = new CommandDetails(commandUpdate, testDescription, testDate, testDeadline,
-				testID);
 		// case 1: undoStack is empty
 		assertEquals(history.undo(), null);
 
-		// case 2: undoStack first element is not update
+		// case 2: undoStack is not empty
 		history.insert(cmdDet);
 		CommandDetails temp = history.undo();
 		assertEquals(temp, cmdDet);
@@ -59,29 +57,14 @@ public class testHistory {
 
 		history.clear();
 		temp = null;
-
-		// case 3: undoStack first element is update
-		history.insert(cmdDetUpdateOld);
-		history.insert(cmdDetUpdateNew);
-		temp = history.undo();
-		assertEquals(history.getUndoStack().empty(), true);
-		assertEquals(history.getRedoStack().peek(), cmdDetUpdateOld);
-		history.getRedoStack().pop();
-		assertEquals(history.getRedoStack().peek(), cmdDetUpdateNew);
-		assertEquals(temp, cmdDetUpdateOld);
-		history.clear();
 	}
 
 	@Test
 	public void testRedo() {
-		CommandDetails.COMMANDS commandUpdate = CommandDetails.COMMANDS.UPDATE;
-		CommandDetails cmdDetUpdateNew = new CommandDetails(commandUpdate, "new test", testDate, testDeadline, testID);
-		CommandDetails cmdDetUpdateOld = new CommandDetails(commandUpdate, testDescription, testDate, testDeadline,
-				testID);
 		// case 1: redoStack is empty
 		assertEquals(history.redo(), null);
 
-		// case 2: redoStack second element is not update
+		// case 2: redoStack is not empty
 		history.insert(cmdDet);
 		history.undo();
 		CommandDetails temp = history.redo();
@@ -90,18 +73,5 @@ public class testHistory {
 
 		history.clear();
 		temp = null;
-
-		// case 3: redoStack second element is update
-		history.insert(cmdDetUpdateOld);
-		history.insert(cmdDetUpdateNew);
-		history.undo();
-		temp = history.redo();
-		assertEquals(history.getRedoStack().empty(), true);
-		assertEquals(history.getUndoStack().peek(), cmdDetUpdateNew);
-		history.getUndoStack().pop();
-		assertEquals(history.getUndoStack().peek(), cmdDetUpdateOld);
-		assertEquals(temp, cmdDetUpdateNew);
-		history.clear();
 	}
-
 }

@@ -1,5 +1,7 @@
 package history;
 
+//@@author A0121834M
+
 import java.util.Stack;
 
 import commandDetail.CommandDetails;
@@ -58,7 +60,10 @@ public class History {
 			return latest;
 		}
 	}
-
+	
+	/** 
+	 * Returns the last undo action, returns null if redoStack is empty
+	 */
 	public CommandDetails redo() {
 		if (redoStack.isEmpty()) {
 			return null;

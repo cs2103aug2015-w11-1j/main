@@ -1,5 +1,6 @@
 package commandDetail;
 
+//@@author A0121834M
 //@@author A0110616W
 
 import java.util.Date;
@@ -30,11 +31,13 @@ public class CommandDetails {
 	private Task newTask;
 
 	public enum COMMANDS {
-		ADD, DELETE, SEARCH, UPDATE, COMPLETE, INCOMPLETE, UNDO, REDO, HELP, ALL, FLOATING, EVENTS, DEADLINES, EXIT, INVALID, SET,
+		ADD, DELETE, SEARCH, UPDATE, COMPLETE, INCOMPLETE, UNDO, REDO, HELP, ALL, 
+		FLOATING, EVENTS, DEADLINES, EXIT, INVALID, SET,
 	}
 
 	// Constructors
-	public CommandDetails(COMMANDS command, String description, Date startDate, Date deadline, int ID) {
+	public CommandDetails(COMMANDS command, String description, Date startDate, 
+			Date deadline, int ID) {
 		this.deadline = deadline;
 		this.startDate = startDate;
 		this.description = description;
@@ -43,7 +46,8 @@ public class CommandDetails {
 
 	}
 
-	public CommandDetails(COMMANDS command, String description, Date startDate, Date deadline, int ID, Task newTask) {
+	public CommandDetails(COMMANDS command, String description, Date startDate, 
+			Date deadline, int ID, Task newTask) {
 		this.deadline = deadline;
 		this.startDate = startDate;
 		this.description = description;
@@ -52,8 +56,9 @@ public class CommandDetails {
 		this.newTask = newTask;
 	}
 
-	public CommandDetails(COMMANDS command, String description, Date startDate, Date deadline, int ID, String recurring,
-			Date originalStartDate, Date originalDeadline, Date endingDate, Task oldTask, Task newTask) {
+	public CommandDetails(COMMANDS command, String description, Date startDate, 
+			Date deadline, int ID, Date originalStartDate, Date originalDeadline, 
+			Date endingDate, Task oldTask, Task newTask) {
 		this.deadline = deadline;
 		this.startDate = startDate;
 		this.description = description;
@@ -72,6 +77,7 @@ public class CommandDetails {
 	}
 
 	// Accessors
+	
 	public COMMANDS getCommand() {
 		return this.command;
 	}

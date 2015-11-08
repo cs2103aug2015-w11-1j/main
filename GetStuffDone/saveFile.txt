@@ -1,45 +1,12 @@
-test
-Not completed
-30 October 15 01:13:00
-30 October 15 01:13:00
-11 November 15 00:00:00
-DAILY
-29 October 15 01:13:00
-29 October 15 01:13:00
-1
-test
-Not completed
-05 November 15 01:13:00
-05 November 15 01:13:00
-11 November 18 00:00:00
-WEEKLY
-29 October 15 01:13:00
-29 October 15 01:13:00
-1
-test
-Not completed
-29 October 16 01:13:00
-29 October 16 01:13:00
-11 November 18 00:00:00
-YEARLY
-29 October 15 01:13:00
-29 October 15 01:13:00
-1
-test
-Not completed
-28 June 15 00:00:00
-28 June 15 00:00:00
-11 November 18 00:00:00
-MONTHLY
-28 February 15 00:00:00
-28 February 15 00:00:00
-5
-test
-Not completed
-31 January 15 00:00:00
-31 January 15 00:00:00
-11 November 18 00:00:00
-MONTHLY
-31 January 15 00:00:00
-31 January 15 00:00:00
-0
+Sample task
+Uncompleted
+
+11:59PM 08/Nov/2015
+Complete income tax report
+Completed
+
+11:00AM 09/Nov/2015
+Sample task for tomorrow
+Uncompleted
+
+11:59PM 09/Nov/2015
