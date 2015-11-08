@@ -678,7 +678,7 @@ public class Parser {
 			case "REMOVE":
 				input.remove(FIRST_IN_ARRAYLIST);
 				return CommandDetails.COMMANDS.DELETE;
-			case "=D":
+			case "-D":
 				input.remove(FIRST_IN_ARRAYLIST);
 				return CommandDetails.COMMANDS.DELETE;
 			case "COMPLETE":
