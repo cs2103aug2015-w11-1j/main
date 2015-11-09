@@ -21,7 +21,7 @@ public class ParserTest {
 	
 	@Test
 	public void startTest1() throws Exception {
-		String input = "add dinner FROM 1234 01 january 23";
+		String input = "add dinner FROM 1234 01 january 23 to 01 feb 25";
 
 		SimpleDateFormat sdf = new SimpleDateFormat("HHmm dd MMMM yy");
 		Date date = sdf.parse("1234 01 january 23");
@@ -31,7 +31,7 @@ public class ParserTest {
 
 	@Test
 	public void startTest2() throws Exception {
-		String input = "add dinner FROM 12.34 01 january 23";
+		String input = "add dinner FROM 12.34 01 january 23 to 01 feb 25";
 
 		SimpleDateFormat sdf = new SimpleDateFormat("HH.mm dd MMMM yy");
 		Date date = sdf.parse("12.34 01 january 23");
@@ -41,7 +41,7 @@ public class ParserTest {
 
 	@Test
 	public void startTest3() throws Exception {
-		String input = "add dinner FROM 12:34 01 january 23";
+		String input = "add dinner FROM 12:34 01 january 23 to 01 feb 25";
 
 		SimpleDateFormat sdf = new SimpleDateFormat("HH:mm dd MMMM yy");
 		Date date = sdf.parse("12:34 01 january 23");
@@ -50,7 +50,7 @@ public class ParserTest {
 
 	@Test
 	public void startTest4() throws Exception {
-		String input = "add dinner FROM 1234am 01 january 23";
+		String input = "add dinner FROM 1234am 01 january 23 to 01 feb 25";
 
 		SimpleDateFormat sdf = new SimpleDateFormat("hhmma dd MMMM yy");
 		Date date = sdf.parse("1234am 01 january 23");
@@ -59,7 +59,7 @@ public class ParserTest {
 
 	@Test
 	public void startTest5() throws Exception {
-		String input = "add dinner FROM 7pm 01 jan 2023";
+		String input = "add dinner FROM 7pm 01 jan 2023 to 01 feb 25";
 
 		SimpleDateFormat sdf = new SimpleDateFormat("hha dd MMMM yy");
 		Date date = sdf.parse("7pm 01 jan 2023");
@@ -1142,7 +1142,7 @@ public class ParserTest {
 		cal.set(Calendar.YEAR, Calendar.getInstance().get(Calendar.YEAR));
 		cal.set(Calendar.DAY_OF_YEAR, Calendar.getInstance().get(Calendar.DAY_OF_YEAR));
 		int days = (Calendar.MONDAY - cal.get(Calendar.DAY_OF_WEEK)) % 7;
-		if (days < 0) {
+		if (days <= 0) {
 			days = days + 7;
 		}
 		cal.add(Calendar.DAY_OF_YEAR, days);
@@ -2421,19 +2421,19 @@ public class ParserTest {
 	
 	@Test
 	public void testCmd() throws Exception {
-		String input = "add dinner FROM 12.34 01 january 23";
+		String input = "add dinner FROM 12.34 01 january 23 to 01 feb 25";
 		assertEquals(CommandDetails.COMMANDS.ADD, Parser.parse(input).getCommand());
 	}
 
 	@Test
 	public void testDefaultCmd() throws Exception {
-		String input = "dinner FROM 12.34 01 january 23";
+		String input = "dinner FROM 12.34 01 january 23 to 01 feb 25";
 		assertEquals(CommandDetails.COMMANDS.ADD, Parser.parse(input).getCommand());
 	}
 
 	@Test
 	public void testCmdWhiteSpace() throws Exception {
-		String input = "dinner FROM 12.34 01 january 23";
+		String input = "       dinner FROM 12.34 01 january 23 to 01 feb 25";
 		assertEquals(CommandDetails.COMMANDS.ADD, Parser.parse(input).getCommand());
 	}
 	
