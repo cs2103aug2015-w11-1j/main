@@ -842,7 +842,6 @@ public class Parser {
 		isKeywordAt = isEventTaskofAT(strTokens);
 		start = parseStartDate(strTokens);
 		if (isKeywordAt) {
-			// end = start;
 			end = setEndDate(start);
 		}
 		description = parseDescription(strTokens);
