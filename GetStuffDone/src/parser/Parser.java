@@ -958,6 +958,10 @@ public class Parser {
 			if (checkDescription.equals("")) {
 				throw new InvalidParametersException(input);
 			}
+			
+			if(start!=null && end==null){
+				throw new InvalidParametersException(input);
+			}
 		}
 		if (command == CommandDetails.COMMANDS.SET) {
 			if (description == null || start != null || end != null) {
@@ -1039,15 +1043,12 @@ public class Parser {
 		input = input.trim().replaceAll(" +", " ").toUpperCase();
 		ArrayList<String> strTokens = new ArrayList<String>(Arrays.asList(input.split(" ")));
 
-		if (strTokens.contains("FROM") && (strTokens.contains("ON") || strTokens.contains("BY"))) {
-			throw new InvalidParametersException("FROM not TO");
-		}
 
 		if (strTokens.contains("AT")
 				&& (strTokens.contains("ON") || strTokens.contains("BY") || strTokens.contains("TO"))) {
 			throw new InvalidParametersException("AT matched with end date");
 		}
-
+		
 	}
 
 }
